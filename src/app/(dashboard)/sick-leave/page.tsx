@@ -5,6 +5,9 @@ import { useState } from 'react';
 
 export default function SickLeavePage() {
   const { data: session } = useSession();
+  
+  // Session will be used for user-specific sick leave data
+  console.log('Sick leave session:', session?.user?.id);
   const [selectedTab, setSelectedTab] = useState('overview');
   
   // User info will be used when implementing sick leave functionality

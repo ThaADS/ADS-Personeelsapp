@@ -6,6 +6,9 @@ import { useState } from 'react';
 export default function EmployeesPage() {
   const { data: session } = useSession();
   
+  // Session will be used for role-based access control
+  console.log('Employee management session:', session?.user?.role);
+  
   // User permissions will be checked when implementing actions
   // const canManageEmployees = session?.user?.role === 'TENANT_ADMIN' || session?.user?.role === 'MANAGER';
   const [searchTerm, setSearchTerm] = useState('');

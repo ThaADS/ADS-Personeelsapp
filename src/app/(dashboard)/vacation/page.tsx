@@ -5,6 +5,9 @@ import { useState } from 'react';
 
 export default function VacationPage() {
   const { data: session } = useSession();
+  
+  // Session will be used for user-specific vacation data
+  console.log('Vacation session:', session?.user?.id);
   const [selectedTab, setSelectedTab] = useState('overview');
   
   // User info will be used when implementing vacation functionality

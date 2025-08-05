@@ -6,6 +6,9 @@ import { useState } from 'react';
 export default function ProfilePage() {
   const { data: session } = useSession();
   
+  // Session will be used for profile data when implementing backend integration
+  console.log('Profile session:', session?.user?.name);
+  
   // User session data will be used when implementing profile display
   // const userName = session?.user?.name || 'Gebruiker';
   // const userEmail = session?.user?.email || '';
@@ -119,6 +122,7 @@ export default function ProfilePage() {
                   value={profileData.email}
                   disabled={!isEditing}
                   onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                  aria-label="E-mailadres wijzigen"
                   className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                     !isEditing ? 'bg-gray-50' : ''
                   }`}
@@ -131,6 +135,7 @@ export default function ProfilePage() {
                   value={profileData.phone}
                   disabled={!isEditing}
                   onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                  aria-label="Telefoonnummer wijzigen"
                   className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                     !isEditing ? 'bg-gray-50' : ''
                   }`}
@@ -190,6 +195,7 @@ export default function ProfilePage() {
                   type="text"
                   value={profileData.employeeId}
                   disabled
+                  aria-label="Personeelsnummer (alleen lezen)"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
                 />
               </div>
@@ -199,6 +205,7 @@ export default function ProfilePage() {
                   type="text"
                   value={profileData.department}
                   disabled
+                  aria-label="Afdeling (alleen lezen)"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
                 />
               </div>
@@ -208,6 +215,7 @@ export default function ProfilePage() {
                   type="text"
                   value={profileData.position}
                   disabled
+                  aria-label="Functie (alleen lezen)"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
                 />
               </div>
@@ -217,6 +225,7 @@ export default function ProfilePage() {
                   type="text"
                   value={profileData.startDate}
                   disabled
+                  aria-label="Startdatum in dienst (alleen lezen)"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
                 />
               </div>
@@ -226,6 +235,7 @@ export default function ProfilePage() {
                   type="text"
                   value={profileData.contractType}
                   disabled
+                  aria-label="Contract type (alleen lezen)"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
                 />
               </div>
@@ -235,6 +245,7 @@ export default function ProfilePage() {
                   type="text"
                   value={profileData.workHours}
                   disabled
+                  aria-label="Werkuren per week (alleen lezen)"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
                 />
               </div>

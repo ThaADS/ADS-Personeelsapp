@@ -5,6 +5,9 @@ import { useState } from 'react';
 
 export default function SettingsPage() {
   const { data: session } = useSession();
+  
+  // Session will be used for admin permissions check
+  console.log('Settings session:', session?.user?.role);
   const [selectedTab, setSelectedTab] = useState('general');
   
   // Admin permissions will be checked when implementing settings actions
