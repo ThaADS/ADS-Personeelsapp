@@ -1,0 +1,118 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "timesheet": "Tijdregistratie",
+    "vacation": "Vakantie",
+    "sickLeave": "Ziekmeldingen",
+    "profile": "Mijn Profiel",
+    "employees": "Werknemers",
+    "approvals": "Goedkeuringen",
+    "settings": "Instellingen",
+    "logout": "Uitloggen"
+  },
+  "auth": {
+    "login": "Inloggen",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "loginButton": "Inloggen",
+    "loginProgress": "Bezig met inloggen...",
+    "loginError": "Ongeldige inloggegevens",
+    "welcome": "Welkom terug!"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welkom bij CKW Personeelsapp",
+    "quickActions": "Snelle acties",
+    "recentActivity": "Recente activiteit",
+    "notifications": "Meldingen"
+  },
+  "timesheet": {
+    "title": "Tijdregistratie",
+    "addEntry": "Uren toevoegen",
+    "startTime": "Starttijd",
+    "endTime": "Eindtijd",
+    "breakTime": "Pauze",
+    "description": "Beschrijving",
+    "save": "Opslaan",
+    "cancel": "Annuleren"
+  },
+  "vacation": {
+    "title": "Vakantie & Verlof",
+    "requestVacation": "Vakantie aanvragen",
+    "startDate": "Startdatum",
+    "endDate": "Einddatum",
+    "reason": "Reden",
+    "submit": "Indienen",
+    "balance": "Saldo",
+    "approved": "Goedgekeurd",
+    "pending": "In behandeling",
+    "rejected": "Afgewezen"
+  },
+  "sickLeave": {
+    "title": "Ziekmeldingen",
+    "reportSick": "Ziek melden",
+    "reportRecovery": "Herstel melden",
+    "sickFrom": "Ziek vanaf",
+    "expectedReturn": "Verwachte terugkeer",
+    "symptoms": "Symptomen",
+    "doctorVisit": "Doktersbezoek"
+  },
+  "profile": {
+    "title": "Mijn Profiel",
+    "personalInfo": "Persoonlijke gegevens",
+    "workInfo": "Werkgegevens",
+    "settings": "Instellingen",
+    "firstName": "Voornaam",
+    "lastName": "Achternaam",
+    "phone": "Telefoon",
+    "address": "Adres",
+    "department": "Afdeling",
+    "position": "Functie",
+    "startDate": "Startdatum"
+  },
+  "employees": {
+    "title": "Werknemers",
+    "search": "Zoeken...",
+    "filter": "Filter",
+    "department": "Afdeling",
+    "status": "Status",
+    "active": "Actief",
+    "inactive": "Inactief"
+  },
+  "approvals": {
+    "title": "Goedkeuringen",
+    "pending": "In behandeling",
+    "approved": "Goedgekeurd",
+    "rejected": "Afgewezen",
+    "approve": "Goedkeuren",
+    "reject": "Afwijzen",
+    "comment": "Opmerking"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "general": "Algemeen",
+    "company": "Bedrijf",
+    "notifications": "Meldingen",
+    "security": "Beveiliging",
+    "language": "Taal",
+    "theme": "Thema",
+    "light": "Licht",
+    "dark": "Donker",
+    "system": "Systeem"
+  },
+  "common": {
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "view": "Bekijken",
+    "close": "Sluiten",
+    "yes": "Ja",
+    "no": "Nee",
+    "loading": "Laden...",
+    "error": "Fout",
+    "success": "Succes",
+    "warning": "Waarschuwing",
+    "info": "Informatie"
+  }
+}

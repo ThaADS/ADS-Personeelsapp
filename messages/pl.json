@@ -1,0 +1,118 @@
+{
+  "navigation": {
+    "dashboard": "Panel główny",
+    "timesheet": "Rejestracja czasu",
+    "vacation": "Urlop",
+    "sickLeave": "Zwolnienie lekarskie",
+    "profile": "Mój profil",
+    "employees": "Pracownicy",
+    "approvals": "Zatwierdzenia",
+    "settings": "Ustawienia",
+    "logout": "Wyloguj"
+  },
+  "auth": {
+    "login": "Zaloguj",
+    "email": "Adres e-mail",
+    "password": "Hasło",
+    "loginButton": "Zaloguj",
+    "loginProgress": "Logowanie...",
+    "loginError": "Nieprawidłowe dane logowania",
+    "welcome": "Witaj ponownie!"
+  },
+  "dashboard": {
+    "title": "Panel główny",
+    "welcome": "Witaj w aplikacji CKW HR",
+    "quickActions": "Szybkie akcje",
+    "recentActivity": "Ostatnia aktywność",
+    "notifications": "Powiadomienia"
+  },
+  "timesheet": {
+    "title": "Rejestracja czasu",
+    "addEntry": "Dodaj godziny",
+    "startTime": "Czas rozpoczęcia",
+    "endTime": "Czas zakończenia",
+    "breakTime": "Przerwa",
+    "description": "Opis",
+    "save": "Zapisz",
+    "cancel": "Anuluj"
+  },
+  "vacation": {
+    "title": "Urlop i zwolnienia",
+    "requestVacation": "Złóż wniosek urlopowy",
+    "startDate": "Data rozpoczęcia",
+    "endDate": "Data zakończenia",
+    "reason": "Powód",
+    "submit": "Wyślij",
+    "balance": "Saldo",
+    "approved": "Zatwierdzone",
+    "pending": "Oczekujące",
+    "rejected": "Odrzucone"
+  },
+  "sickLeave": {
+    "title": "Zwolnienie lekarskie",
+    "reportSick": "Zgłoś chorobę",
+    "reportRecovery": "Zgłoś powrót",
+    "sickFrom": "Chory od",
+    "expectedReturn": "Oczekiwany powrót",
+    "symptoms": "Objawy",
+    "doctorVisit": "Wizyta u lekarza"
+  },
+  "profile": {
+    "title": "Mój profil",
+    "personalInfo": "Dane osobowe",
+    "workInfo": "Dane służbowe",
+    "settings": "Ustawienia",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "phone": "Telefon",
+    "address": "Adres",
+    "department": "Dział",
+    "position": "Stanowisko",
+    "startDate": "Data rozpoczęcia"
+  },
+  "employees": {
+    "title": "Pracownicy",
+    "search": "Szukaj...",
+    "filter": "Filtr",
+    "department": "Dział",
+    "status": "Status",
+    "active": "Aktywny",
+    "inactive": "Nieaktywny"
+  },
+  "approvals": {
+    "title": "Zatwierdzenia",
+    "pending": "Oczekujące",
+    "approved": "Zatwierdzone",
+    "rejected": "Odrzucone",
+    "approve": "Zatwierdź",
+    "reject": "Odrzuć",
+    "comment": "Komentarz"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "general": "Ogólne",
+    "company": "Firma",
+    "notifications": "Powiadomienia",
+    "security": "Bezpieczeństwo",
+    "language": "Język",
+    "theme": "Motyw",
+    "light": "Jasny",
+    "dark": "Ciemny",
+    "system": "Systemowy"
+  },
+  "common": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "view": "Zobacz",
+    "close": "Zamknij",
+    "yes": "Tak",
+    "no": "Nie",
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "success": "Sukces",
+    "warning": "Ostrzeżenie",
+    "info": "Informacja"
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "timesheet": "Zeiterfassung",
+    "vacation": "Urlaub",
+    "sickLeave": "Krankmeldung",
+    "profile": "Mein Profil",
+    "employees": "Mitarbeiter",
+    "approvals": "Genehmigungen",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "loginButton": "Anmelden",
+    "loginProgress": "Anmeldung läuft...",
+    "loginError": "Ungültige Anmeldedaten",
+    "welcome": "Willkommen zurück!"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Willkommen bei CKW HR App",
+    "quickActions": "Schnellaktionen",
+    "recentActivity": "Letzte Aktivität",
+    "notifications": "Benachrichtigungen"
+  },
+  "timesheet": {
+    "title": "Zeiterfassung",
+    "addEntry": "Stunden hinzufügen",
+    "startTime": "Startzeit",
+    "endTime": "Endzeit",
+    "breakTime": "Pause",
+    "description": "Beschreibung",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
+  },
+  "vacation": {
+    "title": "Urlaub & Freistellung",
+    "requestVacation": "Urlaub beantragen",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "reason": "Grund",
+    "submit": "Einreichen",
+    "balance": "Saldo",
+    "approved": "Genehmigt",
+    "pending": "Ausstehend",
+    "rejected": "Abgelehnt"
+  },
+  "sickLeave": {
+    "title": "Krankmeldung",
+    "reportSick": "Krank melden",
+    "reportRecovery": "Genesung melden",
+    "sickFrom": "Krank seit",
+    "expectedReturn": "Erwartete Rückkehr",
+    "symptoms": "Symptome",
+    "doctorVisit": "Arztbesuch"
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "personalInfo": "Persönliche Daten",
+    "workInfo": "Arbeitsdaten",
+    "settings": "Einstellungen",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "phone": "Telefon",
+    "address": "Adresse",
+    "department": "Abteilung",
+    "position": "Position",
+    "startDate": "Startdatum"
+  },
+  "employees": {
+    "title": "Mitarbeiter",
+    "search": "Suchen...",
+    "filter": "Filter",
+    "department": "Abteilung",
+    "status": "Status",
+    "active": "Aktiv",
+    "inactive": "Inaktiv"
+  },
+  "approvals": {
+    "title": "Genehmigungen",
+    "pending": "Ausstehend",
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "comment": "Kommentar"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "general": "Allgemein",
+    "company": "Unternehmen",
+    "notifications": "Benachrichtigungen",
+    "security": "Sicherheit",
+    "language": "Sprache",
+    "theme": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "view": "Anzeigen",
+    "close": "Schließen",
+    "yes": "Ja",
+    "no": "Nein",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "warning": "Warnung",
+    "info": "Information"
+  }
+}

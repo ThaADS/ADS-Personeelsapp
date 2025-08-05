@@ -1,0 +1,228 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-tenant core models
+model Tenant {
+  id                  String    @id @default(cuid())
+  name                String              
+  slug                String    @unique // for subdomains/URLs
+  domain              String?   @unique // custom domain
+  logo                String?
+  contactEmail        String
+  contactName         String
+  address             String?
+  phone               String?
+  settings            String?   // JSON as text for SQLite
+  
+  // Subscription info
+  subscriptionStatus  String    @default("TRIAL") // TRIAL, ACTIVE, FREEMIUM, CANCELED, PAST_DUE, UNPAID
+  currentPlan         String    @default("FREEMIUM") // FREEMIUM, STANDARD
+  stripeCustomerId    String?   @unique
+  stripeSubscriptionId String?  @unique
+  trialEndsAt         DateTime?
+  
+  // Relationships
+  tenantUsers         TenantUser[]
+  invitations         Invitation[]
+  subscriptions       Subscription[]
+  timesheets          Timesheet[]
+  auditLogs           AuditLog[]
+  
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String         @default("USER") // SUPERUSER, TENANT_ADMIN, MANAGER, USER
+  isSuperuser   Boolean        @default(false)
+  
+  // Relationships
+  accounts      Account[]
+  sessions      Session[]
+  tenantUsers   TenantUser[]   // Many-to-many with tenants
+  invitations   Invitation[]   // Invitations sent/received
+  timesheets    Timesheet[]
+  auditLogs     AuditLog[]
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+// Junction table for many-to-many tenant-user relationship
+model TenantUser {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  role      String   @default("USER") // USER, MANAGER, TENANT_ADMIN
+  isActive  Boolean  @default(true)
+  
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([tenantId, userId])
+}
+
+// Subscription plans and pricing
+model Plan {
+  id                String          @id @default(cuid())
+  name              String          @unique
+  type              String          // FREEMIUM, STANDARD
+  price             Float           // Monthly price
+  yearlyPrice       Float?          // Yearly price (with discount)
+  includedUsers     Int             @default(3)
+  pricePerExtraUser Float           @default(4.95)
+  features          String          // JSON as text for SQLite
+  isActive          Boolean         @default(true)
+  
+  subscriptions     Subscription[]
+  
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+// Subscription tracking
+model Subscription {
+  id                    String    @id @default(cuid())
+  tenantId              String
+  planId                String
+  stripeSubscriptionId  String    @unique
+  stripePriceId         String
+  status                String    // TRIAL, ACTIVE, FREEMIUM, CANCELED, PAST_DUE, UNPAID
+  currentPeriodStart    DateTime
+  currentPeriodEnd      DateTime
+  trialEnd              DateTime?
+  userCount             Int       @default(3)
+  
+  tenant                Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  plan                  Plan      @relation(fields: [planId], references: [id])
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// User invitations for tenant onboarding
+model Invitation {
+  id        String    @id @default(cuid())
+  tenantId  String
+  email     String
+  role      String    @default("USER") // USER, MANAGER, TENANT_ADMIN
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invitedBy User?     @relation(fields: [invitedById], references: [id])
+  invitedById String?
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@unique([tenantId, email])
+}
+
+// Advertisement system for freemium users
+model Advertisement {
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  imageUrl    String?
+  linkUrl     String?
+  type        String    @default("BANNER") // BANNER, MODAL, SIDEBAR
+  isActive    Boolean   @default(true)
+  priority    Int       @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  tenantIds   String    @default("") // Comma-separated list for SQLite
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Audit logging for compliance
+model AuditLog {
+  id        String   @id @default(cuid())
+  tenantId  String?  // null for superuser actions
+  userId    String?
+  action    String   // LOGIN, CREATE_USER, UPDATE_SUBSCRIPTION, etc.
+  resource  String?  // affected resource type
+  resourceId String? // affected resource ID
+  oldValues String?  // JSON as text for SQLite
+  newValues String?  // JSON as text for SQLite
+  ipAddress String?
+  userAgent String?
+  
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  createdAt DateTime @default(now())
+}
+
+// Updated models with tenant awareness
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  tenantId     String?  // Current tenant context
+  expires      DateTime
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Timesheet {
+  id          String   @id @default(cuid())
+  tenantId    String   // Tenant isolation
+  userId      String
+  date        DateTime
+  startTime   DateTime
+  endTime     DateTime
+  description String?
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
