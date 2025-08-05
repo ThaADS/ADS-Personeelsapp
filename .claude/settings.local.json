@@ -26,7 +26,8 @@
       "Bash(npm run lint)",
       "Bash(git add:*)",
       "Bash(npm test)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }
