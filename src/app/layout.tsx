@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import AuthSessionProvider from "@/components/providers/SessionProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { LocaleProvider } from "@/components/providers/LocaleProvider";
+import LocaleSync from "@/components/providers/LocaleSync";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({
         <ThemeProvider>
           <LocaleProvider>
             <AuthSessionProvider>
+              <LocaleSync />
               {children}
             </AuthSessionProvider>
           </LocaleProvider>

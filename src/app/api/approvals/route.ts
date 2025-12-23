@@ -14,66 +14,175 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const status = url.searchParams.get('status') || 'PENDING';
-    const type = url.searchParams.get('type') || '';
+    const type = url.searchParams.get('type') || 'all';
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const limit = parseInt(url.searchParams.get('limit') || '10', 10);
 
-    // Get pending timesheets that need approval directly from prisma
-    const context = await requirePermission('timesheet:approve');
-    const prisma = new (await import('@prisma/client')).PrismaClient();
-    
-    const timesheets = await prisma.timesheet.findMany({
-      where: {
-        tenantId: context.tenantId,
-        status: status,
-        ...(type === 'timesheet' && {}), // All timesheets
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    // Try get permission; if not authenticated, return empty list (dev-friendly)
+    let context: Awaited<ReturnType<typeof requirePermission>> | null = null;
+    try {
+      context = await requirePermission('timesheet:approve');
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('Authentication required')) {
+        return NextResponse.json({
+          items: [],
+          pagination: { page, limit, total: 0, pages: 0 },
+        });
+      }
+      // If explicitly permission denied, surface 403
+      if (err instanceof Error && err.message.includes('Permission denied')) {
+        return NextResponse.json({ error: 'Onvoldoende rechten' }, { status: 403 });
+      }
+      throw err;
+    }
 
-    // Transform to approval format
-    const approvals = timesheets.map(timesheet => ({
-      id: timesheet.id,
-      type: 'timesheet',
-      employee: {
-        name: timesheet.user.name || timesheet.user.email,
-        email: timesheet.user.email,
-      },
-      status: timesheet.status,
-      createdAt: timesheet.createdAt.toISOString(),
-      details: {
-        date: timesheet.date.toISOString().split('T')[0],
-        startTime: timesheet.startTime.toISOString(),
-        endTime: timesheet.endTime.toISOString(),
-        description: timesheet.description,
-        hours: Math.round(
-          (timesheet.endTime.getTime() - timesheet.startTime.getTime()) / (1000 * 60 * 60) * 100
-        ) / 100,
-      },
-    }));
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
 
+    type Item = {
+      id: string;
+      type: 'timesheet' | 'vacation' | 'tijd-voor-tijd' | 'sick-leave';
+      employeeId: string;
+      employeeName: string;
+      submittedAt: string;
+      status: string;
+      date?: string;
+      startTime?: string;
+      endTime?: string;
+      description?: string;
+      breakDuration?: number;
+      startDate?: string;
+      endDate?: string;
+      totalDays?: number;
+      reason?: string;
+    };
+
+    const outItems: Item[] = [];
+    let total = 0;
+
+    const includeUser = {
+      select: { id: true, name: true, email: true },
+    } as const;
+
+    // Timesheets
+    if (type === 'all' || type === 'timesheet') {
+      const whereTs = { tenantId: context!.tenantId, status } as const;
+      const [countTs, listTs] = await Promise.all([
+        prisma.timesheet.count({ where: whereTs }),
+        prisma.timesheet.findMany({
+          where: whereTs,
+          include: { user: includeUser },
+          orderBy: { createdAt: 'desc' },
+          skip: type === 'timesheet' ? (page - 1) * limit : 0,
+          take: type === 'timesheet' ? limit : 100, // cap to keep it light in 'all'
+        }),
+      ]);
+      total += countTs;
+      outItems.push(
+        ...listTs.map((t) => ({
+          id: t.id,
+          type: 'timesheet',
+          employeeId: t.userId,
+          employeeName: t.user?.name || t.user?.email || 'Onbekend',
+          submittedAt: t.createdAt.toISOString(),
+          status: t.status,
+          date: t.date.toISOString().split('T')[0],
+          startTime: t.startTime.toISOString(),
+          endTime: t.endTime.toISOString(),
+          description: t.description || undefined,
+          breakDuration: t.breakDuration || 0,
+        }))
+      );
+      if (type === 'timesheet') {
+        return NextResponse.json({
+          items: outItems,
+          pagination: { page, limit, total: countTs, pages: Math.ceil(countTs / limit) || 0 },
+        });
+      }
+    }
+
+    // Vacations (from audit log)
+    if (type === 'all' || type === 'vacation') {
+      const logs = await prisma.auditLog.findMany({
+        where: { tenantId: context!.tenantId, action: { in: ['VACATION_REQUEST', 'TIJD_VOOR_TIJD_REQUEST'] } },
+        include: { user: includeUser },
+        orderBy: { createdAt: 'desc' },
+        skip: type === 'vacation' ? (page - 1) * limit : 0,
+        take: type === 'vacation' ? limit : 100,
+      });
+      const filtered = logs.filter((l) => (l as unknown as { newValues?: { status?: string } }).newValues?.status === status);
+      total += (type === 'vacation' ? filtered.length : logs.length);
+      outItems.push(
+        ...filtered.map((l) => {
+          const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
+          return {
+            id: l.id,
+            type: (l.action === 'VACATION_REQUEST' ? 'vacation' : 'tijd-voor-tijd') as const,
+            employeeId: l.userId!,
+            employeeName: l.user?.name || l.user?.email || 'Onbekend',
+            submittedAt: l.createdAt.toISOString(),
+            status: (nv.status as string) || 'PENDING',
+            startDate: nv.startDate as string | undefined,
+            endDate: nv.endDate as string | undefined,
+            description: nv.description as string | undefined,
+            totalDays: nv.totalDays as number | undefined,
+          } satisfies Item;
+        })
+      );
+      if (type === 'vacation') {
+        return NextResponse.json({
+          items: outItems,
+          pagination: { page, limit, total: outItems.length, pages: Math.ceil(outItems.length / limit) || 0 },
+        });
+      }
+    }
+
+    // Sick leaves (from audit log)
+    if (type === 'all' || type === 'sickleave') {
+      const logs = await prisma.auditLog.findMany({
+        where: { tenantId: context!.tenantId, action: 'SICK_LEAVE_REQUEST' },
+        include: { user: includeUser },
+        orderBy: { createdAt: 'desc' },
+        skip: type === 'sickleave' ? (page - 1) * limit : 0,
+        take: type === 'sickleave' ? limit : 100,
+      });
+      const filtered = logs.filter((l) => (l as unknown as { newValues?: { status?: string } }).newValues?.status === status);
+      total += (type === 'sickleave' ? filtered.length : logs.length);
+      outItems.push(
+        ...filtered.map((l) => {
+          const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
+          return {
+            id: l.id,
+            type: 'sick-leave' as const,
+            employeeId: l.userId!,
+            employeeName: l.user?.name || l.user?.email || 'Onbekend',
+            submittedAt: l.createdAt.toISOString(),
+            status: (nv.status as string) || 'PENDING',
+            startDate: nv.startDate as string | undefined,
+            endDate: nv.endDate as string | undefined,
+            reason: nv.reason as string | undefined,
+          } satisfies Item;
+        })
+      );
+      if (type === 'sickleave') {
+        return NextResponse.json({
+          items: outItems,
+          pagination: { page, limit, total: outItems.length, pages: Math.ceil(outItems.length / limit) || 0 },
+        });
+      }
+    }
+
+    // For 'all', sort by submittedAt and paginate
+    outItems.sort((a, b) => (a.submittedAt < b.submittedAt ? 1 : -1));
+    const start = (page - 1) * limit;
+    const paged = outItems.slice(start, start + limit);
     return NextResponse.json({
-      approvals,
-      total: approvals.length,
+      items: paged,
+      pagination: { page, limit, total: outItems.length, pages: Math.ceil(outItems.length / limit) || 0 },
     });
   } catch (error) {
     console.error('Error in approvals GET:', error);
-    if (error instanceof Error && error.message.includes('Permission denied')) {
-      return NextResponse.json({ error: "Onvoldoende rechten" }, { status: 403 });
-    }
-    if (error instanceof Error && error.message.includes('Authentication required')) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
-    }
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
 

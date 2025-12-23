@@ -15,8 +15,8 @@ const timesheetData = [
     description: "Werkzaamheden bij klant ABC",
     status: "APPROVED",
     locationVerified: true,
-    startLocation: "Kantoor CKW",
-    endLocation: "Kantoor CKW",
+    startLocation: "Kantoor ADS",
+    endLocation: "Kantoor ADS",
   },
   {
     id: "2",
@@ -27,7 +27,7 @@ const timesheetData = [
     description: "Installatie bij klant XYZ",
     status: "APPROVED",
     locationVerified: true,
-    startLocation: "Kantoor CKW",
+    startLocation: "Kantoor ADS",
     endLocation: "Klant XYZ, Amsterdam",
   },
   {
@@ -39,8 +39,8 @@ const timesheetData = [
     description: "Onderhoud systemen",
     status: "APPROVED",
     locationVerified: true,
-    startLocation: "Kantoor CKW",
-    endLocation: "Kantoor CKW",
+    startLocation: "Kantoor ADS",
+    endLocation: "Kantoor ADS",
   },
 ];
 
@@ -54,6 +54,8 @@ export default function TimesheetPage() {
     breakDuration: 30,
     description: "",
   });
+  const [startCoord, setStartCoord] = useState<{lat:number;lng:number}|null>(null);
+  const [endCoord, setEndCoord] = useState<{lat:number;lng:number}|null>(null);
 
   // Functie om de status kleur te bepalen
   const getStatusColor = (status: string) => {
@@ -106,12 +108,25 @@ export default function TimesheetPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const captureLocation = (type: 'start'|'end') => {
+    if (!navigator.geolocation) {
+      alert('Geolocatie wordt niet ondersteund door deze browser.');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const coord = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      if (type === 'start') setStartCoord(coord); else setEndCoord(coord);
+    }, (err) => {
+      alert('Kon locatie niet bepalen: ' + err.message);
+    }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 });
+  };
+
   return (
     <div className="space-y-6">
       {/* Paginatitel */}
       <div className="bg-white shadow rounded-lg p-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Tijdregistratie</h1>
+          <h1 className="text-2xl font-bold text-black">Tijdregistratie</h1>
           <button
             onClick={() => setShowNewEntryForm(!showNewEntryForm)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -124,7 +139,7 @@ export default function TimesheetPage() {
       {/* Formulier voor nieuwe tijdregistratie */}
       {showNewEntryForm && (
         <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">
+            <h2 className="text-lg font-medium text-black mb-4">
             Nieuwe tijdregistratie
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -162,6 +177,10 @@ export default function TimesheetPage() {
                   required
                   className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                 />
+                <button type="button" onClick={() => captureLocation('start')} className="mt-2 inline-flex items-center px-3 py-1 rounded bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">Gebruik mijn locatie (start)</button>
+                {startCoord && (
+                  <p className="text-xs text-gray-500 mt-1">Startlocatie: {startCoord.lat.toFixed(5)}, {startCoord.lng.toFixed(5)}</p>
+                )}
               </div>
               <div>
                 <label
@@ -179,6 +198,10 @@ export default function TimesheetPage() {
                   required
                   className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                 />
+                <button type="button" onClick={() => captureLocation('end')} className="mt-2 inline-flex items-center px-3 py-1 rounded bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">Gebruik mijn locatie (einde)</button>
+                {endCoord && (
+                  <p className="text-xs text-gray-500 mt-1">Eindlocatie: {endCoord.lat.toFixed(5)}, {endCoord.lng.toFixed(5)}</p>
+                )}
               </div>
               <div>
                 <label
@@ -265,7 +288,7 @@ export default function TimesheetPage() {
       {/* Tijdregistratie tabel */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:px-6">
-          <h2 className="text-lg font-medium text-gray-900">
+          <h2 className="text-lg font-medium text-black">
             Recente tijdregistraties
           </h2>
         </div>

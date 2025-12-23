@@ -10,6 +10,7 @@ import {
   ExclamationTriangleIcon 
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import type { ComponentType, SVGProps } from 'react';
 
 interface PlatformStats {
   overview: {
@@ -59,7 +60,7 @@ function StatCard({
 }: {
   title: string;
   value: string | number;
-  icon: any;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
   change?: string;
   color?: 'blue' | 'green' | 'yellow' | 'red';
 }) {

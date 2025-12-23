@@ -25,7 +25,7 @@ export default function ProfilePage() {
     postalCode: '1000 AB',
     department: 'IT',
     position: 'System Administrator',
-    employeeId: 'CKW001',
+    employeeId: 'ADS001',
     startDate: '2020-01-15',
     contractType: 'Vast dienstverband',
     workHours: '40 uur per week'
@@ -34,8 +34,8 @@ export default function ProfilePage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Mijn Profiel</h1>
-        <p className="text-gray-600">Beheer je persoonlijke gegevens en instellingen</p>
+        <h1 className="text-2xl font-bold text-black">Mijn Profiel</h1>
+        <p className="text-black font-medium">Beheer je persoonlijke gegevens en instellingen</p>
       </div>
 
       {/* Tabs */}
@@ -46,8 +46,8 @@ export default function ProfilePage() {
               onClick={() => setSelectedTab('personal')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'personal'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Persoonlijke Gegevens
@@ -56,8 +56,8 @@ export default function ProfilePage() {
               onClick={() => setSelectedTab('work')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'work'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Werkgegevens
@@ -66,8 +66,8 @@ export default function ProfilePage() {
               onClick={() => setSelectedTab('settings')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'settings'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Instellingen
@@ -81,7 +81,7 @@ export default function ProfilePage() {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-medium text-gray-900">Persoonlijke Informatie</h3>
+              <h3 className="text-lg font-medium text-black">Persoonlijke Informatie</h3>
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -98,6 +98,8 @@ export default function ProfilePage() {
                   value={profileData.firstName}
                   disabled={!isEditing}
                   onChange={(e) => setProfileData({...profileData, firstName: e.target.value})}
+                  placeholder="Voer uw voornaam in"
+                  title="Voornaam"
                   className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                     !isEditing ? 'bg-gray-50' : ''
                   }`}
@@ -110,6 +112,8 @@ export default function ProfilePage() {
                   value={profileData.lastName}
                   disabled={!isEditing}
                   onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
+                  placeholder="Voer uw achternaam in"
+                  title="Achternaam"
                   className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                     !isEditing ? 'bg-gray-50' : ''
                   }`}
@@ -148,6 +152,8 @@ export default function ProfilePage() {
                   value={profileData.address}
                   disabled={!isEditing}
                   onChange={(e) => setProfileData({...profileData, address: e.target.value})}
+                  placeholder="Voer uw adres in"
+                  title="Adres"
                   className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                     !isEditing ? 'bg-gray-50' : ''
                   }`}
@@ -160,6 +166,8 @@ export default function ProfilePage() {
                   value={profileData.city}
                   disabled={!isEditing}
                   onChange={(e) => setProfileData({...profileData, city: e.target.value})}
+                  placeholder="Voer uw stad in"
+                  title="Stad"
                   className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                     !isEditing ? 'bg-gray-50' : ''
                   }`}
@@ -172,6 +180,8 @@ export default function ProfilePage() {
                   value={profileData.postalCode}
                   disabled={!isEditing}
                   onChange={(e) => setProfileData({...profileData, postalCode: e.target.value})}
+                  placeholder="Voer uw postcode in"
+                  title="Postcode"
                   className={`mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
                     !isEditing ? 'bg-gray-50' : ''
                   }`}
@@ -186,7 +196,7 @@ export default function ProfilePage() {
       {selectedTab === 'work' && (
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-6">Werkgegevens</h3>
+            <h3 className="text-lg font-medium text-black mb-6">Werkgegevens</h3>
             
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
@@ -259,7 +269,7 @@ export default function ProfilePage() {
         <div className="space-y-6">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Wachtwoord Wijzigen</h3>
+              <h3 className="text-lg font-medium text-black mb-4">Wachtwoord Wijzigen</h3>
               <form className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Huidig wachtwoord</label>
@@ -299,7 +309,7 @@ export default function ProfilePage() {
 
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Notificatie Instellingen</h3>
+              <h3 className="text-lg font-medium text-black mb-4">Notificatie Instellingen</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>

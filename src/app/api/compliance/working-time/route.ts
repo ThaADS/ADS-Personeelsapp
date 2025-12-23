@@ -2,8 +2,7 @@
  * API route voor arbeidstijdenwet compliance checks
  */
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth/auth-options";
+import { auth } from "@/lib/auth/auth";
 import { LaborLawCheck } from "@/lib/services/compliance-service";
 
 // Arbeidstijdenwet regels
@@ -23,7 +22,7 @@ const WORKING_TIME_RULES = {
 export async function GET(request: NextRequest) {
   try {
     // Sessie controleren
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
     }

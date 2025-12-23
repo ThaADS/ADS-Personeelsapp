@@ -9,7 +9,9 @@ declare module 'next-auth' {
       role: UserRole;
       isSuperuser: boolean;
       tenantId: string | null;
+      tenantSlug: string | null;
       tenantName: string | null;
+      tenants?: Array<{id: string; name: string; slug: string}>;
     } & DefaultSession['user'];
   }
 
@@ -17,6 +19,7 @@ declare module 'next-auth' {
     role: UserRole;
     isSuperuser: boolean;
     tenantId: string | null;
+    tenantSlug: string | null;
     tenantName: string | null;
     emailVerified?: Date | null;
   }
@@ -27,6 +30,7 @@ declare module 'next-auth/jwt' {
     role: UserRole;
     isSuperuser: boolean;
     tenantId: string | null;
+    tenantSlug: string | null;
     tenantName: string | null;
     emailVerified?: Date | null;
   }

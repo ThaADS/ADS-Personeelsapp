@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLocale } from '@/components/providers/LocaleProvider';
 
-type Messages = Record<string, any>;
+type Messages = Record<string, unknown>;
 
 export function useTranslations() {
   const { locale } = useLocale();
@@ -31,16 +31,16 @@ export function useTranslations() {
 
   const t = (key: string, fallback?: string): string => {
     const keys = key.split('.');
-    let value = messages;
-    
+    let value: unknown = messages;
+
     for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+      if (value && typeof value === 'object' && k in (value as Record<string, unknown>)) {
+        value = (value as Record<string, unknown>)[k];
       } else {
         return fallback || key;
       }
     }
-    
+
     return typeof value === 'string' ? value : fallback || key;
   };
 

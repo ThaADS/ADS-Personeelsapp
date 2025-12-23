@@ -324,7 +324,7 @@ export function validateSickLeave(sickLeave: SickLeave): ValidationResult {
 export function validateApproval(
   item: Timesheet | VacationRequest | SickLeave,
   type: "timesheet" | "vacation" | "sickleave",
-  additionalData?: any
+  additionalData?: { remainingDays?: number }
 ): ValidationResult {
   switch (type) {
     case "timesheet":

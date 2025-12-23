@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import { compare } from "bcryptjs";
+import { UserRole } from "@/types";
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           // Find user by email with tenant information
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
+            where: { email: credentials.email as string },
             select: {
               id: true,
               email: true,
@@ -53,13 +54,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
 
           // Verify password
-          const isValidPassword = await compare(credentials.password, user.password);
+          const isValidPassword = await compare(credentials.password as string, user.password);
           if (!isValidPassword) {
             return null;
           }
 
           // Get tenant information
-          const tenantUser = user.tenantUsers[0];
+          const tenantUser = user.tenantUsers?.[0];
           const tenantId = tenantUser?.tenantId || null;
           const tenantRole = tenantUser?.role || user.role;
 
@@ -67,9 +68,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             id: user.id,
             email: user.email,
             name: user.name,
-            role: tenantRole, // Use tenant-specific role
+            role: tenantRole as UserRole, // Use tenant-specific role
             isSuperuser: user.isSuperuser,
             tenantId: tenantId,
+            tenantSlug: tenantUser?.tenant?.slug || null,
             tenantName: tenantUser?.tenant?.name || null,
           };
         } catch (error) {
@@ -86,16 +88,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.isSuperuser = user.isSuperuser;
         token.tenantId = user.tenantId;
         token.tenantName = user.tenantName;
+        token.tenantSlug = user.tenantSlug;
+        // Add security: token issued time and expiry tracking
+        token.iat = Math.floor(Date.now() / 1000);
+        token.exp = Math.floor(Date.now() / 1000) + (24 * 60 * 60); // 24 hours
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub;
-        session.user.role = token.role;
-        session.user.isSuperuser = token.isSuperuser;
-        session.user.tenantId = token.tenantId;
-        session.user.tenantName = token.tenantName;
+        session.user.id = token.sub as string;
+        session.user.role = token.role as UserRole;
+        session.user.isSuperuser = token.isSuperuser as boolean;
+        session.user.tenantId = token.tenantId as string | null;
+        session.user.tenantSlug = token.tenantSlug as string | null;
+        session.user.tenantName = token.tenantName as string | null;
       }
       return session;
     },
@@ -105,6 +112,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 hours
+    updateAge: 4 * 60 * 60, // Update session every 4 hours
+  },
+  jwt: {
+    maxAge: 24 * 60 * 60, // 24 hours
+  },
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60, // 24 hours
+      },
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
 });

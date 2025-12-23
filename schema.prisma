@@ -3,51 +3,55 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 // Multi-tenant core models
 model Tenant {
   id                  String    @id @default(cuid())
-  name                String              
+  name                String
   slug                String    @unique // for subdomains/URLs
   domain              String?   @unique // custom domain
   logo                String?
-  contactEmail        String
-  contactName         String
+  contactEmail        String    @map("contact_email")
+  contactName         String    @map("contact_name")
   address             String?
   phone               String?
-  settings            String?   // JSON as text for SQLite
-  
+  settings            String?
+
   // Subscription info
-  subscriptionStatus  String    @default("TRIAL") // TRIAL, ACTIVE, FREEMIUM, CANCELED, PAST_DUE, UNPAID
-  currentPlan         String    @default("FREEMIUM") // FREEMIUM, STANDARD
-  stripeCustomerId    String?   @unique
-  stripeSubscriptionId String?  @unique
-  trialEndsAt         DateTime?
-  
+  subscriptionStatus  String    @default("TRIAL") @map("subscription_status") // TRIAL, ACTIVE, FREEMIUM, CANCELED, PAST_DUE, UNPAID
+  currentPlan         String    @default("FREEMIUM") @map("current_plan") // FREEMIUM, STANDARD
+  stripeCustomerId    String?   @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?  @unique @map("stripe_subscription_id")
+  trialEndsAt         DateTime? @map("trial_ends_at")
+
   // Relationships
   tenantUsers         TenantUser[]
   invitations         Invitation[]
   subscriptions       Subscription[]
   timesheets          Timesheet[]
   auditLogs           AuditLog[]
-  
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  emailTemplates      EmailTemplate[]
+
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  @@map("tenants")
 }
 
 model User {
   id            String         @id @default(cuid())
   name          String?
   email         String         @unique
-  emailVerified DateTime?
+  emailVerified DateTime?      @map("email_verified")
   image         String?
   password      String?
   role          String         @default("USER") // SUPERUSER, TENANT_ADMIN, MANAGER, USER
-  isSuperuser   Boolean        @default(false)
-  
+  isSuperuser   Boolean        @default(false) @map("is_superuser")
+  locale        String         @default("nl") // Interface language preference ('nl','pl','en','de')
+
   // Relationships
   accounts      Account[]
   sessions      Session[]
@@ -55,26 +59,31 @@ model User {
   invitations   Invitation[]   // Invitations sent/received
   timesheets    Timesheet[]
   auditLogs     AuditLog[]
-  
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  notificationPreference NotificationPreference?
+  leaveBalance  LeaveBalance?
+
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  @@map("users")
 }
 
 // Junction table for many-to-many tenant-user relationship
 model TenantUser {
   id        String   @id @default(cuid())
-  tenantId  String
-  userId    String
+  tenantId  String   @map("tenant_id")
+  userId    String   @map("user_id")
   role      String   @default("USER") // USER, MANAGER, TENANT_ADMIN
-  isActive  Boolean  @default(true)
-  
+  isActive  Boolean  @default(true) @map("is_active")
+
   tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   @@unique([tenantId, userId])
+  @@map("tenant_users")
 }
 
 // Subscription plans and pricing
@@ -83,56 +92,61 @@ model Plan {
   name              String          @unique
   type              String          // FREEMIUM, STANDARD
   price             Float           // Monthly price
-  yearlyPrice       Float?          // Yearly price (with discount)
-  includedUsers     Int             @default(3)
-  pricePerExtraUser Float           @default(4.95)
-  features          String          // JSON as text for SQLite
-  isActive          Boolean         @default(true)
-  
+  yearlyPrice       Float?          @map("yearly_price") // Yearly price (with discount)
+  includedUsers     Int             @default(3) @map("included_users")
+  pricePerExtraUser Float           @default(4.95) @map("price_per_extra_user")
+  features          String
+  isActive          Boolean         @default(true) @map("is_active")
+
   subscriptions     Subscription[]
-  
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  @@map("plans")
 }
 
 // Subscription tracking
 model Subscription {
   id                    String    @id @default(cuid())
-  tenantId              String
-  planId                String
-  stripeSubscriptionId  String    @unique
-  stripePriceId         String
+  tenantId              String    @map("tenant_id")
+  planId                String    @map("plan_id")
+  stripeSubscriptionId  String    @unique @map("stripe_subscription_id")
+  stripePriceId         String    @map("stripe_price_id")
   status                String    // TRIAL, ACTIVE, FREEMIUM, CANCELED, PAST_DUE, UNPAID
-  currentPeriodStart    DateTime
-  currentPeriodEnd      DateTime
-  trialEnd              DateTime?
-  userCount             Int       @default(3)
-  
+  currentPeriodStart    DateTime  @map("current_period_start")
+  currentPeriodEnd      DateTime  @map("current_period_end")
+  trialEnd              DateTime? @map("trial_end")
+  userCount             Int       @default(3) @map("user_count")
+
   tenant                Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   plan                  Plan      @relation(fields: [planId], references: [id])
-  
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("subscriptions")
 }
 
 // User invitations for tenant onboarding
 model Invitation {
   id        String    @id @default(cuid())
-  tenantId  String
+  tenantId  String    @map("tenant_id")
   email     String
   role      String    @default("USER") // USER, MANAGER, TENANT_ADMIN
   token     String    @unique
-  expiresAt DateTime
-  usedAt    DateTime?
-  
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+
   tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   invitedBy User?     @relation(fields: [invitedById], references: [id])
-  invitedById String?
-  
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
+  invitedById String? @map("invited_by_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
   @@unique([tenantId, email])
+  @@map("invitations")
 }
 
 // Advertisement system for freemium users
@@ -140,45 +154,49 @@ model Advertisement {
   id          String    @id @default(cuid())
   title       String
   content     String
-  imageUrl    String?
-  linkUrl     String?
+  imageUrl    String?   @map("image_url")
+  linkUrl     String?   @map("link_url")
   type        String    @default("BANNER") // BANNER, MODAL, SIDEBAR
-  isActive    Boolean   @default(true)
+  isActive    Boolean   @default(true) @map("is_active")
   priority    Int       @default(0)
-  startDate   DateTime?
-  endDate     DateTime?
-  tenantIds   String    @default("") // Comma-separated list for SQLite
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  tenantIds   String    @default("") @map("tenant_ids")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("advertisements")
 }
 
 // Audit logging for compliance
 model AuditLog {
   id        String   @id @default(cuid())
-  tenantId  String?  // null for superuser actions
-  userId    String?
+  tenantId  String?  @map("tenant_id") // null for superuser actions
+  userId    String?  @map("user_id")
   action    String   // LOGIN, CREATE_USER, UPDATE_SUBSCRIPTION, etc.
   resource  String?  // affected resource type
-  resourceId String? // affected resource ID
-  oldValues String?  // JSON as text for SQLite
-  newValues String?  // JSON as text for SQLite
-  ipAddress String?
-  userAgent String?
-  
+  resourceId String? @map("resource_id") // affected resource ID
+  oldValues String?  @map("old_values")
+  newValues String?  @map("new_values")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+
   tenant    Tenant?  @relation(fields: [tenantId], references: [id])
   user      User?    @relation(fields: [userId], references: [id])
-  
-  createdAt DateTime @default(now())
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
 }
 
 // Updated models with tenant awareness
 model Account {
   id                String  @id @default(cuid())
-  userId            String
+  userId            String  @map("user_id")
   type              String
   provider          String
-  providerAccountId String
+  providerAccountId String  @map("provider_account_id")
   refresh_token     String?
   access_token      String?
   expires_at        Int?
@@ -190,16 +208,19 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  tenantId     String?  // Current tenant context
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  tenantId     String?  @map("tenant_id") // Current tenant context
   expires      DateTime
-  
+
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
 }
 
 model VerificationToken {
@@ -208,21 +229,68 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 model Timesheet {
   id          String   @id @default(cuid())
-  tenantId    String   // Tenant isolation
-  userId      String
+  tenantId    String   @map("tenant_id") // Tenant isolation
+  userId      String   @map("user_id")
   date        DateTime
-  startTime   DateTime
-  endTime     DateTime
+  startTime   DateTime @map("start_time")
+  endTime     DateTime @map("end_time")
   description String?
   status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
-  
+  breakDuration Int?   @map("break_duration")
+  // GPS
+  startLat    Float?   @map("start_lat")
+  startLng    Float?   @map("start_lng")
+  endLat      Float?   @map("end_lat")
+  endLng      Float?   @map("end_lng")
+
   tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("timesheets")
+}
+
+// Notification preferences per user
+model NotificationPreference {
+  id        String  @id @default(cuid())
+  userId    String  @unique @map("user_id")
+  emailEnabled Boolean @default(true) @map("email_enabled")
+  categories String?
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+// Editable email templates (global or per-tenant)
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  tenantId  String?  @map("tenant_id")
+  name      String
+  subject   String
+  html      String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  @@unique([tenantId, name])
+  @@map("email_templates")
+}
+
+// Leave balances per user (simple model)
+model LeaveBalance {
+  id         String  @id @default(cuid())
+  userId     String  @unique @map("user_id")
+  balanceDays Float  @default(0) @map("balance_days")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("leave_balances")
 }

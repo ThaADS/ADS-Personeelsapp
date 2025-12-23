@@ -31,7 +31,7 @@ const emailConfig: EmailConfig = {
     user: process.env.SMTP_USER || 'user@example.com',
     pass: process.env.SMTP_PASS || 'password',
   },
-  from: process.env.EMAIL_FROM || 'CKW Personeelszaken <noreply@ckwpersoneelszaken.nl>',
+  from: process.env.EMAIL_FROM || 'ADS Personeelsapp <noreply@example.com>',
 };
 
 // Maak een transporter voor het versturen van emails
@@ -114,9 +114,9 @@ export async function sendApprovalNotification(
         {{/description}}
       </div>
       
-      <p>U kunt deze aanvraag bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">CKW Personeelszaken portaal</a>.</p>
+      <p>U kunt deze aanvraag bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">ADS Personeelsapp portaal</a>.</p>
       
-      <p>Met vriendelijke groet,<br>CKW Personeelszaken</p>
+      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
     </div>
   `, data);
 
@@ -151,9 +151,9 @@ export async function sendStatusUpdateNotification(
         {{/comment}}
       </div>
       
-      <p>U kunt al uw aanvragen bekijken via het <a href="{{portalUrl}}" style="color: #3498db;">CKW Personeelszaken portaal</a>.</p>
+      <p>U kunt al uw aanvragen bekijken via het <a href="{{portalUrl}}" style="color: #3498db;">ADS Personeelsapp portaal</a>.</p>
       
-      <p>Met vriendelijke groet,<br>CKW Personeelszaken</p>
+      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
     </div>
   `, data);
 
@@ -183,9 +183,9 @@ export async function sendReminderNotification(
         <p><strong>Oudste aanvraag:</strong> {{oldestDate}}</p>
       </div>
       
-      <p>U kunt deze aanvragen bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">CKW Personeelszaken portaal</a>.</p>
+      <p>U kunt deze aanvragen bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">ADS Personeelsapp portaal</a>.</p>
       
-      <p>Met vriendelijke groet,<br>CKW Personeelszaken</p>
+      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
     </div>
   `, data);
 

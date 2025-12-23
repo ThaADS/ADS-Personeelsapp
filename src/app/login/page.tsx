@@ -34,7 +34,7 @@ export default function LoginPage() {
         email,
         password,
         redirect: false,
-        callbackUrl: "/dashboard"
+        callbackUrl: "/timesheet"
       });
       
       console.log("✅ SignIn result:", result);
@@ -69,12 +69,12 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-8 text-white">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
             ADS Personeelsapp
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-center text-sm text-white/80">
             Log in om toegang te krijgen tot uw dashboard
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="text-red-500 dark:text-red-400 text-sm text-center">{error}</div>
+            <div className="text-red-300 dark:text-red-400 text-sm text-center">{error}</div>
           )}
 
           <div>
@@ -123,10 +123,72 @@ export default function LoginPage() {
               type="button"
               onClick={handleLogin}
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-bold rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900"
             >
               {isLoading ? t('auth.loginProgress', 'Bezig met inloggen...') : t('auth.loginButton', 'Inloggen')}
             </button>
+          </div>
+
+          {/* Testaccounts */}
+          <div className="mt-6">
+            <h3 className="text-sm font-bold text-white mb-2">Testaccounts</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between rounded border p-2">
+                <div>
+                  <div className="font-semibold text-white">Super Admin</div>
+                  <div className="text-white/90">superuser@ads-personeelsapp.nl / SuperAdmin123!</div>
+                </div>
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-bold hover:bg-blue-700"
+                  onClick={() => { setEmail('superuser@ads-personeelsapp.nl'); setPassword('SuperAdmin123!'); }}
+                >
+                  Vul automatisch
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between rounded border p-2">
+                <div>
+                  <div className="font-semibold text-white">Tenant Admin (Demo)</div>
+                  <div className="text-white/90">admin@demo-company.nl / Admin123!</div>
+                </div>
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-bold hover:bg-blue-700"
+                  onClick={() => { setEmail('admin@demo-company.nl'); setPassword('Admin123!'); }}
+                >
+                  Vul automatisch
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between rounded border p-2">
+                <div>
+                  <div className="font-semibold text-white">Manager (Demo)</div>
+                  <div className="text-white/90">manager@demo-company.nl / Manager123!</div>
+                </div>
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-bold hover:bg-blue-700"
+                  onClick={() => { setEmail('manager@demo-company.nl'); setPassword('Manager123!'); }}
+                >
+                  Vul automatisch
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between rounded border p-2">
+                <div>
+                  <div className="font-semibold text-white">Medewerker (Demo)</div>
+                  <div className="text-white/90">gebruiker@demo-company.nl / Gebruiker123!</div>
+                </div>
+                <button
+                  type="button"
+                  className="px-3 py-1 rounded bg-blue-600 text-white text-xs font-bold hover:bg-blue-700"
+                  onClick={() => { setEmail('gebruiker@demo-company.nl'); setPassword('Gebruiker123!'); }}
+                >
+                  Vul automatisch
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

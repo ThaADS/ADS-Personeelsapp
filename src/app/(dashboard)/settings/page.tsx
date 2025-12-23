@@ -1,7 +1,8 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocale } from '@/components/providers/LocaleProvider';
 
 export default function SettingsPage() {
   const { data: session } = useSession();
@@ -9,6 +10,25 @@ export default function SettingsPage() {
   // Session will be used for admin permissions check
   console.log('Settings session:', session?.user?.role);
   const [selectedTab, setSelectedTab] = useState('general');
+  const { locale, setLocale } = useLocale();
+  const [emailPref, setEmailPref] = useState<boolean>(true);
+  const [savingPref, setSavingPref] = useState(false);
+  const [savingLocale, setSavingLocale] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch('/api/user/preferences');
+        if (res.ok) {
+          const data = await res.json();
+          setEmailPref(Boolean(data.emailEnabled));
+        }
+      } catch {
+        // ignore
+      }
+    };
+    load();
+  }, []);
   
   // Admin permissions will be checked when implementing settings actions
   // const isAdmin = session?.user?.role === 'TENANT_ADMIN' || session?.user?.role === 'SUPERUSER';
@@ -73,7 +93,7 @@ export default function SettingsPage() {
         <div className="space-y-6">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Systeem Instellingen</h3>
+              <h3 className="text-lg font-medium text-black mb-4">Systeem Instellingen</h3>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Tijdzone</label>
@@ -84,12 +104,27 @@ export default function SettingsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Taal</label>
-                  <select aria-label="Taal selecteren" className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option>Nederlands</option>
-                    <option>English</option>
-                    <option>Deutsch</option>
-                  </select>
+                  <label className="block text-sm font-bold text-black">Voorkeurstaal</label>
+                  <div className="flex items-center gap-2">
+                    <select value={locale} onChange={(e)=> setLocale(e.target.value as 'nl'|'pl'|'en'|'de')} aria-label="Taal selecteren" className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                      <option value="nl">Nederlands</option>
+                      <option value="pl">Polski</option>
+                      <option value="en">English</option>
+                      <option value="de">Deutsch</option>
+                    </select>
+                    <button
+                      type="button"
+                      disabled={savingLocale}
+                      onClick={async ()=>{
+                        setSavingLocale(true);
+                        try {
+                          await fetch('/api/user/locale', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ locale }) });
+                        } finally { setSavingLocale(false); }
+                      }}
+                      className="mt-1 inline-flex items-center px-4 py-2 rounded bg-blue-600 text-white font-bold hover:bg-blue-700"
+                    >Opslaan</button>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">De interface herlaadt automatisch met de gekozen taal.</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Datumformaat</label>
@@ -170,7 +205,7 @@ export default function SettingsPage() {
                 <label className="block text-sm font-medium text-gray-700">Bedrijfsnaam</label>
                 <input
                   type="text"
-                  defaultValue="CKW Personeelszaken"
+                  defaultValue="ADS Personeelsapp"
                   aria-label="Bedrijfsnaam"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
@@ -307,7 +342,39 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Security Tab */}
+            {/* Notifications Tab (enhanced) */}
+      {selectedTab === 'notifications' && (
+        <div className="space-y-6">
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-4 py-5 sm:p-6">
+              <h3 className="text-lg font-medium text-black mb-4">E-mail Notificaties</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-bold text-black">E-mails ontvangen</div>
+                    <p className="text-sm text-gray-600">Ontvang e-mails over tijdregistratie, verlof en goedkeuringen</p>
+                  </div>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" checked={emailPref} onChange={(e)=> setEmailPref(e.target.checked)} />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-blue-600 relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                  </label>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    disabled={savingPref}
+                    onClick={async ()=>{
+                      setSavingPref(true);
+                      try { await fetch('/api/user/preferences', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ emailEnabled: emailPref }) }); } finally { setSavingPref(false); }
+                    }}
+                    className="inline-flex items-center px-4 py-2 rounded bg-blue-600 text-white font-bold hover:bg-blue-700 disabled:opacity-60"
+                  >Opslaan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}{/* Security Tab */}
       {selectedTab === 'security' && (
         <div className="space-y-6">
           <div className="bg-white shadow rounded-lg">
@@ -421,3 +488,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

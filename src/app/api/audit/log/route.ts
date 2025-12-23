@@ -2,8 +2,7 @@
  * API route voor audit logging
  */
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth/auth-options";
+import { auth } from "@/lib/auth/auth";
 import { v4 as uuidv4 } from "uuid";
 import { AuditLogEntry, AuditCategory } from "@/lib/services/audit-service";
 
@@ -18,7 +17,7 @@ const auditLogs: AuditLogEntry[] = [];
 export async function POST(request: NextRequest) {
   try {
     // Sessie controleren
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
     }

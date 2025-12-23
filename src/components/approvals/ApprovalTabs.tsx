@@ -19,8 +19,8 @@ export default function ApprovalTabs({ activeTab, setActiveTab, counts }: Approv
           onClick={() => setActiveTab("all")}
           className={`${
             activeTab === "all"
-              ? "border-blue-500 text-blue-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-black hover:text-blue-600 hover:border-blue-300"
           } w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm`}
         >
           Alle ({counts.all})
@@ -29,8 +29,8 @@ export default function ApprovalTabs({ activeTab, setActiveTab, counts }: Approv
           onClick={() => setActiveTab("timesheet")}
           className={`${
             activeTab === "timesheet"
-              ? "border-blue-500 text-blue-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-black hover:text-blue-600 hover:border-blue-300"
           } w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm`}
         >
           Tijdregistraties ({counts.timesheet})
@@ -39,8 +39,8 @@ export default function ApprovalTabs({ activeTab, setActiveTab, counts }: Approv
           onClick={() => setActiveTab("vacation")}
           className={`${
             activeTab === "vacation"
-              ? "border-blue-500 text-blue-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-black hover:text-blue-600 hover:border-blue-300"
           } w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm`}
         >
           Vakanties ({counts.vacation})
@@ -49,8 +49,8 @@ export default function ApprovalTabs({ activeTab, setActiveTab, counts }: Approv
           onClick={() => setActiveTab("sickleave")}
           className={`${
             activeTab === "sickleave"
-              ? "border-blue-500 text-blue-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              ? "border-blue-600 text-blue-600"
+              : "border-transparent text-black hover:text-blue-600 hover:border-blue-300"
           } w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm`}
         >
           Ziekmeldingen ({counts.sickleave})

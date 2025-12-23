@@ -36,8 +36,8 @@ export default function SickLeavePage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Ziekmeldingen</h1>
-        <p className="text-gray-600">Beheer je ziekmeldingen en herstelregistraties</p>
+        <h1 className="text-2xl font-bold text-black">Ziekmeldingen</h1>
+        <p className="text-black font-medium">Beheer je ziekmeldingen en herstelregistraties</p>
       </div>
 
       {/* Tabs */}
@@ -48,8 +48,8 @@ export default function SickLeavePage() {
               onClick={() => setSelectedTab('overview')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'overview'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Overzicht
@@ -58,8 +58,8 @@ export default function SickLeavePage() {
               onClick={() => setSelectedTab('report')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'report'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Ziekmelding
@@ -68,8 +68,8 @@ export default function SickLeavePage() {
               onClick={() => setSelectedTab('recovery')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'recovery'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Herstelmelding
@@ -84,22 +84,22 @@ export default function SickLeavePage() {
           {/* Statistics */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Dit Jaar</h3>
+              <h3 className="text-lg font-medium text-black mb-2">Dit Jaar</h3>
               <div className="text-3xl font-bold text-red-600">8</div>
               <p className="text-sm text-gray-500">Ziektedagen</p>
             </div>
             <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Gemiddeld</h3>
+              <h3 className="text-lg font-medium text-black mb-2">Gemiddeld</h3>
               <div className="text-3xl font-bold text-blue-600">2.1</div>
               <p className="text-sm text-gray-500">Dagen per melding</p>
             </div>
             <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Laatste</h3>
+              <h3 className="text-lg font-medium text-black mb-2">Laatste</h3>
               <div className="text-3xl font-bold text-green-600">28</div>
               <p className="text-sm text-gray-500">Dagen geleden</p>
             </div>
             <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Status</h3>
+              <h3 className="text-lg font-medium text-black mb-2">Status</h3>
               <div className="text-3xl font-bold text-green-600">✓</div>
               <p className="text-sm text-gray-500">Gezond</p>
             </div>
@@ -108,7 +108,7 @@ export default function SickLeavePage() {
           {/* Recent Records */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Recente Ziekmeldingen</h3>
+              <h3 className="text-lg font-medium text-black mb-4">Recente Ziekmeldingen</h3>
               <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-50">
@@ -162,7 +162,7 @@ export default function SickLeavePage() {
       {selectedTab === 'report' && (
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Nieuwe Ziekmelding</h3>
+            <h3 className="text-lg font-medium text-black mb-4">Nieuwe Ziekmelding</h3>
             <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
               <div className="flex">
                 <div className="flex-shrink-0">
@@ -232,7 +232,7 @@ export default function SickLeavePage() {
       {selectedTab === 'recovery' && (
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Herstelmelding</h3>
+            <h3 className="text-lg font-medium text-black mb-4">Herstelmelding</h3>
             <div className="bg-green-50 border border-green-200 rounded-md p-4 mb-6">
               <div className="flex">
                 <div className="flex-shrink-0">

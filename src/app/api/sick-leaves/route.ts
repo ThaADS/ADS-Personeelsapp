@@ -36,13 +36,13 @@ export async function GET(request: NextRequest) {
       // Using audit logs to track sick leave requests
       const skip = (page - 1) * limit;
       
-      const where: any = {
+      const where: Record<string, unknown> = {
         tenantId: context.tenantId,
         action: 'SICK_LEAVE_REQUEST',
       };
 
       if (status) {
-        where.newValues = {
+        (where as Record<string, unknown>).newValues = {
           path: ['status'],
           equals: status,
         };

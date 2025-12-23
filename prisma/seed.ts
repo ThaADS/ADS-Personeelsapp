@@ -1,6 +1,27 @@
 import { PrismaClient } from '@prisma/client';
-import { UserRole, PlanType, SubscriptionStatus } from '@/types';
 import { hash } from 'bcrypt';
+
+// Define types locally since @/types is not available in seed context
+enum UserRole {
+  SUPERUSER = 'SUPERUSER',
+  TENANT_ADMIN = 'TENANT_ADMIN',
+  MANAGER = 'MANAGER',
+  USER = 'USER'
+}
+
+enum PlanType {
+  FREEMIUM = 'FREEMIUM',
+  STANDARD = 'STANDARD'
+}
+
+enum SubscriptionStatus {
+  TRIAL = 'TRIAL',
+  ACTIVE = 'ACTIVE',
+  FREEMIUM = 'FREEMIUM',
+  CANCELED = 'CANCELED',
+  PAST_DUE = 'PAST_DUE',
+  UNPAID = 'UNPAID'
+}
 
 const prisma = new PrismaClient();
 
@@ -20,7 +41,7 @@ async function main() {
       yearlyPrice: 0.00,
       includedUsers: 1,
       pricePerExtraUser: 0.00,
-      features: {
+      features: JSON.stringify({
         timeTracking: true,
         basicReports: true,
         emailSupport: true,
@@ -29,7 +50,7 @@ async function main() {
         apiAccess: false,
         prioritySupport: false,
         customBranding: false
-      },
+      }),
       isActive: true,
     },
   });
@@ -44,7 +65,7 @@ async function main() {
       yearlyPrice: 479.52, // 20% discount: 49.95 * 12 * 0.8
       includedUsers: 3,
       pricePerExtraUser: 4.95,
-      features: {
+      features: JSON.stringify({
         timeTracking: true,
         basicReports: true,
         emailSupport: true,
@@ -55,7 +76,7 @@ async function main() {
         customBranding: true,
         routeVisionIntegration: true,
         complianceReports: true
-      },
+      }),
       isActive: true,
     },
   });
@@ -91,7 +112,7 @@ async function main() {
       subscriptionStatus: SubscriptionStatus.TRIAL,
       currentPlan: PlanType.STANDARD,
       trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-      settings: {
+      settings: JSON.stringify({
         companyLogo: null,
         timeZone: 'Europe/Amsterdam',
         currency: 'EUR',
@@ -104,7 +125,7 @@ async function main() {
           saturday: null,
           sunday: null
         }
-      }
+      })
     },
   });
 
@@ -213,7 +234,7 @@ async function main() {
       type: 'BANNER',
       isActive: true,
       priority: 1,
-      tenantIds: [], // Show to all freemium tenants
+      tenantIds: "", // Show to all freemium tenants
     },
   });
 
@@ -229,7 +250,7 @@ async function main() {
       type: 'MODAL',
       isActive: true,
       priority: 2,
-      tenantIds: [],
+      tenantIds: "",
     },
   });
 

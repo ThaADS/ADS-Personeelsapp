@@ -36,20 +36,20 @@ export async function GET(request: NextRequest) {
       // In a full implementation, you'd have a dedicated Vacation model
       const skip = (page - 1) * limit;
       
-      const where: any = {
+      const where: Record<string, unknown> = {
         tenantId: context.tenantId,
         action: { in: ['VACATION_REQUEST', 'TIJD_VOOR_TIJD_REQUEST'] },
       };
 
       if (status) {
-        where.newValues = {
+        (where as Record<string, unknown>).newValues = {
           path: ['status'],
           equals: status,
         };
       }
 
       if (type) {
-        where.action = type === 'vacation' ? 'VACATION_REQUEST' : 'TIJD_VOOR_TIJD_REQUEST';
+        (where as Record<string, unknown>).action = type === 'vacation' ? 'VACATION_REQUEST' : 'TIJD_VOOR_TIJD_REQUEST';
       }
 
       const [vacationLogs, total] = await Promise.all([

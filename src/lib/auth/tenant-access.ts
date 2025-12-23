@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth/auth';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { UserRole } from '@/types';
 import { canUserAccessTenant, isSuperuser } from '@/lib/tenant';
 import { hasPermission, Permission } from '@/lib/rbac';
@@ -209,7 +209,7 @@ async function requireUserAccess(userId: string, context: TenantContext) {
 /**
  * Filter query to only include tenant-specific data
  */
-export function addTenantFilter<T extends Record<string, any>>(
+export function addTenantFilter<T extends Record<string, unknown>>(
   where: T,
   tenantId: string
 ): T & { tenantId: string } {
@@ -226,8 +226,8 @@ export async function createAuditLog(
   action: string,
   resource?: string,
   resourceId?: string,
-  oldValues?: any,
-  newValues?: any
+  oldValues?: unknown,
+  newValues?: unknown
 ) {
   const context = await getTenantContext();
   
@@ -243,8 +243,8 @@ export async function createAuditLog(
         action,
         resource,
         resourceId,
-        oldValues,
-        newValues,
+        oldValues: (oldValues ?? null) as unknown as Prisma.InputJsonValue,
+        newValues: (newValues ?? null) as unknown as Prisma.InputJsonValue,
       },
     });
   } catch (error) {

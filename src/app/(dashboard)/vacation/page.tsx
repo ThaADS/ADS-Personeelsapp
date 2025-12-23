@@ -36,8 +36,8 @@ export default function VacationPage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Vakantie & Verlof</h1>
-        <p className="text-gray-600">Beheer je vakantiedagen en verlofaanvragen</p>
+        <h1 className="text-2xl font-bold text-black">Vakantie & Verlof</h1>
+        <p className="text-black font-medium">Beheer je vakantiedagen en verlofaanvragen</p>
       </div>
 
       {/* Tabs */}
@@ -48,8 +48,8 @@ export default function VacationPage() {
               onClick={() => setSelectedTab('overview')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'overview'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Overzicht
@@ -58,8 +58,8 @@ export default function VacationPage() {
               onClick={() => setSelectedTab('request')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'request'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Nieuwe Aanvraag
@@ -68,8 +68,8 @@ export default function VacationPage() {
               onClick={() => setSelectedTab('balance')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'balance'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
               }`}
             >
               Saldo
@@ -83,7 +83,7 @@ export default function VacationPage() {
         <div className="space-y-6">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Recente Aanvragen</h3>
+              <h3 className="text-lg font-medium text-black mb-4">Recente Aanvragen</h3>
               <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-50">
@@ -137,7 +137,7 @@ export default function VacationPage() {
       {selectedTab === 'request' && (
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Nieuwe Vakantieaanvraag</h3>
+            <h3 className="text-lg font-medium text-black mb-4">Nieuwe Vakantieaanvraag</h3>
             <form className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
@@ -191,17 +191,17 @@ export default function VacationPage() {
       {selectedTab === 'balance' && (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Vakantiedagen</h3>
+            <h3 className="text-lg font-medium text-black mb-2">Vakantiedagen</h3>
             <div className="text-3xl font-bold text-blue-600">23</div>
             <p className="text-sm text-gray-500">Beschikbaar dit jaar</p>
           </div>
           <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Gebruikt</h3>
+            <h3 className="text-lg font-medium text-black mb-2">Gebruikt</h3>
             <div className="text-3xl font-bold text-green-600">12</div>
             <p className="text-sm text-gray-500">Dagen opgenomen</p>
           </div>
           <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Gepland</h3>
+            <h3 className="text-lg font-medium text-black mb-2">Gepland</h3>
             <div className="text-3xl font-bold text-orange-600">5</div>
             <p className="text-sm text-gray-500">Goedgekeurde aanvragen</p>
           </div>
