@@ -199,3 +199,35 @@ body:not(.dark) .text-gray-600 { color: #4b5563 !important; }
 body:not(.dark) .text-gray-700 { color: #374151 !important; }
 body:not(.dark) .text-gray-800 { color: #1f2937 !important; }
 body:not(.dark) .text-gray-900 { color: #111827 !important; }
+
+/* Blob animation for background elements */
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -50px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(50px, 50px) scale(1.05);
+  }
+}
+
+.animate-blob {
+  animation: blob 20s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
