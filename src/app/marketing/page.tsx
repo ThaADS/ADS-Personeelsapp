@@ -322,7 +322,7 @@ export default function MarketingHome() {
               </div>
 
               <blockquote className="text-xl lg:text-2xl text-gray-900 font-medium mb-8 leading-relaxed">
-                "{testimonials[activeTestimonial].content}"
+                &ldquo;{testimonials[activeTestimonial].content}&rdquo;
               </blockquote>
 
               <div className="flex items-center gap-4">
