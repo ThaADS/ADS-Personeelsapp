@@ -1,7 +1,6 @@
 import { auth } from '@/lib/auth/auth';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { UserRole } from '@/types';
-import { canUserAccessTenant, isSuperuser } from '@/lib/tenant';
 import { hasPermission, Permission } from '@/lib/rbac';
 import { headers } from 'next/headers';
 

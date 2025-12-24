@@ -2,7 +2,7 @@
  * API route voor werknemers beheer
  */
 import { NextRequest, NextResponse } from "next/server";
-import { getTenantContext, requirePermission } from "@/lib/auth/tenant-access";
+import { getTenantContext } from "@/lib/auth/tenant-access";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

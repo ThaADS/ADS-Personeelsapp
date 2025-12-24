@@ -58,7 +58,6 @@ export async function GET(request: NextRequest) {
     };
 
     const outItems: Item[] = [];
-    let total = 0;
 
     const includeUser = {
       select: { id: true, name: true, email: true },
@@ -77,7 +76,6 @@ export async function GET(request: NextRequest) {
           take: type === 'timesheet' ? limit : 100, // cap to keep it light in 'all'
         }),
       ]);
-      total += countTs;
       outItems.push(
         ...listTs.map((t) => ({
           id: t.id,
@@ -189,7 +187,7 @@ export async function GET(request: NextRequest) {
 // POST handler - approve/reject items
 export async function POST(request: NextRequest) {
   try {
-    return await withPermission('timesheet:approve', async (context) => {
+    return await withPermission('timesheet:approve', async () => {
       const body = await request.json();
       const validatedData = approvalActionSchema.parse(body);
       const { ids, action, comment } = validatedData;
