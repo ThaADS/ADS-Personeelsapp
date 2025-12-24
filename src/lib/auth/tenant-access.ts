@@ -1,7 +1,6 @@
 import { auth } from '@/lib/auth/auth';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { UserRole } from '@/types';
-import { canUserAccessTenant, isSuperuser } from '@/lib/tenant';
 import { hasPermission, Permission } from '@/lib/rbac';
 import { headers } from 'next/headers';
 
@@ -19,8 +18,11 @@ export interface TenantContext {
  */
 export async function getTenantContext(): Promise<TenantContext | null> {
   const session = await auth();
-  
+
+  console.log('[getTenantContext] Session user:', session?.user);
+
   if (!session?.user) {
+    console.log('[getTenantContext] No session or user - returning null');
     return null;
   }
 
@@ -28,7 +30,9 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   if (session.user.isSuperuser) {
     const headersList = await headers();
     const tenantId = headersList.get('x-tenant-id') || session.user.tenantId;
-    
+
+    console.log('[getTenantContext] Superuser with tenantId:', tenantId);
+
     if (!tenantId) {
       return {
         tenantId: '', // Superuser without specific tenant
@@ -47,7 +51,10 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   }
 
   // Regular users must have tenant context
+  console.log('[getTenantContext] Regular user tenantId from session:', session.user.tenantId);
+
   if (!session.user.tenantId) {
+    console.log('[getTenantContext] No tenantId in session - returning null');
     return null;
   }
 
@@ -68,7 +75,7 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   return {
     tenantId: session.user.tenantId,
     userId: session.user.id,
-    userRole: tenantUser.role,
+    userRole: tenantUser.role as UserRole,
     isSuperuser: false,
   };
 }
@@ -243,8 +250,8 @@ export async function createAuditLog(
         action,
         resource,
         resourceId,
-        oldValues: (oldValues ?? null) as unknown as Prisma.InputJsonValue,
-        newValues: (newValues ?? null) as unknown as Prisma.InputJsonValue,
+        oldValues: oldValues ? JSON.stringify(oldValues) : undefined,
+        newValues: newValues ? JSON.stringify(newValues) : undefined,
       },
     });
   } catch (error) {
@@ -304,5 +311,5 @@ export async function getUserTenantRole(userId: string, tenantId: string): Promi
     select: { role: true, isActive: true },
   });
 
-  return tenantUser?.isActive ? tenantUser.role : null;
+  return tenantUser?.isActive ? tenantUser.role as UserRole : null;
 }

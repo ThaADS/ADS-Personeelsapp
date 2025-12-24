@@ -133,29 +133,42 @@ export class StripeSubscriptionService {
     });
 
     if (plan) {
+      // Access subscription data (handle Stripe API response type)
+      const subData = subscription as unknown as {
+        id: string;
+        current_period_start: number;
+        current_period_end: number;
+        trial_end: number | null;
+      };
+
       await prisma.subscription.create({
         data: {
           tenantId,
           planId: plan.id,
-          stripeSubscriptionId: subscription.id,
+          stripeSubscriptionId: subData.id,
           stripePriceId: subscriptionPriceId,
           status: SubscriptionStatus.TRIAL,
-          currentPeriodStart: new Date(subscription.current_period_start * 1000),
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-          trialEnd: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
+          currentPeriodStart: new Date(subData.current_period_start * 1000),
+          currentPeriodEnd: new Date(subData.current_period_end * 1000),
+          trialEnd: subData.trial_end ? new Date(subData.trial_end * 1000) : null,
           userCount,
         },
       });
     }
 
-    // Update tenant
+    // Update tenant (reuse subData from above for type safety)
+    const subDataForTenant = subscription as unknown as {
+      id: string;
+      trial_end: number | null;
+    };
+
     await prisma.tenant.update({
       where: { id: tenantId },
       data: {
-        stripeSubscriptionId: subscription.id,
+        stripeSubscriptionId: subDataForTenant.id,
         subscriptionStatus: SubscriptionStatus.TRIAL,
         currentPlan: PlanType.STANDARD,
-        trialEndsAt: subscription.trial_end ? new Date(subscription.trial_end * 1000) : null,
+        trialEndsAt: subDataForTenant.trial_end ? new Date(subDataForTenant.trial_end * 1000) : null,
       },
     });
 

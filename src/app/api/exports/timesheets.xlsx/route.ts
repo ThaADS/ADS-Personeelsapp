@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
       date: t.date.toISOString().split('T')[0],
       startTime: t.startTime.toISOString(),
       endTime: t.endTime.toISOString(),
-      breakMinutes: t.breakDuration || 0,
-      hours: ((t.endTime.getTime() - t.startTime.getTime()) / (1000*60*60) - (t.breakDuration || 0)/60).toFixed(2),
+      breakMinutes: t.break_minutes || 0,
+      hours: ((t.endTime.getTime() - t.startTime.getTime()) / (1000*60*60) - (t.break_minutes || 0)/60).toFixed(2),
       status: t.status,
       description: t.description || '',
     }));

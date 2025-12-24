@@ -37,7 +37,11 @@ export async function fetchApprovals(
     
     // Valideer elk item en voeg validatieresultaten toe
     const validatedApprovals = data.items.map((item: ApprovalItem) => {
-      const validationResult = validateApproval(item, item.type as "timesheet" | "vacation" | "sickleave");
+      // Type assertion needed because API returns ApprovalItem, not Prisma types
+      const validationResult = validateApproval(
+        item as unknown as Parameters<typeof validateApproval>[0],
+        item.type as "timesheet" | "vacation" | "sickleave"
+      );
       return {
         ...item,
         validationWarnings: validationResult.warnings,

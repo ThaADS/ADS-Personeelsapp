@@ -1,6 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
+// Type definitions for test mocks
+interface MockTimesheet {
+  id: string;
+  tenantId: string;
+  userId?: string;
+  status?: string;
+}
+
+interface MockUser {
+  id: string;
+  email: string;
+  name: string;
+}
+
+interface MockTenantUser {
+  userId: string;
+  role: string;
+}
+
 // Mock the tenant access functions
 const mockGetTenantContext = vi.fn();
 const mockAddTenantFilter = vi.fn();
@@ -64,10 +83,13 @@ describe('Multi-Tenant Data Isolation Tests', () => {
         { id: 'ts-3', tenantId: 'tenant-1', userId: 'user-3', status: 'APPROVED' },
       ];
 
-      // Mock Prisma to return only tenant-1 timesheets
+      // Mock Prisma to return only tenant-1 timesheets with status filter
       mockPrismaClient.timesheet.findMany.mockImplementation(({ where }) => {
         if (where.tenantId === 'tenant-1') {
-          return Promise.resolve(allTimesheets.filter(ts => ts.tenantId === 'tenant-1'));
+          return Promise.resolve(allTimesheets.filter(ts =>
+            ts.tenantId === 'tenant-1' &&
+            (!where.status || ts.status === where.status)
+          ));
         }
         return Promise.resolve([]);
       });
@@ -81,7 +103,7 @@ describe('Multi-Tenant Data Isolation Tests', () => {
       expect(mockAddTenantFilter).toHaveBeenCalledWith(query, 'tenant-1');
       expect(results).toHaveLength(1); // Only ts-1 should be returned
       expect(results[0].tenantId).toBe('tenant-1');
-      expect(results.every(ts => ts.tenantId === 'tenant-1')).toBe(true);
+      expect(results.every((ts: MockTimesheet) => ts.tenantId === 'tenant-1')).toBe(true);
     });
 
     it('should prevent cross-tenant timesheet access', async () => {
@@ -144,7 +166,7 @@ describe('Multi-Tenant Data Isolation Tests', () => {
 
       // Assert
       expect(results).toHaveLength(3);
-      expect(results.map(ts => ts.tenantId)).toEqual(['tenant-1', 'tenant-2', 'tenant-3']);
+      expect(results.map((ts: MockTimesheet) => ts.tenantId)).toEqual(['tenant-1', 'tenant-2', 'tenant-3']);
     });
 
     it('should allow superuser to impersonate specific tenant', async () => {
@@ -198,8 +220,10 @@ describe('Multi-Tenant Data Isolation Tests', () => {
       ];
 
       mockPrismaClient.user.findMany.mockImplementation(({ where }) => {
-        if (where.tenantUsers?.some?.({ tenantId: 'tenant-1' })) {
-          return Promise.resolve(allUsers.filter(user => 
+        // Check Prisma's nested where structure: { tenantUsers: { some: { tenantId: 'tenant-1' } } }
+        const tenantFilter = where?.tenantUsers?.some?.tenantId;
+        if (tenantFilter === 'tenant-1') {
+          return Promise.resolve(allUsers.filter(user =>
             user.tenantUsers.some(tu => tu.tenantId === 'tenant-1')
           ));
         }
@@ -220,8 +244,8 @@ describe('Multi-Tenant Data Isolation Tests', () => {
 
       // Assert
       expect(results).toHaveLength(2); // Only users from tenant-1
-      expect(results.every(user => 
-        user.tenantUsers.some(tu => tu.tenantId === 'tenant-1')
+      expect(results.every((user: { tenantUsers: { tenantId: string }[] }) =>
+        user.tenantUsers.some((tu: { tenantId: string }) => tu.tenantId === 'tenant-1')
       )).toBe(true);
     });
 
@@ -249,10 +273,10 @@ describe('Multi-Tenant Data Isolation Tests', () => {
       const results = await mockPrismaClient.timesheet.findMany({ where: filteredQuery });
 
       // Assert
-      expect(results.every(ts => ts.tenantId === 'tenant-1')).toBe(true);
+      expect(results.every((ts: MockTimesheet) => ts.tenantId === 'tenant-1')).toBe(true);
       
       // Calculate metrics only on tenant-isolated data
-      const totalHours = results.reduce((sum, ts) => sum + ts.hours, 0);
+      const totalHours = results.reduce((sum: number, ts: MockTimesheet & { hours: number }) => sum + ts.hours, 0);
       expect(totalHours).toBe(15.5); // Only from tenant-1 data
     });
   });
@@ -363,7 +387,7 @@ describe('Multi-Tenant Data Isolation Tests', () => {
 
       mockPrismaClient.timesheet.create.mockImplementation(({ data }) => {
         if (data.tenantId !== userContext.tenantId) {
-          throw new Error('Cannot create record in different tenant');
+          return Promise.reject(new Error('Cannot create record in different tenant'));
         }
         return Promise.resolve({ id: 'ts-new', ...data });
       });

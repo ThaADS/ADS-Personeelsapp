@@ -38,9 +38,9 @@ import { cookies } from 'next/headers'
 import { createClient as createServerClient } from './server'
 
 export async function getServerSideData() {
-  const cookieStore = cookies()
-  const supabase = createServerClient(cookieStore)
-  
+  const cookieStore = await cookies()
+  const supabase = await createServerClient(cookieStore)
+
   const { data, error } = await supabase
     .from('your_table')
     .select('*')

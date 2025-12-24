@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Get the current domain for return URL
     const protocol = request.headers.get('x-forwarded-proto') || 'http';
     const host = request.headers.get('host') || 'localhost:3000';
-    const defaultReturnUrl = `${protocol}://${host}/dashboard/billing`;
+    const defaultReturnUrl = `${protocol}://${host}/billing`;
     
     const stripeService = new StripeSubscriptionService();
     const portalSession = await stripeService.createPortalSession(

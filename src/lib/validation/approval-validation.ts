@@ -92,7 +92,7 @@ export function validateTimesheet(timesheet: Timesheet): ValidationResult {
     }
 
     // Controleer werkduur
-    const workDurationMinutes = differenceInMinutes(endTime, startTime) - (timesheet.breakDuration || 0);
+    const workDurationMinutes = differenceInMinutes(endTime, startTime) - (timesheet.break_minutes || 0);
     
     if (workDurationMinutes < validationConfig.timesheet.minWorkDurationMinutes) {
       warnings.push({
@@ -113,22 +113,22 @@ export function validateTimesheet(timesheet: Timesheet): ValidationResult {
     }
 
     // Controleer pauze
-    if (timesheet.breakDuration === 0 && workDurationMinutes > 5.5 * 60) {
+    if (timesheet.break_minutes === 0 && workDurationMinutes > 5.5 * 60) {
       warnings.push({
         code: "NO_BREAK",
         message: "Geen pauze geregistreerd voor werkdag langer dan 5,5 uur",
       });
     }
     
-    if (timesheet.breakDuration && timesheet.breakDuration > validationConfig.timesheet.maxBreakDurationMinutes) {
+    if (timesheet.break_minutes && timesheet.break_minutes > validationConfig.timesheet.maxBreakDurationMinutes) {
       warnings.push({
         code: "LONG_BREAK",
-        message: `Ongebruikelijk lange pauze (${timesheet.breakDuration} minuten)`,
+        message: `Ongebruikelijk lange pauze (${timesheet.break_minutes} minuten)`,
       });
     }
 
-    // Controleer GPS-verificatie
-    if (!timesheet.locationVerified) {
+    // Controleer GPS-verificatie (check if location data is present)
+    if (!timesheet.location_start && !timesheet.location_end) {
       warnings.push({
         code: "NO_GPS_VERIFICATION",
         message: "Geen GPS-verificatie beschikbaar",
@@ -157,7 +157,7 @@ export function validateTimesheet(timesheet: Timesheet): ValidationResult {
         {
           code: "VALIDATION_ERROR",
           message: "Er is een fout opgetreden bij het valideren van de tijdregistratie",
-          details: error,
+          details: { errorMessage: error instanceof Error ? error.message : String(error) },
         },
       ],
     };
@@ -242,7 +242,7 @@ export function validateVacationRequest(
         {
           code: "VALIDATION_ERROR",
           message: "Er is een fout opgetreden bij het valideren van de vakantieaanvraag",
-          details: error,
+          details: { errorMessage: error instanceof Error ? error.message : String(error) },
         },
       ],
     };
@@ -311,7 +311,7 @@ export function validateSickLeave(sickLeave: SickLeave): ValidationResult {
         {
           code: "VALIDATION_ERROR",
           message: "Er is een fout opgetreden bij het valideren van de ziekmelding",
-          details: error,
+          details: { errorMessage: error instanceof Error ? error.message : String(error) },
         },
       ],
     };
@@ -328,11 +328,11 @@ export function validateApproval(
 ): ValidationResult {
   switch (type) {
     case "timesheet":
-      return validateTimesheet(item);
+      return validateTimesheet(item as Timesheet);
     case "vacation":
-      return validateVacationRequest(item, additionalData?.remainingDays);
+      return validateVacationRequest(item as VacationRequest, additionalData?.remainingDays);
     case "sickleave":
-      return validateSickLeave(item);
+      return validateSickLeave(item as SickLeave);
     default:
       return {
         isValid: false,

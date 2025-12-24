@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withPermission, createAuditLog, requirePermission } from "@/lib/auth/tenant-access";
 import { tenantDb } from "@/lib/db/tenant-db";
 import { z } from "zod";
+import { timesheet_status } from "@prisma/client";
 
 const approvalActionSchema = z.object({
   ids: z.array(z.string()),
@@ -58,7 +59,6 @@ export async function GET(request: NextRequest) {
     };
 
     const outItems: Item[] = [];
-    let total = 0;
 
     const includeUser = {
       select: { id: true, name: true, email: true },
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
 
     // Timesheets
     if (type === 'all' || type === 'timesheet') {
-      const whereTs = { tenantId: context!.tenantId, status } as const;
+      const whereTs = { tenantId: context!.tenantId, status: status as timesheet_status };
       const [countTs, listTs] = await Promise.all([
         prisma.timesheet.count({ where: whereTs }),
         prisma.timesheet.findMany({
@@ -77,21 +77,20 @@ export async function GET(request: NextRequest) {
           take: type === 'timesheet' ? limit : 100, // cap to keep it light in 'all'
         }),
       ]);
-      total += countTs;
       outItems.push(
         ...listTs.map((t) => ({
           id: t.id,
-          type: 'timesheet',
+          type: 'timesheet' as const,
           employeeId: t.userId,
           employeeName: t.user?.name || t.user?.email || 'Onbekend',
-          submittedAt: t.createdAt.toISOString(),
-          status: t.status,
+          submittedAt: t.createdAt?.toISOString() || new Date().toISOString(),
+          status: t.status || 'PENDING',
           date: t.date.toISOString().split('T')[0],
           startTime: t.startTime.toISOString(),
           endTime: t.endTime.toISOString(),
           description: t.description || undefined,
-          breakDuration: t.breakDuration || 0,
-        }))
+          breakDuration: t.break_minutes || 0,
+        } satisfies Item))
       );
       if (type === 'timesheet') {
         return NextResponse.json({
@@ -111,16 +110,15 @@ export async function GET(request: NextRequest) {
         take: type === 'vacation' ? limit : 100,
       });
       const filtered = logs.filter((l) => (l as unknown as { newValues?: { status?: string } }).newValues?.status === status);
-      total += (type === 'vacation' ? filtered.length : logs.length);
       outItems.push(
         ...filtered.map((l) => {
           const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
           return {
             id: l.id,
-            type: (l.action === 'VACATION_REQUEST' ? 'vacation' : 'tijd-voor-tijd') as const,
+            type: (l.action === 'VACATION_REQUEST' ? 'vacation' : 'tijd-voor-tijd') as 'vacation' | 'tijd-voor-tijd',
             employeeId: l.userId!,
             employeeName: l.user?.name || l.user?.email || 'Onbekend',
-            submittedAt: l.createdAt.toISOString(),
+            submittedAt: l.createdAt?.toISOString() || new Date().toISOString(),
             status: (nv.status as string) || 'PENDING',
             startDate: nv.startDate as string | undefined,
             endDate: nv.endDate as string | undefined,
@@ -147,7 +145,6 @@ export async function GET(request: NextRequest) {
         take: type === 'sickleave' ? limit : 100,
       });
       const filtered = logs.filter((l) => (l as unknown as { newValues?: { status?: string } }).newValues?.status === status);
-      total += (type === 'sickleave' ? filtered.length : logs.length);
       outItems.push(
         ...filtered.map((l) => {
           const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
@@ -156,7 +153,7 @@ export async function GET(request: NextRequest) {
             type: 'sick-leave' as const,
             employeeId: l.userId!,
             employeeName: l.user?.name || l.user?.email || 'Onbekend',
-            submittedAt: l.createdAt.toISOString(),
+            submittedAt: l.createdAt?.toISOString() || new Date().toISOString(),
             status: (nv.status as string) || 'PENDING',
             startDate: nv.startDate as string | undefined,
             endDate: nv.endDate as string | undefined,
@@ -189,7 +186,7 @@ export async function GET(request: NextRequest) {
 // POST handler - approve/reject items
 export async function POST(request: NextRequest) {
   try {
-    return await withPermission('timesheet:approve', async (context) => {
+    return await withPermission('timesheet:approve', async () => {
       const body = await request.json();
       const validatedData = approvalActionSchema.parse(body);
       const { ids, action, comment } = validatedData;
@@ -245,7 +242,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 }
       );
     }

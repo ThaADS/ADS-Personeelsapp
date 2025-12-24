@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission } from "@/lib/auth/tenant-access";
+import { timesheet_status } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const status = url.searchParams.get('status') || 'APPROVED';
+    const statusParam = url.searchParams.get('status') || 'APPROVED';
+    const status = statusParam as timesheet_status;
 
     const context = await requirePermission('timesheet:approve');
     const prisma = new (await import('@prisma/client')).PrismaClient();
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest) {
     ];
     const csv = [header.join(',')].concat(
       rows.map((t) => {
-        const hours = (t.endTime.getTime() - t.startTime.getTime()) / (1000*60*60) - (t.breakDuration || 0)/60;
+        const hours = (t.endTime.getTime() - t.startTime.getTime()) / (1000*60*60) - (t.break_minutes || 0)/60;
         const vals = [
           t.id,
           t.user?.email || '',
@@ -29,7 +31,7 @@ export async function GET(request: NextRequest) {
           t.date.toISOString().split('T')[0],
           t.startTime.toISOString(),
           t.endTime.toISOString(),
-          String(t.breakDuration || 0),
+          String(t.break_minutes || 0),
           hours.toFixed(2),
           t.status,
           (t.description || '').replace(/\n|\r|,/g,' '),

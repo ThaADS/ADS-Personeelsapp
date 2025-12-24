@@ -2,7 +2,7 @@
  * API route voor vakantie en tijd-voor-tijd
  */
 import { NextRequest, NextResponse } from "next/server";
-import { withTenantAccess, createAuditLog } from "@/lib/auth/tenant-access";
+import { getTenantContext, createAuditLog, addTenantFilter } from "@/lib/auth/tenant-access";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
@@ -15,8 +15,8 @@ const vacationSchema = z.object({
   endDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
     message: "Invalid end date",
   }),
-  description: z.string().min(1, "Description is required"),
-  type: z.enum(['vacation', 'tijd-voor-tijd']),
+  description: z.string().optional(),
+  type: z.enum(['VACATION', 'TIME_FOR_TIME']),
 });
 
 /**
@@ -25,83 +25,94 @@ const vacationSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
-    return await withTenantAccess(async (context) => {
-      const url = new URL(request.url);
-      const page = parseInt(url.searchParams.get("page") || "1");
-      const limit = parseInt(url.searchParams.get("limit") || "10");
-      const status = url.searchParams.get("status") || undefined;
-      const type = url.searchParams.get("type") || undefined;
+    const context = await getTenantContext();
 
-      // For now, using audit logs to track vacation requests
-      // In a full implementation, you'd have a dedicated Vacation model
-      const skip = (page - 1) * limit;
-      
-      const where: Record<string, unknown> = {
-        tenantId: context.tenantId,
-        action: { in: ['VACATION_REQUEST', 'TIJD_VOOR_TIJD_REQUEST'] },
-      };
+    if (!context) {
+      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+    }
 
-      if (status) {
-        (where as Record<string, unknown>).newValues = {
-          path: ['status'],
-          equals: status,
-        };
-      }
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    const status = url.searchParams.get("status") || undefined;
+    const type = url.searchParams.get("type") || undefined;
 
-      if (type) {
-        (where as Record<string, unknown>).action = type === 'vacation' ? 'VACATION_REQUEST' : 'TIJD_VOOR_TIJD_REQUEST';
-      }
+    // Build where clause
+    let where: Record<string, unknown> = {};
 
-      const [vacationLogs, total] = await Promise.all([
-        prisma.auditLog.findMany({
-          where,
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
+    // Tenant filtering
+    if (context.tenantId) {
+      where = addTenantFilter(where, context.tenantId);
+    }
+
+    // Type filtering - only VACATION and TIME_FOR_TIME
+    if (type) {
+      where.type = type === 'vacation' ? 'VACATION' : 'TIME_FOR_TIME';
+    } else {
+      where.type = { in: ['VACATION', 'TIME_FOR_TIME'] };
+    }
+
+    // Status filtering
+    if (status) {
+      where.status = status.toUpperCase();
+    }
+
+    // User filtering - regular users can only see their own requests
+    if (context.userRole === 'USER') {
+      where.userId = context.userId;
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [requests, total] = await Promise.all([
+      prisma.leaveRequest.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
             },
           },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          skip,
-          take: limit,
-        }),
-        prisma.auditLog.count({ where }),
-      ]);
-
-      // Transform audit logs to vacation format
-      const vacations = vacationLogs.map(log => ({
-        id: log.id,
-        type: log.action === 'VACATION_REQUEST' ? 'vacation' : 'tijd-voor-tijd',
-        employeeId: log.userId,
-        employeeName: log.user?.name || log.user?.email || 'Unknown',
-        startDate: log.newValues?.startDate || '',
-        endDate: log.newValues?.endDate || '',
-        description: log.newValues?.description || '',
-        totalDays: log.newValues?.totalDays || 0,
-        submittedAt: log.createdAt.toISOString(),
-        status: log.newValues?.status || 'pending',
-      }));
-
-      return NextResponse.json({
-        items: vacations,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
         },
-      });
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.leaveRequest.count({ where }),
+    ]);
+
+    // Transform to response format
+    const items = requests.map(req => ({
+      id: req.id,
+      type: req.type === 'VACATION' ? 'vacation' : 'tijd-voor-tijd',
+      employeeId: req.userId,
+      employeeName: req.user?.name || req.user?.email || 'Onbekend',
+      startDate: req.startDate.toISOString().split('T')[0],
+      endDate: req.endDate.toISOString().split('T')[0],
+      description: req.description || '',
+      totalDays: req.totalDays,
+      submittedAt: req.createdAt?.toISOString() || new Date().toISOString(),
+      status: (req.status || 'pending').toLowerCase(),
+      reviewedBy: req.reviewedBy,
+      reviewedAt: req.reviewedAt?.toISOString(),
+      reviewNotes: req.reviewNotes,
+    }));
+
+    return NextResponse.json({
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error("Error in vacations GET:", error);
-    if (error instanceof Error && error.message.includes('Authentication required')) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
-    }
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }
@@ -112,62 +123,94 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    return await withTenantAccess(async (context) => {
-      const body = await request.json();
-      const validatedData = vacationSchema.parse(body);
+    const context = await getTenantContext();
 
-      // Calculate total days
-      const startDate = new Date(validatedData.startDate);
-      const endDate = new Date(validatedData.endDate);
-      
-      if (endDate < startDate) {
-        return NextResponse.json(
-          { error: "End date must be after start date" },
-          { status: 400 }
-        );
-      }
+    if (!context) {
+      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+    }
 
-      const diffTime = endDate.getTime() - startDate.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    if (!context.tenantId) {
+      return NextResponse.json({ error: "Geen tenant context" }, { status: 400 });
+    }
 
-      const vacationData = {
+    const body = await request.json();
+    const validatedData = vacationSchema.parse(body);
+
+    // Calculate total days
+    const startDate = new Date(validatedData.startDate);
+    const endDate = new Date(validatedData.endDate);
+
+    if (endDate < startDate) {
+      return NextResponse.json(
+        { error: "Einddatum moet na startdatum liggen" },
+        { status: 400 }
+      );
+    }
+
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    // Create leave request
+    const leaveRequest = await prisma.leaveRequest.create({
+      data: {
+        tenantId: context.tenantId,
+        userId: context.userId,
+        type: validatedData.type,
+        startDate,
+        endDate,
+        totalDays: diffDays,
+        description: validatedData.description || null,
+        status: 'PENDING',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    // Create audit log
+    await createAuditLog(
+      validatedData.type === 'VACATION' ? 'VACATION_REQUEST' : 'TIME_FOR_TIME_REQUEST',
+      'LeaveRequest',
+      leaveRequest.id,
+      null,
+      {
         startDate: validatedData.startDate,
         endDate: validatedData.endDate,
         description: validatedData.description,
         totalDays: diffDays,
-        status: 'pending',
-        type: validatedData.type,
-      };
+      }
+    );
 
-      // Create audit log entry for the vacation request
-      await createAuditLog(
-        validatedData.type === 'vacation' ? 'VACATION_REQUEST' : 'TIJD_VOOR_TIJD_REQUEST',
-        'Vacation',
-        undefined,
-        undefined,
-        vacationData
-      );
-
-      return NextResponse.json({
-        id: `vac-${Date.now()}`,
-        type: validatedData.type,
-        employeeId: context.userId,
-        ...vacationData,
-        submittedAt: new Date().toISOString(),
-      }, { status: 201 });
-    });
+    return NextResponse.json({
+      success: true,
+      request: {
+        id: leaveRequest.id,
+        type: leaveRequest.type === 'VACATION' ? 'vacation' : 'tijd-voor-tijd',
+        employeeId: leaveRequest.userId,
+        employeeName: leaveRequest.user?.name || leaveRequest.user?.email || 'Onbekend',
+        startDate: leaveRequest.startDate.toISOString().split('T')[0],
+        endDate: leaveRequest.endDate.toISOString().split('T')[0],
+        description: leaveRequest.description,
+        totalDays: leaveRequest.totalDays,
+        status: (leaveRequest.status || 'pending').toLowerCase(),
+        submittedAt: leaveRequest.createdAt?.toISOString() || new Date().toISOString(),
+      },
+    }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validatiefout", details: error.issues },
         { status: 400 }
       );
     }
 
     console.error("Error in vacations POST:", error);
-    if (error instanceof Error && error.message.includes('Authentication required')) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
-    }
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }

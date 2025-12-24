@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
     const host = request.headers.get('host') || 'localhost:3000';
     const baseUrl = `${protocol}://${host}`;
     
-    const successUrl = validatedData.returnUrl || `${baseUrl}/dashboard/billing?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/dashboard/billing?canceled=true`;
+    const successUrl = validatedData.returnUrl || `${baseUrl}/billing?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${baseUrl}/billing?canceled=true`;
 
     const checkoutSession = await stripeService.createCheckoutSession(
       session.user.tenantId,
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: error.issues },
         { status: 400 }
       );
     }

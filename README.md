@@ -1,296 +1,342 @@
-# CKW Personeelsapp ✅ VOLLEDIG FUNCTIONEEL
+# ADS Personeelsapp
 
-## 🎉 Status: PRODUCTIE-KLAAR
+<div align="center">
 
-**De CKW Personeelsapp is volledig operationeel en klaar voor gebruik!**
+![Next.js](https://img.shields.io/badge/Next.js-15.5-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
+![Prisma](https://img.shields.io/badge/Prisma-6.15-2D3748?style=for-the-badge&logo=prisma)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase)
+![Stripe](https://img.shields.io/badge/Stripe-Payments-635BFF?style=for-the-badge&logo=stripe)
 
-✅ **Login werkt perfect** - NextAuth v5 geïmplementeerd  
-✅ **Alle pagina's functioneel** - Dashboard, Vakantie, Ziekmeldingen, Tijdregistratie, etc.  
-✅ **Responsive design** - Werkt op desktop, tablet en mobiel  
-✅ **Nederlandse interface** - Volledig gelokaliseerd  
-✅ **Veilige authenticatie** - Rolgebaseerde toegangscontrole  
+**Een modern, multi-tenant HR management platform voor Nederlandse bedrijven**
+
+[Demo](https://adspersoneelsapp.vercel.app) · [Documentatie](#-documentatie) · [Bijdragen](#-contributing)
+
+</div>
+
+---
 
 ## Overzicht
 
-De CKW Personeelsapp is een uitgebreid HR-managementsysteem ontwikkeld voor Nederlandse bedrijven, met speciale aandacht voor compliance met Nederlandse arbeidswetgeving, AVG/GDPR, en efficiënte tijdregistratie. Het systeem biedt uitgebreide functionaliteiten voor personeelsbeheer, goedkeuringsworkflows, verlofbeheer en tijdregistratie.
+ADS Personeelsapp is een uitgebreid SaaS HR-managementsysteem speciaal ontwikkeld voor Nederlandse bedrijven. Het platform biedt volledige ondersteuning voor tijdregistratie, verlofbeheer, goedkeuringsworkflows en facturatie - allemaal met strikte naleving van Nederlandse arbeidswetgeving en AVG/GDPR.
 
-## Belangrijkste Functionaliteiten
+### Waarom ADS Personeelsapp?
 
-- **Authenticatie en Rolgebaseerde Toegangscontrole (RBAC)**
-  - Veilige inlogprocedures met meerdere authenticatiemethoden
-  - Gedetailleerde rolgebaseerde toegangscontrole voor verschillende gebruikerstypen
+- **Multi-tenant architectuur** - Volledige data-isolatie per organisatie
+- **Nederlandse compliance** - AVG/GDPR en Arbeidstijdenwet ready
+- **Modern & snel** - Next.js 15 met Turbopack voor razendsnelle ontwikkeling
+- **SaaS-ready** - Stripe integratie voor subscripties en facturatie
+- **Responsive design** - Perfect op desktop, tablet én mobiel
+- **Light/Dark mode** - Gebruiksvriendelijke thema-schakelaar
 
-- **Personeelsbeheer**
-  - Beheer van werknemersprofielen, rollen en machtigingen
-  - Uitgebreide personeelsinformatie inclusief contractgegevens
+---
 
-- **Tijdregistratiesysteem**
+## Features
 
-### Core HR Management
-- **Werknemerbeheer**: Uitgebreide profielen, rollen en machtigingen
-- **Urenstaten**: Geautomatiseerde invoer en verificatie
-- **RouteVision Integratie**: GPS-gebaseerde tijdregistratie en routeverificatie
-- **Goedkeuringsworkflows**: Smart validatie en multi-level approval
-- **Verlofbeheer**: Vakantie, ziekteverlof, tijd-voor-tijd
-- **Document Management**: Veilige opslag en toegang
-- **Email Integratie**: SMTP templates en notificaties
+### Core HR Functionaliteiten
 
-### Compliance & Beveiliging
-- **AVG/GDPR Compliance**: Data privacy en gebruikersrechten
-- **Arbeidstijdenwet**: Nederlandse arbeidsregelgeving
-- **Multi-layered Security**: Encryptie, RBAC, MFA
-- **Audit Trail**: Uitgebreide logging en rapportage
-- **Regulatory Integration**: UWV, belastingdienst connecties
+| Feature | Beschrijving |
+|---------|--------------|
+| **Tijdregistratie** | GPS-gebaseerde klok-in/uit met automatische urenberekening |
+| **Verlofbeheer** | Vakantie, ziekteverlof, tijd-voor-tijd aanvragen en goedkeuring |
+| **Goedkeuringsworkflows** | Multi-level approval met smart validatie |
+| **Medewerkerbeheer** | Uitgebreide profielen, rollen en machtigingen |
+| **Rapportages** | Export naar PDF en Excel, real-time dashboards |
 
-### Technische Features
-- **Modern Stack**: Next.js 14+, App Router, Turbopack
-- **Database**: Vercel Postgres met Prisma ORM
-- **Authentication**: NextAuth.js met credentials provider
-- **UI/UX**: Tailwind CSS, responsive design
-- **Accessibility**: WCAG 2.1 AA compliance
-- **Internationalization**: Nederlands/Engels
-- **Performance**: Server-side rendering, optimized loading
+### Technische Highlights
 
-## 🛠 Technische Stack
+| Technologie | Gebruik |
+|-------------|---------|
+| **Next.js 15** | App Router, Server Components, Turbopack |
+| **Supabase** | PostgreSQL database met connection pooling |
+| **NextAuth.js v5** | Secure JWT-based authenticatie |
+| **Prisma ORM** | Type-safe database queries |
+| **Stripe** | Subscriptie management en betalingen |
+| **Tailwind CSS** | Utility-first styling met dark mode |
 
-- **Frontend**: Next.js 14+, React 18, TypeScript
-- **Styling**: Tailwind CSS
-- **Database**: Vercel Postgres, Prisma ORM
-- **Authentication**: NextAuth.js
-- **Deployment**: Vercel (serverless, EU data residency)
-- **Development**: Turbopack, ESLint, Prettier
+### Beveiliging & Compliance
 
-## 📋 Installatie
+- **Role-Based Access Control (RBAC)** - Fijnmazige toegangscontrole
+- **Multi-tenant isolatie** - Strikte data-scheiding per organisatie
+- **Audit logging** - Complete traceerbaarheid van alle acties
+- **AVG/GDPR compliant** - Privacy by design
+- **WCAG 2.1 AA** - Toegankelijkheid gewaarborgd
+
+---
+
+## Snelle Start
 
 ### Vereisten
-- Node.js 18+ 
+
+- Node.js 18+
 - npm of yarn
-- Git
+- Supabase account (of PostgreSQL database)
+- Stripe account (voor betalingen)
 
-### Setup
+### Installatie
 
-1. **Clone de repository**
-   ```bash
-   git clone <repository-url>
-   cd ckw-personeelsapp
-   ```
+```bash
+# Clone de repository
+git clone https://github.com/ThaADS/ADS-Personeelsapp.git
+cd ADS-Personeelsapp
 
-2. **Installeer dependencies**
-   ```bash
-   npm install
-   ```
+# Installeer dependencies
+npm install
 
-3. **Environment variabelen**
-   Kopieer `.env.example` naar `.env.local` en vul de vereiste waarden in:
-   ```bash
-   cp .env.example .env.local
-   ```
+# Kopieer environment template
+cp .env.example .env.local
 
-   Vereiste variabelen:
-   ```env
-   NEXTAUTH_SECRET=your-secret-key
-   NEXTAUTH_URL=http://localhost:3000
-   DATABASE_URL=your-database-url
-   ```
+# Genereer Prisma client
+npx prisma generate
 
-4. **Database setup**
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
+# Push database schema
+npx prisma db push
 
-5. **Start development server**
-   ```bash
-   npm run dev
-   ```
+# Seed de database met demo data
+npm run prisma:seed
 
-   De applicatie is beschikbaar op `http://localhost:3000`
+# Start development server
+npm run dev
+```
 
-## 🔐 Authenticatie
+De applicatie is nu beschikbaar op `http://localhost:3000`
 
-### Huidige Status
-- ✅ Login pagina functioneel op `/login`
-- ✅ In-memory authenticatie actief
-- ⚠️ Database authenticatie tijdelijk uitgeschakeld
+### Environment Variabelen
 
-### Test Credentials (Lokale Ontwikkeling)
+```env
+# Database (Supabase PostgreSQL)
+DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
 
-Voor lokale ontwikkeling zijn er test credentials beschikbaar:
+# Authentication
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key"
 
-**Admin gebruiker:**
-- Email: `admin@ckw.nl`
-- Wachtwoord: `Admin123!`
-- Rol: Administrator (volledige toegang)
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL="https://xxx.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
 
-**Standaard gebruiker:**
-- Email: `gebruiker@ckw.nl`
-- Wachtwoord: `Gebruiker123!`
-- Rol: Employee (beperkte toegang)
+# Stripe (optioneel voor betalingen)
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_PUBLISHABLE_KEY="pk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+```
 
-### Login Proces
-1. Navigeer naar `http://localhost:3000/login`
-2. Voer een van de bovenstaande credentials in
-3. Na succesvol inloggen word je doorverwezen naar het dashboard
+---
 
-## 🏗 Project Architectuur
+## Demo Accounts
+
+Na het seeden van de database zijn de volgende accounts beschikbaar:
+
+### Hoofdorganisatie (CKW)
+
+| Rol | Email | Wachtwoord |
+|-----|-------|------------|
+| Admin | `admin@ckw.nl` | `Admin123!` |
+| Manager | `manager@ckw.nl` | `Manager123!` |
+| Medewerker | `gebruiker@ckw.nl` | `Gebruiker123!` |
+
+### Demo Organisatie
+
+| Rol | Email | Wachtwoord |
+|-----|-------|------------|
+| Admin | `admin@demo-company.nl` | `Admin123!` |
+| Manager | `manager@demo-company.nl` | `Manager123!` |
+| Medewerker | `gebruiker@demo-company.nl` | `Gebruiker123!` |
+
+### Superuser
+
+| Rol | Email | Wachtwoord |
+|-----|-------|------------|
+| Superuser | `superuser@ads-personeelsapp.nl` | `SuperAdmin123!` |
+
+---
+
+## Project Architectuur
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── login/             # Login page (actief)
-│   ├── dashboard/         # Main application
-│   ├── api/               # API routes
-│   └── globals.css        # Global styles
-├── components/            # Reusable components
-│   ├── ui/               # Base UI components
-│   └── forms/            # Form components
-├── lib/                   # Utilities and configurations
-│   ├── auth/             # Authentication logic
-│   ├── db/               # Database utilities
-│   └── utils/            # Helper functions
-├── types/                 # TypeScript type definitions
-└── middleware.ts          # Next.js middleware (aangepast)
+├── app/                      # Next.js App Router
+│   ├── (dashboard)/          # Beschermde dashboard routes
+│   │   ├── dashboard/        # Hoofd dashboard
+│   │   ├── timesheet/        # Tijdregistratie
+│   │   ├── vacation/         # Verlofaanvragen
+│   │   ├── sick-leave/       # Ziekmeldingen
+│   │   ├── employees/        # Medewerkerbeheer
+│   │   ├── approvals/        # Goedkeuringen
+│   │   ├── billing/          # Facturatie
+│   │   └── profile/          # Gebruikersprofiel
+│   ├── admin/                # Superuser admin interface
+│   ├── login/                # Authenticatie pagina's
+│   ├── marketing/            # Publieke landingspagina
+│   └── api/                  # API routes
+├── components/               # Herbruikbare componenten
+│   ├── ui/                   # Basis UI componenten
+│   ├── dashboard/            # Dashboard widgets
+│   ├── filters/              # Filter componenten
+│   └── mobile/               # Mobiele componenten
+├── lib/                      # Utilities en configuraties
+│   ├── auth/                 # Authenticatie logica
+│   ├── db/                   # Database utilities
+│   ├── services/             # Business logic services
+│   ├── stripe/               # Stripe integratie
+│   └── utils/                # Helper functies
+└── types/                    # TypeScript type definities
 ```
 
-## 📚 Documentatie
+---
 
-- **[Gebruikershandleiding](./GEBRUIKERSHANDLEIDING.md)**: Uitgebreide handleiding voor eindgebruikers
-- **[API Documentatie](./API-DOCUMENTATIE.md)**: Technische API referentie
-- **[Project Requirements](./Project-requirements.md)**: Gedetailleerde projectvereisten
-- **[Afrondinstructies](#-project-afronding)**: Stappen voor projectcompletion
-
-## 🚧 Development
-
-### Available Scripts
+## Scripts
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript checks
+# Development
+npm run dev              # Start dev server met Turbopack
+npm run build            # Build voor productie
+npm run start            # Start productie server
+npm run lint             # ESLint code linting
+
+# Testing
+npm test                 # Tests in watch mode
+npm run test:run         # Eenmalige test run
+npm run test:coverage    # Test coverage rapport
+
+# Database
+npx prisma generate      # Genereer Prisma client
+npx prisma db push       # Push schema naar database
+npm run prisma:seed      # Seed database met demo data
 ```
 
-### Code Quality
+---
 
-- **ESLint**: Code linting en formatting
-- **TypeScript**: Type safety
-- **Prettier**: Code formatting
-- **Husky**: Git hooks voor quality checks
+## Multi-Tenant Architectuur
 
-## 🔧 Configuratie
+De applicatie is gebouwd met een robuuste multi-tenant architectuur:
 
-### Database
-De applicatie gebruikt Prisma ORM met Vercel Postgres. Het schema is gedefinieerd in `prisma/schema.prisma`.
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Tenant Layer                          │
+├─────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │
+│  │   CKW B.V.  │  │ Demo Corp   │  │  Tenant N   │     │
+│  │  (active)   │  │  (trial)    │  │   (...)     │     │
+│  └─────────────┘  └─────────────┘  └─────────────┘     │
+├─────────────────────────────────────────────────────────┤
+│                 Data Isolation Layer                     │
+│   - Alle queries gefilterd op tenantId                  │
+│   - Geen cross-tenant data leakage mogelijk             │
+├─────────────────────────────────────────────────────────┤
+│                   User-Tenant Junction                   │
+│   - Gebruikers kunnen bij meerdere tenants horen        │
+│   - Rol per tenant configureerbaar                      │
+└─────────────────────────────────────────────────────────┘
+```
 
-### Authentication
-NextAuth.js is geconfigureerd met een credentials provider voor lokale ontwikkeling. Voor productie moet dit worden uitgebreid met externe providers.
+### Rollen Hiërarchie
 
-### Middleware
-De middleware in `src/middleware.ts` handelt authenticatie en route protection af.
+```
+SUPERUSER          → Volledige systeemtoegang
+    ↓
+TENANT_ADMIN       → Beheer van eigen organisatie
+    ↓
+MANAGER            → Team management, goedkeuringen
+    ↓
+USER               → Basisgebruiker functionaliteit
+```
 
-## 🎯 Project Afronding
+---
 
-### Voltooide Onderdelen ✅
-- [x] Basis applicatie architectuur
-- [x] Authentication systeem (in-memory)
-- [x] Login functionaliteit
-- [x] Dashboard en UI componenten
-- [x] API routes en services
-- [x] Goedkeuringsworkflows
-- [x] Email integratie
-- [x] Document management
-- [x] Compliance features
-- [x] Alle documentatie
-
-### Resterende Taken voor Productie 🔄
-
-#### Hoge Prioriteit
-1. **Database Authenticatie Herstellen**
-   - PrismaAdapter opnieuw configureren
-   - Database gebruikers tabel vullen
-   - Productie credentials setup
-
-2. **Middleware Optimalisatie**
-   - JWT token handling verbeteren
-   - Session management optimaliseren
-   - Route protection verfijnen
-
-3. **Productie Environment**
-   - Environment variabelen configureren
-   - Database migraties uitvoeren
-   - SSL certificaten installeren
-
-#### Middel Prioriteit
-4. **Testing & QA**
-   - Unit tests schrijven
-   - Integration tests uitvoeren
-   - User acceptance testing
-
-5. **Performance Optimalisatie**
-   - Bundle size optimaliseren
-   - Caching strategieën implementeren
-   - Database query optimalisatie
-
-6. **Security Hardening**
-   - Security headers configureren
-   - Rate limiting implementeren
-   - Audit logging verbeteren
-
-#### Lage Prioriteit
-7. **Monitoring & Analytics**
-   - Error tracking (Sentry)
-   - Performance monitoring
-   - Usage analytics
-
-8. **Backup & Recovery**
-   - Automated backups
-   - Disaster recovery plan
-   - Data retention policies
-
-### Geschatte Tijdsinvestering
-- **Hoge Prioriteit**: 2-3 dagen
-- **Middel Prioriteit**: 3-5 dagen
-- **Lage Prioriteit**: 2-3 dagen
-- **Totaal**: 7-11 dagen voor volledige productie-ready status
-
-### Volgende Stappen
-1. **Onmiddellijk**: Test huidige login functionaliteit
-2. **Deze week**: Database authenticatie herstellen
-3. **Volgende week**: Productie deployment voorbereiden
-4. **Over 2 weken**: Go-live met monitoring
-
-## 🌐 Deployment
+## Deployment
 
 ### Vercel (Aanbevolen)
 
-1. **Connect repository** naar Vercel
-2. **Configure environment variables** in Vercel dashboard
-3. **Deploy** automatisch via Git push
+1. Fork of import de repository in Vercel
+2. Configureer environment variabelen in Vercel dashboard
+3. Deploy automatisch bij elke push naar `main`
 
-### Environment Variables (Productie)
+### Database Setup (Supabase)
 
-```env
-NEXTAUTH_SECRET=production-secret
-NEXTAUTH_URL=https://your-domain.com
-DATABASE_URL=your-production-database-url
-```
+1. Maak een nieuw Supabase project aan
+2. Kopieer de connection strings:
+   - `DATABASE_URL` - Pooler connection (poort 6543)
+   - `DIRECT_URL` - Direct connection (poort 5432)
+3. Run `npx prisma db push` om het schema te creëren
+4. Run `npm run prisma:seed` voor demo data
 
-## 🤝 Contributing
+---
+
+## Subscriptie Plannen
+
+| Plan | Prijs | Features |
+|------|-------|----------|
+| **Freemium** | Gratis | Tot 5 gebruikers, basis features |
+| **Standard** | €49,95/maand | Onbeperkte gebruikers, alle features |
+
+Stripe Checkout en Customer Portal zijn volledig geïntegreerd voor naadloze betalingsafhandeling.
+
+---
+
+## Documentatie
+
+- [**CLAUDE.md**](./CLAUDE.md) - Technische project instructies
+- [**Project Requirements**](./Project-requirements.md) - Gedetailleerde requirements
+- [**API Documentatie**](./API-DOCUMENTATIE.md) - API referentie
+
+---
+
+## Contributing
+
+Bijdragen zijn welkom! Volg deze stappen:
 
 1. Fork de repository
 2. Maak een feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit je changes (`git commit -m 'Add amazing feature'`)
+3. Commit je wijzigingen (`git commit -m 'Add amazing feature'`)
 4. Push naar de branch (`git push origin feature/amazing-feature`)
 5. Open een Pull Request
 
-## 📄 License
+### Code Standaarden
 
-Dit project is eigendom van CKW en is niet publiek beschikbaar.
+- TypeScript strict mode
+- ESLint configuratie volgen
+- Tailwind CSS voor styling
+- Commit messages in Engels
 
-## 🆘 Support
+---
+
+## Tech Stack
+
+<div align="center">
+
+| Category | Technology |
+|----------|------------|
+| **Framework** | Next.js 15, React 19, TypeScript |
+| **Database** | Supabase PostgreSQL, Prisma ORM |
+| **Auth** | NextAuth.js v5 |
+| **Payments** | Stripe |
+| **Styling** | Tailwind CSS, next-themes |
+| **Testing** | Vitest, Testing Library |
+| **Deployment** | Vercel |
+
+</div>
+
+---
+
+## License
+
+Dit project is eigendom van ADS en is niet publiek beschikbaar voor commercieel gebruik.
+
+---
+
+## Support
 
 Voor vragen of ondersteuning:
-- **Email**: support@ckw.nl
-- **Documentatie**: Zie de meegeleverde handleidingen
-- **Issues**: Gebruik het interne issue tracking systeem
+
+- **GitHub Issues**: [Open een issue](https://github.com/ThaADS/ADS-Personeelsapp/issues)
+- **Email**: support@ads-personeelsapp.nl
+
+---
+
+<div align="center">
+
+**Gebouwd met ❤️ in Nederland**
+
+</div>

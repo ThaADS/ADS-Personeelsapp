@@ -180,8 +180,11 @@ export async function GET(request: NextRequest) {
 
     const mrr = activeSubscriptions.reduce((total, subscription) => {
       const planPrice = Number(subscription.plan.price);
-      const extraUsers = Math.max(0, subscription.userCount - subscription.plan.includedUsers);
-      const extraUserCost = extraUsers * Number(subscription.plan.pricePerExtraUser);
+      const userCount = subscription.userCount ?? 0;
+      const includedUsers = subscription.plan.includedUsers ?? 0;
+      const pricePerExtraUser = subscription.plan.pricePerExtraUser ?? 0;
+      const extraUsers = Math.max(0, userCount - includedUsers);
+      const extraUserCost = extraUsers * Number(pricePerExtraUser);
       return total + planPrice + extraUserCost;
     }, 0);
 

@@ -162,7 +162,7 @@ export async function PUT(
         action: 'TENANT_UPDATE',
         resource: 'Tenant',
         resourceId: id,
-        newValues: validatedData,
+        newValues: JSON.stringify(validatedData),
       },
     });
 
@@ -182,7 +182,7 @@ export async function PUT(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: error.issues },
         { status: 400 }
       );
     }
@@ -246,10 +246,10 @@ export async function DELETE(
           action: 'TENANT_DELETE',
           resource: 'Tenant',
           resourceId: id,
-          oldValues: {
+          oldValues: JSON.stringify({
             name: existingTenant.name,
             subscriptionStatus: existingTenant.subscriptionStatus,
-          },
+          }),
         },
       });
     });

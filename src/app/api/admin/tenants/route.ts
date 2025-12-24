@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { PrismaClient } from '@prisma/client';
-import { UserRole, PlanType, SubscriptionStatus } from '@/types';
+import { UserRole, SubscriptionStatus } from '@/types';
 import { createTenantSlug, isSlugAvailable } from '@/lib/tenant';
-import { hasPermission } from '@/lib/rbac';
 import { z } from 'zod';
 import { hash } from 'bcrypt';
 
@@ -208,7 +207,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: error.issues },
         { status: 400 }
       );
     }

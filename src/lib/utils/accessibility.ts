@@ -286,8 +286,11 @@ export function checkAccessibility(element: HTMLElement): {
   const warnings: string[] = [];
   
   // Controleer alt tekst voor afbeeldingen
-  if (element.tagName === 'IMG' && (!element.alt || element.alt === '')) {
-    issues.push('Afbeelding mist alt tekst');
+  if (element.tagName === 'IMG') {
+    const imgElement = element as HTMLImageElement;
+    if (!imgElement.alt || imgElement.alt === '') {
+      issues.push('Afbeelding mist alt tekst');
+    }
   }
   
   // Controleer aria-label voor interactieve elementen zonder tekst
@@ -299,7 +302,7 @@ export function checkAccessibility(element: HTMLElement): {
   
   // Controleer contrast ratio (vereenvoudigd)
   const style = window.getComputedStyle(element);
-  const hasText = element.textContent?.trim().length > 0;
+  const hasText = (element.textContent?.trim().length ?? 0) > 0;
   
   if (hasText && style.color === style.backgroundColor) {
     issues.push('Tekstkleur is gelijk aan achtergrondkleur');

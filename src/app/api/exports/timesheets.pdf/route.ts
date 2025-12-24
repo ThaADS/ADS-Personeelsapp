@@ -24,9 +24,9 @@ export async function GET(request: NextRequest) {
     doc.moveDown();
 
     rows.forEach((t) => {
-      const hours = ((t.endTime.getTime() - t.startTime.getTime()) / (1000*60*60) - (t.breakDuration || 0)/60).toFixed(2);
+      const hours = ((t.endTime.getTime() - t.startTime.getTime()) / (1000*60*60) - (t.break_minutes || 0)/60).toFixed(2);
       doc.fontSize(11).text(`${t.user?.name || t.user?.email || ''} — ${t.date.toISOString().split('T')[0]}`);
-      doc.fontSize(9).fillColor('#000').text(`Start: ${t.startTime.toISOString()}  Eind: ${t.endTime.toISOString()}  Pauze: ${t.breakDuration || 0}m  Uren: ${hours}  Status: ${t.status}`);
+      doc.fontSize(9).fillColor('#000').text(`Start: ${t.startTime.toISOString()}  Eind: ${t.endTime.toISOString()}  Pauze: ${t.break_minutes || 0}m  Uren: ${hours}  Status: ${t.status}`);
       if (t.description) doc.text(`Omschrijving: ${t.description}`);
       doc.moveDown(0.6);
     });
