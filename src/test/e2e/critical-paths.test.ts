@@ -75,9 +75,10 @@ describe('E2E Critical Path Tests (Mocked)', () => {
       const timesheetFlow = {
         navigateToTimesheet: () => ({ success: true, url: '/dashboard/timesheet' }),
         clickNewTimesheet: () => ({ success: true, modalOpen: true }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         fillTimesheetForm: (data: any) => ({
           success: true,
-          formValid: data.date && data.startTime && data.endTime,
+          formValid: !!(data.date && data.startTime && data.endTime),
           data
         }),
         submitTimesheet: () => ({ success: true, submitted: true }),
@@ -121,6 +122,7 @@ describe('E2E Critical Path Tests (Mocked)', () => {
             endTime: 'End time must be after start time'
           }
         }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         verifyValidationErrors: (errors: any) => ({
           errorsVisible: Object.keys(errors).length > 0,
           submitDisabled: true

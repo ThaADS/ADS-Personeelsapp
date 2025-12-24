@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       outItems.push(
         ...listTs.map((t) => ({
           id: t.id,
-          type: 'timesheet',
+          type: 'timesheet' as const,
           employeeId: t.userId,
           employeeName: t.user?.name || t.user?.email || 'Onbekend',
           submittedAt: t.createdAt.toISOString(),
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
           endTime: t.endTime.toISOString(),
           description: t.description || undefined,
           breakDuration: t.breakDuration || 0,
-        }))
+        } satisfies Item))
       );
       if (type === 'timesheet') {
         return NextResponse.json({
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
           const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
           return {
             id: l.id,
-            type: (l.action === 'VACATION_REQUEST' ? 'vacation' : 'tijd-voor-tijd') as const,
+            type: (l.action === 'VACATION_REQUEST' ? 'vacation' : 'tijd-voor-tijd') as 'vacation' | 'tijd-voor-tijd',
             employeeId: l.userId!,
             employeeName: l.user?.name || l.user?.email || 'Onbekend',
             submittedAt: l.createdAt.toISOString(),
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 }
       );
     }

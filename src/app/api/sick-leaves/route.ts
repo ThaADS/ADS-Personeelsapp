@@ -2,7 +2,7 @@
  * API route voor ziekteverlof
  */
 import { NextRequest, NextResponse } from "next/server";
-import { withTenantAccess, createAuditLog } from "@/lib/auth/tenant-access";
+import { getTenantContext, createAuditLog, addTenantFilter } from "@/lib/auth/tenant-access";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
@@ -15,10 +15,7 @@ const sickLeaveSchema = z.object({
   endDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
     message: "Invalid end date",
   }).optional(),
-  reason: z.string().min(1, "Reason is required"),
-  medicalNote: z.boolean().default(false),
-  uwvReported: z.boolean().default(false),
-  expectedReturnDate: z.string().optional(),
+  reason: z.string().optional(),
 });
 
 /**
@@ -27,79 +24,89 @@ const sickLeaveSchema = z.object({
  */
 export async function GET(request: NextRequest) {
   try {
-    return await withTenantAccess(async (context) => {
-      const url = new URL(request.url);
-      const page = parseInt(url.searchParams.get("page") || "1");
-      const limit = parseInt(url.searchParams.get("limit") || "10");
-      const status = url.searchParams.get("status") || undefined;
+    const context = await getTenantContext();
 
-      // Using audit logs to track sick leave requests
-      const skip = (page - 1) * limit;
-      
-      const where: Record<string, unknown> = {
-        tenantId: context.tenantId,
-        action: 'SICK_LEAVE_REQUEST',
-      };
+    if (!context) {
+      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+    }
 
-      if (status) {
-        (where as Record<string, unknown>).newValues = {
-          path: ['status'],
-          equals: status,
-        };
-      }
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1");
+    const limit = parseInt(url.searchParams.get("limit") || "10");
+    const status = url.searchParams.get("status") || undefined;
 
-      const [sickLeaveLogs, total] = await Promise.all([
-        prisma.auditLog.findMany({
-          where,
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-              },
+    // Build where clause
+    let where: Record<string, unknown> = {};
+
+    // Tenant filtering
+    if (context.tenantId) {
+      where = addTenantFilter(where, context.tenantId);
+    }
+
+    // Only SICK_LEAVE type
+    where.type = 'SICK_LEAVE';
+
+    // Status filtering
+    if (status) {
+      where.status = status.toUpperCase();
+    }
+
+    // User filtering - regular users can only see their own requests
+    if (context.userRole === 'USER') {
+      where.userId = context.userId;
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [requests, total] = await Promise.all([
+      prisma.leaveRequest.findMany({
+        where,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
             },
           },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          skip,
-          take: limit,
-        }),
-        prisma.auditLog.count({ where }),
-      ]);
-
-      // Transform audit logs to sick leave format
-      const sickLeaves = sickLeaveLogs.map(log => ({
-        id: log.id,
-        type: 'sick-leave',
-        employeeId: log.userId,
-        employeeName: log.user?.name || log.user?.email || 'Unknown',
-        startDate: log.newValues?.startDate || '',
-        endDate: log.newValues?.endDate || null,
-        reason: log.newValues?.reason || '',
-        medicalNote: log.newValues?.medicalNote || false,
-        uwvReported: log.newValues?.uwvReported || false,
-        expectedReturnDate: log.newValues?.expectedReturnDate || null,
-        submittedAt: log.createdAt.toISOString(),
-        status: log.newValues?.status || 'pending',
-      }));
-
-      return NextResponse.json({
-        items: sickLeaves,
-        pagination: {
-          page,
-          limit,
-          total,
-          pages: Math.ceil(total / limit),
         },
-      });
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip,
+        take: limit,
+      }),
+      prisma.leaveRequest.count({ where }),
+    ]);
+
+    // Transform to response format
+    const items = requests.map(req => ({
+      id: req.id,
+      type: 'sick-leave',
+      employeeId: req.userId,
+      employeeName: req.user?.name || req.user?.email || 'Onbekend',
+      startDate: req.startDate.toISOString().split('T')[0],
+      endDate: req.endDate.toISOString().split('T')[0],
+      reason: req.description || '',
+      totalDays: req.totalDays,
+      submittedAt: req.createdAt.toISOString(),
+      status: req.status.toLowerCase(),
+      reviewedBy: req.reviewedBy,
+      reviewedAt: req.reviewedAt?.toISOString(),
+      reviewNotes: req.reviewNotes,
+    }));
+
+    return NextResponse.json({
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error("Error in sick-leaves GET:", error);
-    if (error instanceof Error && error.message.includes('Authentication required')) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
-    }
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }
@@ -110,69 +117,99 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    return await withTenantAccess(async (context) => {
-      const body = await request.json();
-      const validatedData = sickLeaveSchema.parse(body);
+    const context = await getTenantContext();
 
-      // Validate dates
-      const startDate = new Date(validatedData.startDate);
-      const endDate = validatedData.endDate ? new Date(validatedData.endDate) : null;
-      
-      if (endDate && endDate < startDate) {
-        return NextResponse.json(
-          { error: "End date must be after start date" },
-          { status: 400 }
-        );
-      }
+    if (!context) {
+      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+    }
 
-      const sickLeaveData = {
-        startDate: validatedData.startDate,
-        endDate: validatedData.endDate,
-        reason: validatedData.reason,
-        medicalNote: validatedData.medicalNote,
-        uwvReported: validatedData.uwvReported,
-        expectedReturnDate: validatedData.expectedReturnDate,
-        status: 'pending',
-      };
+    if (!context.tenantId) {
+      return NextResponse.json({ error: "Geen tenant context" }, { status: 400 });
+    }
 
-      // Create audit log entry for the sick leave request
-      await createAuditLog(
-        'SICK_LEAVE_REQUEST',
-        'SickLeave',
-        undefined,
-        undefined,
-        sickLeaveData
+    const body = await request.json();
+    const validatedData = sickLeaveSchema.parse(body);
+
+    // Validate dates
+    const startDate = new Date(validatedData.startDate);
+    const endDate = validatedData.endDate ? new Date(validatedData.endDate) : new Date(validatedData.startDate);
+
+    if (endDate < startDate) {
+      return NextResponse.json(
+        { error: "Einddatum moet na startdatum liggen" },
+        { status: 400 }
       );
+    }
 
-      // Check if UWV reporting is required (>4 days)
-      let uwvReportingRequired = false;
-      if (endDate) {
-        const diffTime = endDate.getTime() - startDate.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-        uwvReportingRequired = diffDays > 4;
-      }
+    // Calculate total days
+    const diffTime = endDate.getTime() - startDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-      return NextResponse.json({
-        id: `sl-${Date.now()}`,
-        type: 'sick-leave',
-        employeeId: context.userId,
-        ...sickLeaveData,
-        submittedAt: new Date().toISOString(),
-        uwvReportingRequired,
-      }, { status: 201 });
+    // Create leave request
+    const leaveRequest = await prisma.leaveRequest.create({
+      data: {
+        tenantId: context.tenantId,
+        userId: context.userId,
+        type: 'SICK_LEAVE',
+        startDate,
+        endDate,
+        totalDays: diffDays,
+        description: validatedData.reason || null,
+        status: 'PENDING',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
+
+    // Create audit log
+    await createAuditLog(
+      'SICK_LEAVE_REQUEST',
+      'LeaveRequest',
+      leaveRequest.id,
+      null,
+      {
+        startDate: validatedData.startDate,
+        endDate: validatedData.endDate || validatedData.startDate,
+        reason: validatedData.reason,
+        totalDays: diffDays,
+      }
+    );
+
+    // Check if UWV reporting is required (>4 days)
+    const uwvReportingRequired = diffDays > 4;
+
+    return NextResponse.json({
+      success: true,
+      request: {
+        id: leaveRequest.id,
+        type: 'sick-leave',
+        employeeId: leaveRequest.userId,
+        employeeName: leaveRequest.user?.name || leaveRequest.user?.email || 'Onbekend',
+        startDate: leaveRequest.startDate.toISOString().split('T')[0],
+        endDate: leaveRequest.endDate.toISOString().split('T')[0],
+        reason: leaveRequest.description,
+        totalDays: leaveRequest.totalDays,
+        status: leaveRequest.status.toLowerCase(),
+        submittedAt: leaveRequest.createdAt.toISOString(),
+        uwvReportingRequired,
+      },
+    }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validatiefout", details: error.issues },
         { status: 400 }
       );
     }
 
     console.error("Error in sick-leaves POST:", error);
-    if (error instanceof Error && error.message.includes('Authentication required')) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
-    }
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }

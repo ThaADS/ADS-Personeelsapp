@@ -68,7 +68,7 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   return {
     tenantId: session.user.tenantId,
     userId: session.user.id,
-    userRole: tenantUser.role,
+    userRole: tenantUser.role as UserRole,
     isSuperuser: false,
   };
 }
@@ -243,8 +243,8 @@ export async function createAuditLog(
         action,
         resource,
         resourceId,
-        oldValues: (oldValues ?? null) as unknown as Prisma.InputJsonValue,
-        newValues: (newValues ?? null) as unknown as Prisma.InputJsonValue,
+        oldValues: oldValues ? JSON.stringify(oldValues) : null,
+        newValues: newValues ? JSON.stringify(newValues) : null,
       },
     });
   } catch (error) {
@@ -304,5 +304,5 @@ export async function getUserTenantRole(userId: string, tenantId: string): Promi
     select: { role: true, isActive: true },
   });
 
-  return tenantUser?.isActive ? tenantUser.role : null;
+  return tenantUser?.isActive ? tenantUser.role as UserRole : null;
 }

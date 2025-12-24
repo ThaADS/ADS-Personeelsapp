@@ -4,6 +4,7 @@ import { StripeSubscriptionService } from '@/lib/stripe/subscription-service';
 import { PrismaClient } from '@prisma/client';
 import { canManageBilling } from '@/lib/rbac';
 import { z } from 'zod';
+import type Stripe from 'stripe';
 
 const prisma = new PrismaClient();
 
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
     }
 
     const currentSubscription = tenant.subscriptions[0];
-    let stripeSubscription = null;
+    let stripeSubscription: Stripe.Subscription | null = null;
 
     // Get Stripe subscription details if available
     if (tenant.stripeSubscriptionId) {
@@ -95,8 +96,8 @@ export async function GET(request: NextRequest) {
       stripeSubscription: stripeSubscription ? {
         id: stripeSubscription.id,
         status: stripeSubscription.status,
-        currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000),
-        currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000),
+        currentPeriodStart: new Date((stripeSubscription as Stripe.Subscription).current_period_start * 1000),
+        currentPeriodEnd: new Date((stripeSubscription as Stripe.Subscription).current_period_end * 1000),
         trialEnd: stripeSubscription.trial_end ? new Date(stripeSubscription.trial_end * 1000) : null,
         cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
         items: stripeSubscription.items.data.map(item => ({
@@ -163,7 +164,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Get updated subscription
-    const updatedSubscription = await stripeService.getSubscription(tenant.stripeSubscriptionId);
+    const updatedSubscription: Stripe.Subscription = await stripeService.getSubscription(tenant.stripeSubscriptionId);
 
     return NextResponse.json({
       message: 'Subscription updated successfully',
@@ -177,7 +178,7 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: error.issues },
         { status: 400 }
       );
     }
@@ -216,7 +217,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const stripeService = new StripeSubscriptionService();
-    const canceledSubscription = await stripeService.cancelSubscription(
+    const canceledSubscription: Stripe.Subscription = await stripeService.cancelSubscription(
       tenant.stripeSubscriptionId,
       immediately
     );
