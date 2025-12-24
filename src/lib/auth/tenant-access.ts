@@ -18,8 +18,11 @@ export interface TenantContext {
  */
 export async function getTenantContext(): Promise<TenantContext | null> {
   const session = await auth();
-  
+
+  console.log('[getTenantContext] Session user:', session?.user);
+
   if (!session?.user) {
+    console.log('[getTenantContext] No session or user - returning null');
     return null;
   }
 
@@ -27,7 +30,9 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   if (session.user.isSuperuser) {
     const headersList = await headers();
     const tenantId = headersList.get('x-tenant-id') || session.user.tenantId;
-    
+
+    console.log('[getTenantContext] Superuser with tenantId:', tenantId);
+
     if (!tenantId) {
       return {
         tenantId: '', // Superuser without specific tenant
@@ -46,7 +51,10 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   }
 
   // Regular users must have tenant context
+  console.log('[getTenantContext] Regular user tenantId from session:', session.user.tenantId);
+
   if (!session.user.tenantId) {
+    console.log('[getTenantContext] No tenantId in session - returning null');
     return null;
   }
 
@@ -242,8 +250,8 @@ export async function createAuditLog(
         action,
         resource,
         resourceId,
-        oldValues: oldValues ? JSON.stringify(oldValues) : null,
-        newValues: newValues ? JSON.stringify(newValues) : null,
+        oldValues: oldValues ? JSON.stringify(oldValues) : undefined,
+        newValues: newValues ? JSON.stringify(newValues) : undefined,
       },
     });
   } catch (error) {

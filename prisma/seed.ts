@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { hash } from 'bcrypt';
+import { hash } from 'bcryptjs';
 
 // Define types locally since @/types is not available in seed context
 enum UserRole {
@@ -356,33 +356,27 @@ async function main() {
   const today = new Date();
   const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  await prisma.timesheet.upsert({
-    where: { id: 'ts-ckw-001' },
-    update: {},
-    create: {
-      id: 'ts-ckw-001',
+  await prisma.timesheet.create({
+    data: {
       tenantId: ckwTenant.id,
       userId: ckwUser.id,
       date: lastWeek,
       startTime: new Date(lastWeek.setHours(8, 0, 0, 0)),
       endTime: new Date(lastWeek.setHours(17, 0, 0, 0)),
-      breakDuration: 30,
+      break_minutes: 30,
       description: 'Projectwerk en meetings',
       status: 'APPROVED',
     },
   });
 
-  await prisma.timesheet.upsert({
-    where: { id: 'ts-ckw-002' },
-    update: {},
-    create: {
-      id: 'ts-ckw-002',
+  await prisma.timesheet.create({
+    data: {
       tenantId: ckwTenant.id,
       userId: ckwUser.id,
       date: today,
       startTime: new Date(today.setHours(8, 30, 0, 0)),
       endTime: new Date(today.setHours(16, 30, 0, 0)),
-      breakDuration: 30,
+      break_minutes: 30,
       description: 'Development taken',
       status: 'PENDING',
     },
@@ -393,11 +387,8 @@ async function main() {
   const nextMonth = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
   const nextMonthEnd = new Date(nextMonth.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-  await prisma.leaveRequest.upsert({
-    where: { id: 'leave-ckw-001' },
-    update: {},
-    create: {
-      id: 'leave-ckw-001',
+  await prisma.leaveRequest.create({
+    data: {
       tenantId: ckwTenant.id,
       userId: ckwUser.id,
       type: 'VACATION',
@@ -413,11 +404,8 @@ async function main() {
   console.log('🏥 Creating sample sick leave requests...');
   const lastMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  await prisma.leaveRequest.upsert({
-    where: { id: 'leave-ckw-002' },
-    update: {},
-    create: {
-      id: 'leave-ckw-002',
+  await prisma.leaveRequest.create({
+    data: {
       tenantId: ckwTenant.id,
       userId: ckwUser.id,
       type: 'SICK_LEAVE',
@@ -461,40 +449,155 @@ async function main() {
     },
   });
 
-  // Create demo tenant users
+  // Create demo tenant users with full profile data
   console.log('👥 Creating demo tenant users...');
   const demoAdmin = await prisma.user.upsert({
     where: { email: 'admin@demo-company.nl' },
-    update: {},
+    update: {
+      phone: '+31 20 111 2222',
+      department: 'Management',
+      position: 'CEO',
+      employeeId: 'DEMO001',
+      startDate: new Date('2010-01-01'),
+      contractType: 'Vast dienstverband',
+      workHoursPerWeek: 40,
+    },
     create: {
       email: 'admin@demo-company.nl',
       name: 'Demo Admin',
       password: adminPassword,
       role: UserRole.TENANT_ADMIN,
+      phone: '+31 20 111 2222',
+      address: 'Keizersgracht 100',
+      city: 'Amsterdam',
+      postalCode: '1015 AB',
+      department: 'Management',
+      position: 'CEO',
+      employeeId: 'DEMO001',
+      startDate: new Date('2010-01-01'),
+      contractType: 'Vast dienstverband',
+      workHoursPerWeek: 40,
     },
   });
 
   const demoManager = await prisma.user.upsert({
     where: { email: 'manager@demo-company.nl' },
-    update: {},
+    update: {
+      phone: '+31 20 222 3333',
+      department: 'Sales',
+      position: 'Sales Manager',
+      employeeId: 'DEMO002',
+      startDate: new Date('2015-06-01'),
+      contractType: 'Vast dienstverband',
+      workHoursPerWeek: 40,
+    },
     create: {
       email: 'manager@demo-company.nl',
       name: 'Demo Manager',
       password: managerPassword,
       role: UserRole.MANAGER,
+      phone: '+31 20 222 3333',
+      address: 'Herengracht 250',
+      city: 'Amsterdam',
+      postalCode: '1016 CD',
+      department: 'Sales',
+      position: 'Sales Manager',
+      employeeId: 'DEMO002',
+      startDate: new Date('2015-06-01'),
+      contractType: 'Vast dienstverband',
+      workHoursPerWeek: 40,
     },
   });
 
   const demoUser = await prisma.user.upsert({
     where: { email: 'gebruiker@demo-company.nl' },
-    update: {},
+    update: {
+      phone: '+31 20 333 4444',
+      department: 'Marketing',
+      position: 'Marketing Specialist',
+      employeeId: 'DEMO003',
+      startDate: new Date('2020-03-15'),
+      contractType: 'Vast dienstverband',
+      workHoursPerWeek: 32,
+    },
     create: {
       email: 'gebruiker@demo-company.nl',
       name: 'Demo Gebruiker',
       password: userPassword,
       role: UserRole.USER,
+      phone: '+31 20 333 4444',
+      address: 'Prinsengracht 500',
+      city: 'Amsterdam',
+      postalCode: '1017 EF',
+      department: 'Marketing',
+      position: 'Marketing Specialist',
+      employeeId: 'DEMO003',
+      startDate: new Date('2020-03-15'),
+      contractType: 'Vast dienstverband',
+      workHoursPerWeek: 32,
     },
   });
+
+  // Additional employees for demo company
+  const demoAdditionalEmployees = [
+    {
+      email: 'sophie.bakker@demo-company.nl',
+      name: 'Sophie Bakker',
+      phone: '+31 20 444 5555',
+      department: 'Sales',
+      position: 'Account Manager',
+      employeeId: 'DEMO004',
+      startDate: new Date('2018-09-01'),
+    },
+    {
+      email: 'lucas.jansen@demo-company.nl',
+      name: 'Lucas Jansen',
+      phone: '+31 20 555 6666',
+      department: 'IT',
+      position: 'Developer',
+      employeeId: 'DEMO005',
+      startDate: new Date('2019-02-15'),
+    },
+    {
+      email: 'emma.dekker@demo-company.nl',
+      name: 'Emma Dekker',
+      phone: '+31 20 666 7777',
+      department: 'HR',
+      position: 'HR Specialist',
+      employeeId: 'DEMO006',
+      startDate: new Date('2021-01-10'),
+    },
+  ];
+
+  const createdDemoEmployees = [];
+  for (const emp of demoAdditionalEmployees) {
+    const employee = await prisma.user.upsert({
+      where: { email: emp.email },
+      update: {
+        phone: emp.phone,
+        department: emp.department,
+        position: emp.position,
+        employeeId: emp.employeeId,
+        startDate: emp.startDate,
+        contractType: 'Vast dienstverband',
+        workHoursPerWeek: 40,
+      },
+      create: {
+        email: emp.email,
+        name: emp.name,
+        password: userPassword,
+        role: UserRole.USER,
+        phone: emp.phone,
+        department: emp.department,
+        position: emp.position,
+        employeeId: emp.employeeId,
+        startDate: emp.startDate,
+        contractType: 'Vast dienstverband',
+        workHoursPerWeek: 40,
+      },
+    });
+    createdDemoEmployees.push(employee);
+  }
 
   // Link users to demo tenant
   await prisma.tenantUser.upsert({
@@ -530,14 +633,137 @@ async function main() {
     },
   });
 
+  // Link additional employees to demo tenant
+  for (const employee of createdDemoEmployees) {
+    await prisma.tenantUser.upsert({
+      where: { tenantId_userId: { tenantId: demoTenant.id, userId: employee.id } },
+      update: {},
+      create: {
+        tenantId: demoTenant.id,
+        userId: employee.id,
+        role: UserRole.USER,
+        isActive: true,
+      },
+    });
+  }
+
+  // Create sample data for demo tenant
+  console.log('⏰ Creating sample timesheets for demo tenant...');
+  const yesterday = new Date(today.getTime() - 1 * 24 * 60 * 60 * 1000);
+  const twoDaysAgo = new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000);
+
+  // Demo user timesheets
+  await prisma.timesheet.create({
+    data: {
+      tenantId: demoTenant.id,
+      userId: demoUser.id,
+      date: twoDaysAgo,
+      startTime: new Date(twoDaysAgo.setHours(9, 0, 0, 0)),
+      endTime: new Date(twoDaysAgo.setHours(17, 30, 0, 0)),
+      break_minutes: 30,
+      description: 'Klantgesprekken en administratie',
+      status: 'APPROVED',
+    },
+  });
+
+  await prisma.timesheet.create({
+    data: {
+      tenantId: demoTenant.id,
+      userId: demoUser.id,
+      date: yesterday,
+      startTime: new Date(yesterday.setHours(8, 45, 0, 0)),
+      endTime: new Date(yesterday.setHours(17, 15, 0, 0)),
+      break_minutes: 30,
+      description: 'Projectwerk',
+      status: 'PENDING',
+    },
+  });
+
+  // Demo manager timesheets
+  await prisma.timesheet.create({
+    data: {
+      tenantId: demoTenant.id,
+      userId: demoManager.id,
+      date: yesterday,
+      startTime: new Date(yesterday.setHours(9, 0, 0, 0)),
+      endTime: new Date(yesterday.setHours(18, 0, 0, 0)),
+      break_minutes: 60,
+      description: 'Team meetings en planning',
+      status: 'APPROVED',
+    },
+  });
+
+  // Demo admin timesheets
+  await prisma.timesheet.create({
+    data: {
+      tenantId: demoTenant.id,
+      userId: demoAdmin.id,
+      date: yesterday,
+      startTime: new Date(yesterday.setHours(8, 30, 0, 0)),
+      endTime: new Date(yesterday.setHours(17, 30, 0, 0)),
+      break_minutes: 30,
+      description: 'Strategische planning',
+      status: 'APPROVED',
+    },
+  });
+
+  console.log('🏖️ Creating vacation requests for demo tenant...');
+  const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const nextWeekEnd = new Date(nextWeek.getTime() + 5 * 24 * 60 * 60 * 1000);
+
+  // Demo user vacation
+  await prisma.leaveRequest.create({
+    data: {
+      tenantId: demoTenant.id,
+      userId: demoUser.id,
+      type: 'VACATION',
+      startDate: nextWeek,
+      endDate: nextWeekEnd,
+      totalDays: 5,
+      description: 'Familievakantie naar Spanje',
+      status: 'PENDING',
+    },
+  });
+
+  // Demo manager vacation (approved)
+  const inTwoWeeks = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+  const inTwoWeeksEnd = new Date(inTwoWeeks.getTime() + 10 * 24 * 60 * 60 * 1000);
+
+  await prisma.leaveRequest.create({
+    data: {
+      tenantId: demoTenant.id,
+      userId: demoManager.id,
+      type: 'VACATION',
+      startDate: inTwoWeeks,
+      endDate: inTwoWeeksEnd,
+      totalDays: 10,
+      description: 'Vakantie Frankrijk',
+      status: 'APPROVED',
+    },
+  });
+
+  console.log('🏥 Creating sick leave for demo tenant...');
+  const threeWeeksAgo = new Date(today.getTime() - 21 * 24 * 60 * 60 * 1000);
+
+  // Demo user sick leave
+  await prisma.leaveRequest.create({
+    data: {
+      tenantId: demoTenant.id,
+      userId: demoUser.id,
+      type: 'SICK_LEAVE',
+      startDate: threeWeeksAgo,
+      endDate: new Date(threeWeeksAgo.getTime() + 3 * 24 * 60 * 60 * 1000),
+      totalDays: 3,
+      description: 'Verkoudheid',
+      status: 'APPROVED',
+    },
+  });
+
   // Create sample advertisements for freemium users
   console.log('📢 Creating sample advertisements...');
 
-  await prisma.advertisement.upsert({
-    where: { id: 'ads-upgrade-banner' },
-    update: {},
-    create: {
-      id: 'ads-upgrade-banner',
+  await prisma.advertisement.create({
+    data: {
       title: 'Upgrade to Standard Plan',
       content: 'Get access to all features, remove ads, and unlock advanced reporting. Start your journey to better HR management today!',
       imageUrl: null,
@@ -545,15 +771,12 @@ async function main() {
       type: 'BANNER',
       isActive: true,
       priority: 1,
-      tenantIds: "",
+      target_tenant_ids: [],
     },
   });
 
-  await prisma.advertisement.upsert({
-    where: { id: 'ads-routevision-integration' },
-    update: {},
-    create: {
-      id: 'ads-routevision-integration',
+  await prisma.advertisement.create({
+    data: {
       title: 'RouteVision Integration Available',
       content: 'Automatically track work hours with GPS verification. Upgrade to Standard plan to enable RouteVision integration.',
       imageUrl: null,
@@ -561,7 +784,7 @@ async function main() {
       type: 'MODAL',
       isActive: true,
       priority: 2,
-      tenantIds: "",
+      target_tenant_ids: [],
     },
   });
 

@@ -95,8 +95,8 @@ export async function GET(request: NextRequest) {
       endDate: req.endDate.toISOString().split('T')[0],
       description: req.description || '',
       totalDays: req.totalDays,
-      submittedAt: req.createdAt.toISOString(),
-      status: req.status.toLowerCase(),
+      submittedAt: req.createdAt?.toISOString() || new Date().toISOString(),
+      status: (req.status || 'pending').toLowerCase(),
       reviewedBy: req.reviewedBy,
       reviewedAt: req.reviewedAt?.toISOString(),
       reviewNotes: req.reviewNotes,
@@ -198,8 +198,8 @@ export async function POST(request: NextRequest) {
         endDate: leaveRequest.endDate.toISOString().split('T')[0],
         description: leaveRequest.description,
         totalDays: leaveRequest.totalDays,
-        status: leaveRequest.status.toLowerCase(),
-        submittedAt: leaveRequest.createdAt.toISOString(),
+        status: (leaveRequest.status || 'pending').toLowerCase(),
+        submittedAt: leaveRequest.createdAt?.toISOString() || new Date().toISOString(),
       },
     }, { status: 201 });
   } catch (error) {

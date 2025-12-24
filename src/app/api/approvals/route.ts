@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withPermission, createAuditLog, requirePermission } from "@/lib/auth/tenant-access";
 import { tenantDb } from "@/lib/db/tenant-db";
 import { z } from "zod";
+import { timesheet_status } from "@prisma/client";
 
 const approvalActionSchema = z.object({
   ids: z.array(z.string()),
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
 
     // Timesheets
     if (type === 'all' || type === 'timesheet') {
-      const whereTs = { tenantId: context!.tenantId, status } as const;
+      const whereTs = { tenantId: context!.tenantId, status: status as timesheet_status };
       const [countTs, listTs] = await Promise.all([
         prisma.timesheet.count({ where: whereTs }),
         prisma.timesheet.findMany({
@@ -82,13 +83,13 @@ export async function GET(request: NextRequest) {
           type: 'timesheet' as const,
           employeeId: t.userId,
           employeeName: t.user?.name || t.user?.email || 'Onbekend',
-          submittedAt: t.createdAt.toISOString(),
-          status: t.status,
+          submittedAt: t.createdAt?.toISOString() || new Date().toISOString(),
+          status: t.status || 'PENDING',
           date: t.date.toISOString().split('T')[0],
           startTime: t.startTime.toISOString(),
           endTime: t.endTime.toISOString(),
           description: t.description || undefined,
-          breakDuration: t.breakDuration || 0,
+          breakDuration: t.break_minutes || 0,
         } satisfies Item))
       );
       if (type === 'timesheet') {
@@ -109,7 +110,6 @@ export async function GET(request: NextRequest) {
         take: type === 'vacation' ? limit : 100,
       });
       const filtered = logs.filter((l) => (l as unknown as { newValues?: { status?: string } }).newValues?.status === status);
-      total += (type === 'vacation' ? filtered.length : logs.length);
       outItems.push(
         ...filtered.map((l) => {
           const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
             type: (l.action === 'VACATION_REQUEST' ? 'vacation' : 'tijd-voor-tijd') as 'vacation' | 'tijd-voor-tijd',
             employeeId: l.userId!,
             employeeName: l.user?.name || l.user?.email || 'Onbekend',
-            submittedAt: l.createdAt.toISOString(),
+            submittedAt: l.createdAt?.toISOString() || new Date().toISOString(),
             status: (nv.status as string) || 'PENDING',
             startDate: nv.startDate as string | undefined,
             endDate: nv.endDate as string | undefined,
@@ -145,7 +145,6 @@ export async function GET(request: NextRequest) {
         take: type === 'sickleave' ? limit : 100,
       });
       const filtered = logs.filter((l) => (l as unknown as { newValues?: { status?: string } }).newValues?.status === status);
-      total += (type === 'sickleave' ? filtered.length : logs.length);
       outItems.push(
         ...filtered.map((l) => {
           const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
@@ -154,7 +153,7 @@ export async function GET(request: NextRequest) {
             type: 'sick-leave' as const,
             employeeId: l.userId!,
             employeeName: l.user?.name || l.user?.email || 'Onbekend',
-            submittedAt: l.createdAt.toISOString(),
+            submittedAt: l.createdAt?.toISOString() || new Date().toISOString(),
             status: (nv.status as string) || 'PENDING',
             startDate: nv.startDate as string | undefined,
             endDate: nv.endDate as string | undefined,

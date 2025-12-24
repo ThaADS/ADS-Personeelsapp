@@ -210,7 +210,7 @@ export function validateSickLeave(data: Partial<CreateSickLeaveRequest>): {
   }
 
   // Medische verklaring waarschuwing
-  if (data.endDate && !data.medicalNote) {
+  if (data.startDate && data.endDate && !data.medicalNote) {
     const start = new Date(data.startDate);
     const end = new Date(data.endDate);
     const diffTime = Math.abs(end.getTime() - start.getTime());

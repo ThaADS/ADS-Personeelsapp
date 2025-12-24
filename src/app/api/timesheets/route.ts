@@ -82,15 +82,15 @@ export async function GET(request: NextRequest) {
       endTime: t.endTime.toISOString().substring(11, 16),
       description: t.description,
       status: t.status,
-      breakDuration: t.breakDuration || 0,
-      startLat: t.startLat,
-      startLng: t.startLng,
-      endLat: t.endLat,
-      endLng: t.endLng,
+      breakDuration: t.break_minutes || 0,
+      startLat: t.location_start ? (t.location_start as { lat: number }).lat : null,
+      startLng: t.location_start ? (t.location_start as { lng: number }).lng : null,
+      endLat: t.location_end ? (t.location_end as { lat: number }).lat : null,
+      endLng: t.location_end ? (t.location_end as { lng: number }).lng : null,
       userId: t.userId,
       userName: t.user?.name || t.user?.email || 'Onbekend',
-      createdAt: t.createdAt.toISOString(),
-      updatedAt: t.updatedAt.toISOString(),
+      createdAt: t.createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: t.updatedAt?.toISOString() || new Date().toISOString(),
     }));
 
     return NextResponse.json({
@@ -136,6 +136,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Create timesheet
+    const locationStart = validatedData.startLat && validatedData.startLng
+      ? { lat: validatedData.startLat, lng: validatedData.startLng }
+      : undefined;
+    const locationEnd = validatedData.endLat && validatedData.endLng
+      ? { lat: validatedData.endLat, lng: validatedData.endLng }
+      : undefined;
+
     const timesheet = await prisma.timesheet.create({
       data: {
         tenantId: context.tenantId,
@@ -144,11 +151,9 @@ export async function POST(request: NextRequest) {
         startTime,
         endTime,
         description: validatedData.description || null,
-        breakDuration: validatedData.breakDuration || null,
-        startLat: validatedData.startLat || null,
-        startLng: validatedData.startLng || null,
-        endLat: validatedData.endLat || null,
-        endLng: validatedData.endLng || null,
+        break_minutes: validatedData.breakDuration || null,
+        location_start: locationStart,
+        location_end: locationEnd,
         status: 'PENDING',
       },
       include: {
@@ -185,9 +190,9 @@ export async function POST(request: NextRequest) {
         endTime: timesheet.endTime.toISOString().substring(11, 16),
         description: timesheet.description,
         status: timesheet.status,
-        breakDuration: timesheet.breakDuration || 0,
+        breakDuration: timesheet.break_minutes || 0,
         userName: timesheet.user?.name || timesheet.user?.email || 'Onbekend',
-        createdAt: timesheet.createdAt.toISOString(),
+        createdAt: timesheet.createdAt?.toISOString() || new Date().toISOString(),
       },
     }, { status: 201 });
   } catch (error) {

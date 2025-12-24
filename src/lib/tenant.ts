@@ -7,9 +7,9 @@ export interface TenantContext {
   id: string;
   name: string;
   slug: string;
-  subscriptionStatus: string;
-  currentPlan: string;
-  trialEndsAt?: Date;
+  subscriptionStatus: string | null;
+  currentPlan: string | null;
+  trialEndsAt?: Date | null;
 }
 
 export async function getTenantFromSlug(slug: string): Promise<TenantContext | null> {

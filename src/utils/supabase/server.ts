@@ -42,7 +42,7 @@ function createNoopClient(): MinimalSupabaseClient {
   } as MinimalSupabaseClient;
 }
 
-export const createClient = (cookieStore: ReturnType<typeof cookies>) => {
+export const createClient = async (cookieStore: Awaited<ReturnType<typeof cookies>>) => {
   if (!supabaseUrl || !supabaseKey) {
     if (process.env.NODE_ENV !== "production") {
       console.warn(

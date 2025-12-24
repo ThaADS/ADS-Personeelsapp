@@ -6,6 +6,12 @@ import { canManageBilling } from '@/lib/rbac';
 import { z } from 'zod';
 import type Stripe from 'stripe';
 
+// Extended type for Stripe subscription with billing period fields
+interface StripeSubscriptionWithPeriod extends Stripe.Subscription {
+  current_period_start?: number;
+  current_period_end?: number;
+}
+
 const prisma = new PrismaClient();
 
 const updateSubscriptionSchema = z.object({
@@ -67,7 +73,8 @@ export async function GET(request: NextRequest) {
     const includedUsers = currentSubscription?.plan?.includedUsers || 1;
     const extraUsers = Math.max(0, activeUserCount - includedUsers);
     const extraUserPrice = currentSubscription?.plan?.pricePerExtraUser || 0;
-    const totalMonthlyPrice = Number(basePlanPrice) + (extraUsers * Number(extraUserPrice));
+    const extraUserCost = extraUsers * Number(extraUserPrice);
+    const totalMonthlyPrice = Number(basePlanPrice) + extraUserCost;
 
     return NextResponse.json({
       tenant: {
@@ -76,6 +83,7 @@ export async function GET(request: NextRequest) {
         subscriptionStatus: tenant.subscriptionStatus,
         currentPlan: tenant.currentPlan,
         trialEndsAt: tenant.trialEndsAt,
+        stripeCustomerId: tenant.stripeCustomerId,
       },
       subscription: currentSubscription ? {
         id: currentSubscription.id,
@@ -86,6 +94,7 @@ export async function GET(request: NextRequest) {
         userCount: currentSubscription.userCount,
         plan: {
           name: currentSubscription.plan.name,
+          type: currentSubscription.plan.type,
           price: currentSubscription.plan.price,
           yearlyPrice: currentSubscription.plan.yearlyPrice,
           includedUsers: currentSubscription.plan.includedUsers,
@@ -94,28 +103,15 @@ export async function GET(request: NextRequest) {
         },
       } : null,
       stripeSubscription: stripeSubscription ? {
-        id: stripeSubscription.id,
         status: stripeSubscription.status,
-        currentPeriodStart: new Date((stripeSubscription as Stripe.Subscription).current_period_start * 1000),
-        currentPeriodEnd: new Date((stripeSubscription as Stripe.Subscription).current_period_end * 1000),
-        trialEnd: stripeSubscription.trial_end ? new Date(stripeSubscription.trial_end * 1000) : null,
+        currentPeriodEnd: (stripeSubscription as StripeSubscriptionWithPeriod).current_period_end || 0,
         cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
-        items: stripeSubscription.items.data.map(item => ({
-          id: item.id,
-          quantity: item.quantity,
-          price: {
-            id: item.price.id,
-            unitAmount: item.price.unit_amount,
-            currency: item.price.currency,
-            recurring: item.price.recurring,
-            nickname: item.price.nickname,
-          },
-        })),
       } : null,
       usage: {
         activeUsers: activeUserCount,
         includedUsers,
         extraUsers,
+        extraUserCost,
         totalMonthlyPrice,
       },
     });
@@ -164,15 +160,19 @@ export async function PUT(request: NextRequest) {
     }
 
     // Get updated subscription
-    const updatedSubscription: Stripe.Subscription = await stripeService.getSubscription(tenant.stripeSubscriptionId);
+    const updatedSubscription = await stripeService.getSubscription(tenant.stripeSubscriptionId) as StripeSubscriptionWithPeriod;
 
     return NextResponse.json({
       message: 'Subscription updated successfully',
       subscription: {
         id: updatedSubscription.id,
         status: updatedSubscription.status,
-        currentPeriodStart: new Date(updatedSubscription.current_period_start * 1000),
-        currentPeriodEnd: new Date(updatedSubscription.current_period_end * 1000),
+        currentPeriodStart: updatedSubscription.current_period_start
+          ? new Date(updatedSubscription.current_period_start * 1000)
+          : null,
+        currentPeriodEnd: updatedSubscription.current_period_end
+          ? new Date(updatedSubscription.current_period_end * 1000)
+          : null,
       },
     });
   } catch (error) {
@@ -217,10 +217,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     const stripeService = new StripeSubscriptionService();
-    const canceledSubscription: Stripe.Subscription = await stripeService.cancelSubscription(
+    const canceledSubscription = await stripeService.cancelSubscription(
       tenant.stripeSubscriptionId,
       immediately
-    );
+    ) as StripeSubscriptionWithPeriod;
 
     return NextResponse.json({
       message: immediately ? 'Subscription canceled immediately' : 'Subscription will be canceled at period end',
@@ -228,7 +228,9 @@ export async function DELETE(request: NextRequest) {
         id: canceledSubscription.id,
         status: canceledSubscription.status,
         cancelAtPeriodEnd: canceledSubscription.cancel_at_period_end,
-        currentPeriodEnd: new Date(canceledSubscription.current_period_end * 1000),
+        currentPeriodEnd: canceledSubscription.current_period_end
+          ? new Date(canceledSubscription.current_period_end * 1000)
+          : null,
       },
     });
   } catch (error) {

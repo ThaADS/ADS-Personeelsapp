@@ -3,12 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Tenant {
-  id                   String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                   String               @id @default(uuid()) @db.Uuid
   name                 String
   slug                 String               @unique
   domain               String?              @unique
@@ -48,7 +49,7 @@ model Tenant {
 }
 
 model User {
-  id                                       String                  @id @default(cuid()) @db.Uuid
+  id                                       String                  @id @default(uuid()) @db.Uuid
   name                                     String?
   email                                    String                  @unique
   emailVerified                            DateTime?               @map("email_verified") @db.Timestamptz(6)
@@ -88,7 +89,7 @@ model User {
 }
 
 model TenantUser {
-  id        String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id        String    @id @default(uuid()) @db.Uuid
   tenantId  String    @map("tenant_id") @db.Uuid
   userId    String    @map("user_id") @db.Uuid
   role      String?   @default("USER")
@@ -106,7 +107,7 @@ model TenantUser {
 }
 
 model Plan {
-  id                String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                String         @id @default(uuid()) @db.Uuid
   name              String         @unique
   type              plan_type
   price             Decimal        @db.Decimal(10, 2)
@@ -123,7 +124,7 @@ model Plan {
 }
 
 model Subscription {
-  id                   String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                   String              @id @default(uuid()) @db.Uuid
   tenantId             String              @map("tenant_id") @db.Uuid
   planId               String              @map("plan_id") @db.Uuid
   stripeSubscriptionId String              @unique @map("stripe_subscription_id")
@@ -142,7 +143,7 @@ model Subscription {
 }
 
 model Invitation {
-  id         String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String     @id @default(uuid()) @db.Uuid
   tenantId   String     @map("tenant_id") @db.Uuid
   email      String
   role       user_role? @default(USER)
@@ -160,7 +161,7 @@ model Invitation {
 }
 
 model Advertisement {
-  id                String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                String    @id @default(uuid()) @db.Uuid
   title             String
   content           String
   imageUrl          String?   @map("image_url")
@@ -170,7 +171,7 @@ model Advertisement {
   priority          Int?      @default(0)
   startDate         DateTime? @map("start_date") @db.Timestamptz(6)
   endDate           DateTime? @map("end_date") @db.Timestamptz(6)
-  target_tenant_ids String[]  @default([]) @db.Uuid
+  target_tenant_ids String[]  @db.Uuid
   createdAt         DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt         DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -178,7 +179,7 @@ model Advertisement {
 }
 
 model AuditLog {
-  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String    @id @default(uuid()) @db.Uuid
   tenantId   String?   @map("tenant_id") @db.Uuid
   userId     String?   @map("user_id") @db.Uuid
   action     String
@@ -200,7 +201,7 @@ model AuditLog {
 }
 
 model Timesheet {
-  id                                  String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                  String            @id @default(uuid()) @db.Uuid
   tenantId                            String            @map("tenant_id") @db.Uuid
   userId                              String            @map("user_id") @db.Uuid
   date                                DateTime          @db.Date
@@ -208,7 +209,7 @@ model Timesheet {
   endTime                             DateTime          @map("end_time") @db.Timestamptz(6)
   break_minutes                       Int?              @default(0)
   description                         String?
-  total_hours                         Decimal?          @default(dbgenerated("((EXTRACT(epoch FROM (end_time - start_time)) / (3600)::numeric) - ((break_minutes)::numeric / (60)::numeric))")) @db.Decimal(5, 2)
+  total_hours                         Decimal?          @db.Decimal(5, 2)
   status                              timesheet_status? @default(PENDING)
   approved_by                         String?           @db.Uuid
   approved_at                         DateTime?         @db.Timestamptz(6)
@@ -230,7 +231,7 @@ model Timesheet {
 }
 
 model NotificationPreference {
-  id                       String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                       String    @id @default(uuid()) @db.Uuid
   userId                   String    @unique @map("user_id") @db.Uuid
   email_vacation_approved  Boolean?  @default(true)
   email_vacation_rejected  Boolean?  @default(true)
@@ -247,21 +248,21 @@ model NotificationPreference {
 }
 
 model LeaveBalance {
-  id                  String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                  String    @id @default(uuid()) @db.Uuid
   tenant_id           String    @db.Uuid
   employee_id         String    @db.Uuid
   year                Int
-  statutory_days      Decimal?  @default(20) @db.Decimal(5, 2)
-  statutory_used      Decimal?  @default(0) @db.Decimal(5, 2)
+  statutory_days      Decimal?  @default("20")
+  statutory_used      Decimal?  @default("0")
   statutory_expiry    DateTime? @db.Date
-  extra_days          Decimal?  @default(5) @db.Decimal(5, 2)
-  extra_used          Decimal?  @default(0) @db.Decimal(5, 2)
+  extra_days          Decimal?  @default("5")
+  extra_used          Decimal?  @default("0")
   extra_expiry        DateTime? @db.Date
-  compensation_hours  Decimal?  @default(0) @db.Decimal(6, 2)
-  compensation_used   Decimal?  @default(0) @db.Decimal(6, 2)
+  compensation_hours  Decimal?  @default("0")
+  compensation_used   Decimal?  @default("0")
   compensation_expiry DateTime? @db.Date
-  special_leave       Decimal?  @default(0) @db.Decimal(5, 2)
-  special_leave_used  Decimal?  @default(0) @db.Decimal(5, 2)
+  special_leave       Decimal?  @default("0")
+  special_leave_used  Decimal?  @default("0")
   created_at          DateTime? @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   employees           employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -272,7 +273,7 @@ model LeaveBalance {
 }
 
 model LeaveRequest {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id          String    @id @default(uuid()) @db.Uuid
   tenantId    String    @map("tenant_id") @db.Uuid
   userId      String    @map("user_id") @db.Uuid
   type        String
@@ -294,7 +295,7 @@ model LeaveRequest {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model departments {
-  id         String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String      @id @default(uuid()) @db.Uuid
   tenant_id  String      @db.Uuid
   name       String
   code       String?
@@ -310,7 +311,7 @@ model departments {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model documents {
-  id           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id           String        @id @default(uuid()) @db.Uuid
   tenant_id    String        @db.Uuid
   employee_id  String?       @db.Uuid
   type         document_type
@@ -333,14 +334,14 @@ model documents {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model employees {
-  id                String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                String           @id @default(uuid()) @db.Uuid
   user_id           String           @unique @db.Uuid
   tenant_id         String           @db.Uuid
   department_id     String?          @db.Uuid
   employee_number   String?
   position          String?
   contract_type     contract_type?   @default(FULLTIME)
-  hours_per_week    Decimal?         @default(40) @db.Decimal(4, 2)
+  hours_per_week    Decimal?         @default("40")
   start_date        DateTime         @db.Date
   end_date          DateTime?        @db.Date
   phone_number      String?
@@ -366,7 +367,7 @@ model employees {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model notifications {
-  id         String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String            @id @default(uuid()) @db.Uuid
   tenant_id  String?           @db.Uuid
   user_id    String            @db.Uuid
   type       notification_type
@@ -386,7 +387,7 @@ model notifications {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model public_holidays {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   tenant_id   String?  @db.Uuid
   date        DateTime @db.Date
   name        String
@@ -399,7 +400,7 @@ model public_holidays {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model sick_leaves {
-  id                   String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                   String             @id @default(uuid()) @db.Uuid
   tenant_id            String             @db.Uuid
   employee_id          String             @db.Uuid
   start_date           DateTime           @db.Date
@@ -425,7 +426,7 @@ model sick_leaves {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model vacations {
-  id               String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id               String           @id @default(uuid()) @db.Uuid
   tenant_id        String           @db.Uuid
   employee_id      String           @db.Uuid
   type             vacation_type?   @default(VACATION)
@@ -452,7 +453,7 @@ model vacations {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model work_schedules {
-  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id            String    @id @default(uuid()) @db.Uuid
   tenant_id     String    @db.Uuid
   employee_id   String    @db.Uuid
   day_of_week   Int

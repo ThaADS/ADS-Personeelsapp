@@ -71,8 +71,13 @@ export async function GET() {
         },
         notificationPreference: {
           select: {
-            emailEnabled: true,
-            categories: true,
+            email_vacation_approved: true,
+            email_vacation_rejected: true,
+            email_sick_leave_uwv: true,
+            email_timesheet_reminder: true,
+            email_approval_pending: true,
+            email_leave_expiring: true,
+            in_app_all: true,
           },
         },
       },
@@ -95,7 +100,7 @@ export async function GET() {
       tenantRole: currentTenantUser?.role || 'USER',
       isActive: currentTenantUser?.isActive ?? true,
       tenant: currentTenantUser?.tenant || null,
-      notifications: user.notificationPreference || { emailEnabled: true, categories: null },
+      notifications: user.notificationPreference || null,
       // Contact info
       phone: user.phone,
       address: user.address,

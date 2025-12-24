@@ -58,12 +58,19 @@ export async function collectPerformanceMetrics(): Promise<Partial<PerformanceMe
       
       metrics.resourceLoadTimes = resourceLoadTimes;
       
-      // Geheugengebruik ophalen indien beschikbaar
-      if (performance.memory) {
+      // Geheugengebruik ophalen indien beschikbaar (Chrome-specific)
+      const perfWithMemory = performance as Performance & {
+        memory?: {
+          jsHeapSizeLimit: number;
+          totalJSHeapSize: number;
+          usedJSHeapSize: number;
+        };
+      };
+      if (perfWithMemory.memory) {
         metrics.memoryUsage = {
-          jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
-          totalJSHeapSize: performance.memory.totalJSHeapSize,
-          usedJSHeapSize: performance.memory.usedJSHeapSize
+          jsHeapSizeLimit: perfWithMemory.memory.jsHeapSizeLimit,
+          totalJSHeapSize: perfWithMemory.memory.totalJSHeapSize,
+          usedJSHeapSize: perfWithMemory.memory.usedJSHeapSize
         };
       }
       
@@ -108,11 +115,15 @@ export function observeWebVitals(
     // Cumulative Layout Shift
     new PerformanceObserver((entryList) => {
       const entries = entryList.getEntries();
-      entries.forEach((entry: { value: number; }) => {
-        callback({
-          name: 'CLS',
-          value: entry.value
-        });
+      entries.forEach((entry) => {
+        // LayoutShift entries have a 'value' property
+        const layoutEntry = entry as PerformanceEntry & { value?: number };
+        if (layoutEntry.value !== undefined) {
+          callback({
+            name: 'CLS',
+            value: layoutEntry.value
+          });
+        }
       });
     }).observe({ type: 'layout-shift', buffered: true });
 

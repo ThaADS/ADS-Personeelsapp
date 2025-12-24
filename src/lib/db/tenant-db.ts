@@ -61,14 +61,16 @@ export class TenantDB {
 
       create: async (args: Prisma.TimesheetCreateArgs) => {
         const context = await this.getContext();
+        // Extract relation fields to avoid type conflicts
+        const { tenant, user, ...restData } = args.data as Record<string, unknown>;
         return this.prisma.timesheet.create({
           ...args,
           data: {
-            ...args.data,
+            ...restData,
             tenantId: context.tenantId,
             // Users can only create timesheets for themselves
-            ...(context.userRole === 'USER' && { userId: context.userId }),
-          },
+            userId: context.userRole === 'USER' ? context.userId : (restData.userId as string),
+          } as Prisma.TimesheetUncheckedCreateInput,
         });
       },
 
@@ -359,9 +361,9 @@ export class TenantDB {
   /**
    * Transaction support with tenant context
    */
-  async transaction<T>(fn: (tx: PrismaClient) => Promise<T>): Promise<T> {
-    const context = await this.getContext();
-    
+  async transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+    await this.getContext(); // Verify context exists
+
     return this.prisma.$transaction(async (tx) => {
       // Pass the transaction client to the function
       return fn(tx);
