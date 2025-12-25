@@ -122,13 +122,13 @@ export default function MarketingHomePage() {
                   href="/login"
                   className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-xl hover:from-violet-700 hover:to-fuchsia-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
-                  Start gratis trial
+                  Start demo
                   <ArrowRightIcon className="ml-2 w-5 h-5" />
                 </Link>
 
                 <button className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-white/10 rounded-xl border-2 border-white/20 hover:border-violet-300 hover:bg-white/20 transition-all backdrop-blur-sm">
-                  <PlayCircleIcon className="mr-2 w-6 h-6" />
-                  Bekijk demo
+                  <PlayCircleIcon className="mr-2 w-6 h-6 text-white" />
+                  <span className="text-white">Bekijk demo</span>
                 </button>
               </div>
 
@@ -295,7 +295,7 @@ export default function MarketingHomePage() {
               href="/login"
               className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-violet-600 bg-white rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              Start gratis trial
+              Start demo
               <ArrowRightIcon className="ml-2 w-5 h-5" />
             </Link>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,7 +13,18 @@ export default function DashboardLayout({
 }) {
   const { data: session } = useSession();
   const pathname = usePathname();
-  // Mobile menu state removed - not currently implemented
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = useCallback(async () => {
+    setIsLoggingOut(true);
+    setMobileMenuOpen(false);
+    try {
+      await signOut({ callbackUrl: '/login', redirect: true });
+    } catch {
+      setIsLoggingOut(false);
+    }
+  }, []);
 
   // Navigation items based on user role
   const getNavigationItems = () => {
@@ -86,16 +98,99 @@ export default function DashboardLayout({
                     {session?.user?.name} <span className="text-purple-600 dark:text-purple-400">({session?.user?.role})</span>
                   </span>
                   <button
-                    onClick={() => signOut({ callbackUrl: '/login' })}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px] flex items-center justify-center"
                   >
-                    Uitloggen
+                    {isLoggingOut ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Bezig...
+                      </>
+                    ) : (
+                      'Uitloggen'
+                    )}
                   </button>
                 </div>
               </div>
             </div>
+
+            {/* Mobile hamburger button */}
+            <div className="sm:hidden flex items-center">
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-white/10 focus:outline-none transition-colors"
+                aria-expanded={mobileMenuOpen}
+                aria-label="Open menu"
+              >
+                {mobileMenuOpen ? (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden border-t border-gray-200 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg">
+            <div className="px-4 py-3 space-y-1">
+              {getNavigationItems().map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                    item.current
+                      ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-white/10'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+
+              {/* User info and logout */}
+              <div className="pt-4 pb-2 border-t border-gray-200 dark:border-white/10 mt-4">
+                <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                  Ingelogd als: <span className="font-medium text-gray-900 dark:text-white">{session?.user?.name}</span>
+                </div>
+                <div className="flex items-center justify-between px-3 py-2">
+                  <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                    {session?.user?.role}
+                  </span>
+                  <ThemeToggle />
+                </div>
+                <button
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="w-full mt-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {isLoggingOut ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Bezig...
+                    </>
+                  ) : (
+                    'Uitloggen'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Mobile bottom bar */}

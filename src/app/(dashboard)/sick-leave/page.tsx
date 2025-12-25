@@ -107,13 +107,13 @@ export default function SickLeavePage() {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'approved':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
     }
   };
 
@@ -138,27 +138,27 @@ export default function SickLeavePage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-black">Ziekmeldingen</h1>
-        <p className="text-black font-medium">Beheer je ziekmeldingen en herstelregistraties</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Ziekmeldingen</h1>
+        <p className="text-gray-600 dark:text-gray-400">Beheer je ziekmeldingen en herstelregistraties</p>
       </div>
 
       {/* Error message */}
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">{error}</p>
+        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
       {/* Tabs */}
       <div className="mb-6">
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setSelectedTab('overview')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'overview'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
+                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600'
               }`}
             >
               Overzicht
@@ -167,8 +167,8 @@ export default function SickLeavePage() {
               onClick={() => setSelectedTab('report')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 selectedTab === 'report'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-black hover:text-blue-600 hover:border-blue-300'
+                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600'
               }`}
             >
               Ziekmelding
@@ -182,74 +182,74 @@ export default function SickLeavePage() {
         <div className="space-y-6">
           {/* Statistics */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-black mb-2">Totaal</h3>
-              <div className="text-3xl font-bold text-red-600">{totalDays}</div>
-              <p className="text-sm text-gray-500">Ziektedagen</p>
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Totaal</h3>
+              <div className="text-3xl font-bold text-red-600 dark:text-red-400">{totalDays}</div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Ziektedagen</p>
             </div>
-            <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-black mb-2">Gemiddeld</h3>
-              <div className="text-3xl font-bold text-blue-600">{avgDays}</div>
-              <p className="text-sm text-gray-500">Dagen per melding</p>
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Gemiddeld</h3>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{avgDays}</div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Dagen per melding</p>
             </div>
-            <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-black mb-2">Meldingen</h3>
-              <div className="text-3xl font-bold text-gray-600">{records.length}</div>
-              <p className="text-sm text-gray-500">Totaal aantal</p>
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Meldingen</h3>
+              <div className="text-3xl font-bold text-gray-600 dark:text-gray-300">{records.length}</div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Totaal aantal</p>
             </div>
-            <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-black mb-2">In behandeling</h3>
-              <div className="text-3xl font-bold text-orange-600">{pendingCount}</div>
-              <p className="text-sm text-gray-500">Wachtende meldingen</p>
+            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">In behandeling</h3>
+              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{pendingCount}</div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Wachtende meldingen</p>
             </div>
           </div>
 
           {/* Recent Records */}
-          <div className="bg-white shadow rounded-lg">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg font-medium text-black mb-4">Recente Ziekmeldingen</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Recente Ziekmeldingen</h3>
 
               {isLoading ? (
                 <div className="p-8 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-500">Laden...</p>
+                  <p className="mt-2 text-gray-500 dark:text-gray-400">Laden...</p>
                 </div>
               ) : records.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
+                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                   <p>Geen ziekmeldingen gevonden.</p>
                 </div>
               ) : (
-                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                  <table className="min-w-full divide-y divide-gray-300">
-                    <thead className="bg-gray-50">
+                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-white/10 md:rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Periode
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Dagen
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Reden
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                           Ingediend
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                       {records.map((record) => (
-                        <tr key={record.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <tr key={record.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {new Date(record.startDate).toLocaleDateString('nl-NL')} - {new Date(record.endDate).toLocaleDateString('nl-NL')}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {record.totalDays}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {record.reason || '-'}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -257,7 +257,7 @@ export default function SickLeavePage() {
                               {getStatusText(record.status)}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                             {new Date(record.submittedAt).toLocaleDateString('nl-NL')}
                           </td>
                         </tr>
@@ -270,21 +270,21 @@ export default function SickLeavePage() {
               {/* Pagination */}
               {pagination && pagination.pages > 1 && (
                 <div className="mt-4 flex items-center justify-between">
-                  <div className="text-sm text-gray-700">
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
                     Pagina {pagination.page} van {pagination.pages} ({pagination.total} resultaten)
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => fetchRecords(pagination.page - 1)}
                       disabled={pagination.page <= 1}
-                      className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Vorige
                     </button>
                     <button
                       onClick={() => fetchRecords(pagination.page + 1)}
                       disabled={pagination.page >= pagination.pages}
-                      className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Volgende
                     </button>
@@ -298,10 +298,10 @@ export default function SickLeavePage() {
 
       {/* Report Tab */}
       {selectedTab === 'report' && (
-        <div className="bg-white shadow rounded-lg">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-black mb-4">Nieuwe Ziekmelding</h3>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Nieuwe Ziekmelding</h3>
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4 mb-6">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -309,8 +309,8 @@ export default function SickLeavePage() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-yellow-800">Belangrijk</h3>
-                  <div className="mt-2 text-sm text-yellow-700">
+                  <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-300">Belangrijk</h3>
+                  <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-400">
                     <p>Meld je ziek zo snel mogelijk, bij voorkeur voor 09:00 uur. Neem contact op met je leidinggevende.</p>
                   </div>
                 </div>
@@ -319,7 +319,7 @@ export default function SickLeavePage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Startdatum ziekte</label>
+                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Startdatum ziekte</label>
                   <input
                     type="date"
                     id="startDate"
@@ -327,30 +327,30 @@ export default function SickLeavePage() {
                     value={formData.startDate}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">Verwachte einddatum (optioneel)</label>
+                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Verwachte einddatum (optioneel)</label>
                   <input
                     type="date"
                     id="endDate"
                     name="endDate"
                     value={formData.endDate}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
               <div>
-                <label htmlFor="reason" className="block text-sm font-medium text-gray-700">Reden (optioneel)</label>
+                <label htmlFor="reason" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reden (optioneel)</label>
                 <textarea
                   id="reason"
                   name="reason"
                   rows={3}
                   value={formData.reason}
                   onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                   placeholder="Korte omschrijving van de klachten..."
                 />
               </div>

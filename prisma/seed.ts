@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, timesheet_status, vacation_status, vacation_type } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
 // Define types locally since @/types is not available in seed context
@@ -788,6 +788,277 @@ async function main() {
     },
   });
 
+  // ==========================================
+  // 📊 8 MONTHS OF HISTORICAL DATA FOR DEMO
+  // ==========================================
+  console.log('📊 Creating 8 months of historical demo data...');
+
+  // Helper function to get working days (Monday-Friday)
+  const isWorkingDay = (date: Date): boolean => {
+    const day = date.getDay();
+    return day !== 0 && day !== 6; // Not Sunday (0) or Saturday (6)
+  };
+
+  // Helper function to create a date at specific time
+  const createDateTime = (date: Date, hours: number, minutes: number): Date => {
+    const newDate = new Date(date);
+    newDate.setHours(hours, minutes, 0, 0);
+    return newDate;
+  };
+
+  // Helper to add random variation to hours (-30 to +30 minutes)
+  const randomVariation = (): number => Math.floor(Math.random() * 61) - 30;
+
+  // Get all users for both tenants
+  const allCKWUsers = [ckwAdmin, ckwManager, ckwUser, ...createdEmployees];
+  const allDemoUsers = [demoAdmin, demoManager, demoUser, ...createdDemoEmployees];
+
+  // Work patterns for variety
+  const workDescriptions = [
+    'Reguliere werkzaamheden',
+    'Projectwerk en meetings',
+    'Klantgesprekken',
+    'Administratie en rapportage',
+    'Team overleg',
+    'Sprint planning',
+    'Code review en development',
+    'Documentatie',
+    'Onderzoek en analyse',
+    'Training en ontwikkeling',
+    'Externe vergadering',
+    'Deadline werkzaamheden',
+  ];
+
+  const vacationReasons = [
+    'Vakantie',
+    'Zomervakantie',
+    'Kerstvakantie',
+    'Herfstvakantie',
+    'Voorjaarsvakantie',
+    'Familiebezoek',
+    'Uitstapje',
+    'Rust en ontspanning',
+  ];
+
+  const sickLeaveReasons = [
+    'Griep',
+    'Verkoudheid',
+    'Niet lekker',
+    'Ziek thuis',
+    'Herstel na ziekte',
+  ];
+
+  // Generate 8 months of historical data
+  const eightMonthsAgo = new Date();
+  eightMonthsAgo.setMonth(eightMonthsAgo.getMonth() - 8);
+  eightMonthsAgo.setHours(0, 0, 0, 0);
+
+  const historicalTimesheets: Array<{
+    tenantId: string;
+    userId: string;
+    date: Date;
+    startTime: Date;
+    endTime: Date;
+    break_minutes: number;
+    description: string;
+    status: timesheet_status;
+  }> = [];
+
+  const historicalLeaveRequests: Array<{
+    tenantId: string;
+    userId: string;
+    type: vacation_type;
+    startDate: Date;
+    endDate: Date;
+    totalDays: number;
+    description: string;
+    status: vacation_status;
+  }> = [];
+
+  // Generate timesheets for each user over 8 months
+  const generateTimesheetsForUser = (
+    tenantId: string,
+    userId: string,
+    workHoursPerWeek: number = 40
+  ) => {
+    const currentDate = new Date(eightMonthsAgo);
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() - 3); // Stop 3 days ago to avoid conflicts
+
+    // Track days off for this user
+    const daysOff = new Set<string>();
+
+    // Add some random vacation periods (2-3 per user over 8 months)
+    const numVacations = Math.floor(Math.random() * 2) + 1;
+    for (let v = 0; v < numVacations; v++) {
+      const vacationStart = new Date(eightMonthsAgo);
+      vacationStart.setDate(vacationStart.getDate() + Math.floor(Math.random() * 200));
+
+      // Skip if vacation would be in the future
+      if (vacationStart > endDate) continue;
+
+      const vacationDays = Math.floor(Math.random() * 8) + 3; // 3-10 days
+      const vacationEnd = new Date(vacationStart);
+      vacationEnd.setDate(vacationEnd.getDate() + vacationDays);
+
+      // Only add if within our range
+      if (vacationEnd <= endDate) {
+        // Count working days
+        let workingDays = 0;
+        const tempDate = new Date(vacationStart);
+        while (tempDate <= vacationEnd) {
+          if (isWorkingDay(tempDate)) {
+            daysOff.add(tempDate.toISOString().split('T')[0]);
+            workingDays++;
+          }
+          tempDate.setDate(tempDate.getDate() + 1);
+        }
+
+        if (workingDays > 0) {
+          historicalLeaveRequests.push({
+            tenantId,
+            userId,
+            type: vacation_type.VACATION,
+            startDate: vacationStart,
+            endDate: vacationEnd,
+            totalDays: workingDays,
+            description: vacationReasons[Math.floor(Math.random() * vacationReasons.length)],
+            status: vacation_status.APPROVED,
+          });
+        }
+      }
+    }
+
+    // Add some random sick days (0-5 per user over 8 months)
+    const numSickPeriods = Math.floor(Math.random() * 4);
+    for (let s = 0; s < numSickPeriods; s++) {
+      const sickStart = new Date(eightMonthsAgo);
+      sickStart.setDate(sickStart.getDate() + Math.floor(Math.random() * 220));
+
+      // Skip if sick day would be in the future
+      if (sickStart > endDate) continue;
+
+      const sickDays = Math.floor(Math.random() * 4) + 1; // 1-4 days
+      const sickEnd = new Date(sickStart);
+      sickEnd.setDate(sickEnd.getDate() + sickDays - 1);
+
+      // Only add if within our range
+      if (sickEnd <= endDate) {
+        // Count working days
+        let workingDays = 0;
+        const tempDate = new Date(sickStart);
+        while (tempDate <= sickEnd) {
+          if (isWorkingDay(tempDate)) {
+            daysOff.add(tempDate.toISOString().split('T')[0]);
+            workingDays++;
+          }
+          tempDate.setDate(tempDate.getDate() + 1);
+        }
+
+        if (workingDays > 0) {
+          historicalLeaveRequests.push({
+            tenantId,
+            userId,
+            type: vacation_type.LEAVE, // Using LEAVE for sick leave as the schema uses vacation_type
+            startDate: sickStart,
+            endDate: sickEnd,
+            totalDays: workingDays,
+            description: sickLeaveReasons[Math.floor(Math.random() * sickLeaveReasons.length)],
+            status: vacation_status.APPROVED,
+          });
+        }
+      }
+    }
+
+    // Generate daily timesheets
+    const hoursPerDay = workHoursPerWeek / 5;
+    const tempDate = new Date(eightMonthsAgo);
+
+    while (tempDate <= endDate) {
+      const dateKey = tempDate.toISOString().split('T')[0];
+
+      // Skip weekends and days off
+      if (isWorkingDay(tempDate) && !daysOff.has(dateKey)) {
+        // Randomly skip some days (about 5% - sick not reported, etc)
+        if (Math.random() > 0.05) {
+          // Calculate start/end times with variation
+          const baseStart = workHoursPerWeek === 32 ? 9 : 8; // Part-time starts later
+          const startMinutes = 0 + randomVariation();
+          const startHour = baseStart + Math.floor(startMinutes / 60);
+          const actualStartMinutes = ((startMinutes % 60) + 60) % 60;
+
+          const workMinutes = hoursPerDay * 60 + randomVariation();
+          const breakMinutes = hoursPerDay >= 6 ? 30 : 0;
+          const endMinutes = startMinutes + workMinutes + breakMinutes;
+          const endHour = baseStart + Math.floor(endMinutes / 60);
+          const actualEndMinutes = ((endMinutes % 60) + 60) % 60;
+
+          // Determine status based on date (older = approved, recent = mix)
+          const daysAgo = Math.floor((today.getTime() - tempDate.getTime()) / (1000 * 60 * 60 * 24));
+          let status: timesheet_status = timesheet_status.APPROVED;
+          if (daysAgo < 14) {
+            // Recent entries have mixed status
+            const rand = Math.random();
+            if (rand < 0.3) status = timesheet_status.PENDING;
+            // Note: Schema only has PENDING, APPROVED, REJECTED - no SUBMITTED
+          }
+
+          historicalTimesheets.push({
+            tenantId,
+            userId,
+            date: new Date(tempDate),
+            startTime: createDateTime(tempDate, startHour, actualStartMinutes),
+            endTime: createDateTime(tempDate, endHour, actualEndMinutes),
+            break_minutes: breakMinutes,
+            description: workDescriptions[Math.floor(Math.random() * workDescriptions.length)],
+            status,
+          });
+        }
+      }
+
+      tempDate.setDate(tempDate.getDate() + 1);
+    }
+  };
+
+  // Generate data for CKW users
+  console.log('  📅 Generating CKW historical data...');
+  for (const user of allCKWUsers) {
+    const workHours = user.email === 'gebruiker@demo-company.nl' ? 32 : 40;
+    generateTimesheetsForUser(ckwTenant.id, user.id, workHours);
+  }
+
+  // Generate data for Demo Company users
+  console.log('  📅 Generating Demo Company historical data...');
+  for (const user of allDemoUsers) {
+    const workHours = user.email === 'gebruiker@demo-company.nl' ? 32 : 40;
+    generateTimesheetsForUser(demoTenant.id, user.id, workHours);
+  }
+
+  // Batch insert timesheets (to avoid hitting database limits)
+  console.log(`  ⏰ Inserting ${historicalTimesheets.length} timesheets...`);
+  const BATCH_SIZE = 100;
+  for (let i = 0; i < historicalTimesheets.length; i += BATCH_SIZE) {
+    const batch = historicalTimesheets.slice(i, i + BATCH_SIZE);
+    await prisma.timesheet.createMany({
+      data: batch,
+      skipDuplicates: true,
+    });
+  }
+
+  // Batch insert leave requests
+  console.log(`  🏖️ Inserting ${historicalLeaveRequests.length} leave requests...`);
+  for (let i = 0; i < historicalLeaveRequests.length; i += BATCH_SIZE) {
+    const batch = historicalLeaveRequests.slice(i, i + BATCH_SIZE);
+    await prisma.leaveRequest.createMany({
+      data: batch,
+      skipDuplicates: true,
+    });
+  }
+
+  console.log('  ✅ Historical data created successfully!');
+  console.log(`     - ${historicalTimesheets.length} timesheet entries`);
+  console.log(`     - ${historicalLeaveRequests.length} leave requests`);
+
   console.log('✅ Database seeded successfully!');
   console.log('');
   console.log('🔑 Login credentials:');
@@ -808,6 +1079,7 @@ async function main() {
   console.log('🏢 Tenants created: CKW (active) and Demo Company (14-day trial)');
   console.log('📦 Plans created: Freemium (€0) and Standard (€49.95/month)');
   console.log('👥 CKW has 8 employees with full profile data');
+  console.log('📊 8 months of historical timesheet and leave data generated');
 }
 
 main()

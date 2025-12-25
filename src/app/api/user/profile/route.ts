@@ -1,8 +1,8 @@
 /**
  * API route voor gebruikersprofiel
  */
-import { NextRequest, NextResponse } from "next/server";
-import { getTenantContext, createAuditLog } from "@/lib/auth/tenant-access";
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth/auth";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 
@@ -24,16 +24,17 @@ const profileUpdateSchema = z.object({
  * GET /api/user/profile
  * Haalt het profiel van de huidige gebruiker op
  */
-export async function GET() {
+export const GET = auth(async function GET(req) {
   try {
-    const context = await getTenantContext();
-
-    if (!context) {
+    if (!req.auth?.user?.id) {
       return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
     }
 
+    const userId = req.auth.user.id;
+    const tenantId = req.auth.user.tenantId;
+
     const user = await prisma.user.findUnique({
-      where: { id: context.userId },
+      where: { id: userId },
       select: {
         id: true,
         name: true,
@@ -56,7 +57,7 @@ export async function GET() {
         createdAt: true,
         updatedAt: true,
         tenantUsers: {
-          where: context.tenantId ? { tenantId: context.tenantId } : undefined,
+          where: tenantId ? { tenantId } : undefined,
           select: {
             role: true,
             isActive: true,
@@ -120,26 +121,27 @@ export async function GET() {
     console.error("Error in profile GET:", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
-}
+});
 
 /**
  * PUT /api/user/profile
  * Werkt het profiel van de huidige gebruiker bij
  */
-export async function PUT(request: NextRequest) {
+export const PUT = auth(async function PUT(req) {
   try {
-    const context = await getTenantContext();
-
-    if (!context) {
+    if (!req.auth?.user?.id) {
       return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
     }
 
-    const body = await request.json();
+    const userId = req.auth.user.id;
+    const tenantId = req.auth.user.tenantId;
+
+    const body = await req.json();
     const validatedData = profileUpdateSchema.parse(body);
 
     // Get current user data for audit log
     const currentUser = await prisma.user.findUnique({
-      where: { id: context.userId },
+      where: { id: userId },
       select: {
         name: true,
         email: true,
@@ -171,7 +173,7 @@ export async function PUT(request: NextRequest) {
 
     // Update user
     const updatedUser = await prisma.user.update({
-      where: { id: context.userId },
+      where: { id: userId },
       data: {
         ...(validatedData.name && { name: validatedData.name }),
         ...(validatedData.email && { email: validatedData.email }),
@@ -199,31 +201,39 @@ export async function PUT(request: NextRequest) {
     });
 
     // Create audit log
-    await createAuditLog(
-      'UPDATE_PROFILE',
-      'User',
-      context.userId,
-      {
-        name: currentUser.name,
-        email: currentUser.email,
-        locale: currentUser.locale,
-        image: currentUser.image,
-        phone: currentUser.phone,
-        address: currentUser.address,
-        city: currentUser.city,
-        postalCode: currentUser.postalCode,
-      },
-      {
-        name: updatedUser.name,
-        email: updatedUser.email,
-        locale: updatedUser.locale,
-        image: updatedUser.image,
-        phone: updatedUser.phone,
-        address: updatedUser.address,
-        city: updatedUser.city,
-        postalCode: updatedUser.postalCode,
-      }
-    );
+    try {
+      await prisma.auditLog.create({
+        data: {
+          action: 'UPDATE_PROFILE',
+          userId: userId,
+          tenantId: tenantId || undefined,
+          resource: 'User',
+          resourceId: userId,
+          oldValues: JSON.parse(JSON.stringify({
+            name: currentUser.name,
+            email: currentUser.email,
+            locale: currentUser.locale,
+            image: currentUser.image,
+            phone: currentUser.phone,
+            address: currentUser.address,
+            city: currentUser.city,
+            postalCode: currentUser.postalCode,
+          })),
+          newValues: JSON.parse(JSON.stringify({
+            name: updatedUser.name,
+            email: updatedUser.email,
+            locale: updatedUser.locale,
+            image: updatedUser.image,
+            phone: updatedUser.phone,
+            address: updatedUser.address,
+            city: updatedUser.city,
+            postalCode: updatedUser.postalCode,
+          })),
+        },
+      });
+    } catch (auditError) {
+      console.error("Failed to create audit log:", auditError);
+    }
 
     return NextResponse.json({
       success: true,
@@ -252,4 +262,4 @@ export async function PUT(request: NextRequest) {
     console.error("Error in profile PUT:", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
-}
+});

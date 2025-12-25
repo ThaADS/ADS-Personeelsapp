@@ -183,6 +183,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      id: timesheet.id, // Top-level id for QuickClockIn component
       timesheet: {
         id: timesheet.id,
         date: timesheet.date.toISOString().split('T')[0],

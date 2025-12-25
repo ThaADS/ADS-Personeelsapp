@@ -171,20 +171,99 @@ export async function sendReminderNotification(
   data: EmailTemplateData
 ): Promise<boolean> {
   const subject = `Herinnering: Openstaande goedkeuringsaanvragen`;
-  
+
   const html = renderTemplate(`
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2c3e50;">Herinnering: Openstaande goedkeuringsaanvragen</h2>
       <p>Beste {{recipientName}},</p>
       <p>Dit is een herinnering dat er {{pendingCount}} openstaande aanvragen zijn die uw goedkeuring vereisen.</p>
-      
+
       <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
         <p><strong>Aantal openstaande aanvragen:</strong> {{pendingCount}}</p>
         <p><strong>Oudste aanvraag:</strong> {{oldestDate}}</p>
       </div>
-      
+
       <p>U kunt deze aanvragen bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">ADS Personeelsapp portaal</a>.</p>
-      
+
+      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+    </div>
+  `, data);
+
+  return sendEmail(to, subject, html);
+}
+
+/**
+ * Verstuurt een wachtwoord reset email
+ * @param to Email adres van de ontvanger
+ * @param data Data voor het template (resetUrl, userName, expiresIn)
+ * @returns Promise met het resultaat van het versturen
+ */
+export async function sendPasswordResetEmail(
+  to: string,
+  data: EmailTemplateData
+): Promise<boolean> {
+  const subject = 'Wachtwoord Reset - ADS Personeelsapp';
+
+  const html = renderTemplate(`
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2c3e50;">Wachtwoord Reset Aangevraagd</h2>
+      <p>Beste {{userName}},</p>
+      <p>U heeft een wachtwoord reset aangevraagd voor uw ADS Personeelsapp account.</p>
+
+      <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
+        <a href="{{resetUrl}}" style="display: inline-block; background-color: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+          Wachtwoord Resetten
+        </a>
+      </div>
+
+      <p style="color: #7f8c8d; font-size: 14px;">
+        Deze link is {{expiresIn}} geldig. Als u geen wachtwoord reset heeft aangevraagd,
+        kunt u deze email negeren.
+      </p>
+
+      <p style="color: #7f8c8d; font-size: 12px; margin-top: 30px;">
+        Als de knop niet werkt, kopieer en plak deze link in uw browser:<br>
+        <a href="{{resetUrl}}" style="color: #3498db; word-break: break-all;">{{resetUrl}}</a>
+      </p>
+
+      <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+    </div>
+  `, data);
+
+  return sendEmail(to, subject, html);
+}
+
+/**
+ * Verstuurt een bevestiging dat het wachtwoord is gewijzigd
+ * @param to Email adres van de ontvanger
+ * @param data Data voor het template (userName)
+ * @returns Promise met het resultaat van het versturen
+ */
+export async function sendPasswordChangedEmail(
+  to: string,
+  data: EmailTemplateData
+): Promise<boolean> {
+  const subject = 'Wachtwoord Gewijzigd - ADS Personeelsapp';
+
+  const html = renderTemplate(`
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #2c3e50;">Wachtwoord Succesvol Gewijzigd</h2>
+      <p>Beste {{userName}},</p>
+      <p>Uw wachtwoord voor ADS Personeelsapp is succesvol gewijzigd.</p>
+
+      <div style="background-color: #d4edda; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c3e6cb;">
+        <p style="color: #155724; margin: 0;">
+          <strong>✓</strong> Uw wachtwoord is bijgewerkt op {{changedAt}}.
+        </p>
+      </div>
+
+      <p style="color: #856404; background-color: #fff3cd; padding: 15px; border-radius: 5px; border: 1px solid #ffeeba;">
+        <strong>Let op:</strong> Als u deze wijziging niet heeft aangevraagd, neem dan
+        direct contact op met uw beheerder.
+      </p>
+
       <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
     </div>
   `, data);
