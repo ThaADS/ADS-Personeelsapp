@@ -3,19 +3,7 @@
   "crons": [
     {
       "path": "/api/cron/timesheet-reminder",
-      "schedule": "0 15 * * 5"
-    },
-    {
-      "path": "/api/cron/timesheet-reminder",
       "schedule": "0 8 * * 1"
-    },
-    {
-      "path": "/api/cron/leave-expiration",
-      "schedule": "0 9 * * 1"
-    },
-    {
-      "path": "/api/cron/uwv-alerts",
-      "schedule": "0 8 * * *"
     },
     {
       "path": "/api/cron/approval-reminders",
