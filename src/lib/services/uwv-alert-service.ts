@@ -17,7 +17,7 @@
  * - Week 8: Plan van Aanpak (action plan) must be in place
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { sendEmail } from '@/lib/services/email-service';
 
 interface AlertResult {
@@ -319,7 +319,6 @@ export async function processUwvAlerts(): Promise<AlertResult> {
           tenantId,
           role: { in: ['MANAGER', 'TENANT_ADMIN'] },
           isActive: true,
-          user: { isActive: true },
         },
         include: {
           user: { select: { id: true, name: true, email: true } },

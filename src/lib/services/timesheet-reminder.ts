@@ -9,7 +9,7 @@
  * - Monday 09:00: Escalation "Your timesheet from last week is still pending"
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { sendEmail } from '@/lib/services/email-service';
 
 interface ReminderResult {
@@ -71,12 +71,6 @@ async function findUsersWithIncompleteTimesheets(
   const activeUsers = await prisma.tenantUser.findMany({
     where: {
       isActive: true,
-      user: {
-        isActive: true,
-      },
-      tenant: {
-        isActive: true,
-      },
     },
     include: {
       user: {
@@ -369,8 +363,6 @@ export async function notifyManagersAboutIncompleteTimesheets(): Promise<Reminde
       where: {
         role: 'MANAGER',
         isActive: true,
-        user: { isActive: true },
-        tenant: { isActive: true },
       },
       include: {
         user: { select: { id: true, name: true, email: true } },

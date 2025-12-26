@@ -45,20 +45,16 @@ export async function GET(request: NextRequest) {
     const result = await processApprovalReminders();
 
     console.log('[Approval Reminders Cron] Completed:', {
-      managersNotified: result.managersNotified,
-      pendingVacations: result.pendingVacations,
-      pendingTimesheets: result.pendingTimesheets,
-      pendingSickLeaves: result.pendingSickLeaves,
+      totalManagers: result.totalManagers,
+      emailsSent: result.emailsSent,
       errors: result.errors.length
     });
 
     return NextResponse.json({
-      success: true,
+      success: result.success,
       message: 'Approval reminders processed',
-      managersNotified: result.managersNotified,
-      pendingVacations: result.pendingVacations,
-      pendingTimesheets: result.pendingTimesheets,
-      pendingSickLeaves: result.pendingSickLeaves,
+      totalManagers: result.totalManagers,
+      emailsSent: result.emailsSent,
       errors: result.errors
     });
 

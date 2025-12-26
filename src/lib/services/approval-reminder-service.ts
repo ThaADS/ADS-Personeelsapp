@@ -13,7 +13,7 @@
  * - Weekly on Monday: Summary of all pending items
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { sendEmail } from '@/lib/services/email-service';
 
 interface ReminderResult {
@@ -81,8 +81,6 @@ async function getPendingApprovalsForManagers(): Promise<ManagerPendingApprovals
     where: {
       role: { in: ['MANAGER', 'TENANT_ADMIN'] },
       isActive: true,
-      user: { isActive: true },
-      tenant: { isActive: true },
     },
     include: {
       user: { select: { id: true, name: true, email: true } },
@@ -381,14 +379,14 @@ export async function processApprovalReminders(): Promise<ReminderResult> {
               action: 'APPROVAL_REMINDER_SENT',
               userId: manager.managerId,
               tenantId: manager.tenantId,
-              details: JSON.stringify({
+              newValues: {
                 totalPending: manager.totalPending,
                 categories: manager.pendingApprovals.map((pa) => ({
                   type: pa.type,
                   count: pa.count,
                 })),
                 oldestDays: daysAgo(manager.oldestPending),
-              }),
+              },
               ipAddress: 'system',
             },
           });

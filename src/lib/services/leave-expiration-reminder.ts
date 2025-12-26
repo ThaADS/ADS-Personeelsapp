@@ -14,7 +14,7 @@
  * - Warnings at: 3 months, 1 month, 2 weeks before expiration
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { sendEmail } from '@/lib/services/email-service';
 
 interface ReminderResult {
@@ -425,7 +425,6 @@ export async function notifyManagersAboutExpiringLeave(): Promise<ReminderResult
           tenantId,
           role: 'MANAGER',
           isActive: true,
-          user: { isActive: true },
         },
         include: {
           user: { select: { id: true, name: true, email: true } },

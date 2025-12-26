@@ -12,7 +12,7 @@
  * - Audit logging for all attempts
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/db/prisma';
 import { hash } from 'bcryptjs';
 import crypto from 'crypto';
 import { sendPasswordResetEmail, sendPasswordChangedEmail } from '@/lib/services/email-service';
@@ -126,9 +126,8 @@ async function createAuditLog(
       data: {
         action,
         userId,
-        details: JSON.stringify(details),
-        ipAddress: ipAddress || 'unknown',
-        timestamp: new Date()
+        newValues: details as object,
+        ipAddress: ipAddress || null
       }
     });
   } catch (error) {
@@ -181,8 +180,7 @@ export async function requestPasswordReset(
       select: {
         id: true,
         email: true,
-        name: true,
-        isActive: true
+        name: true
       }
     });
 
@@ -194,8 +192,8 @@ export async function requestPasswordReset(
       userAgent
     }, ipAddress);
 
-    // If user doesn't exist or is inactive, return generic message
-    if (!user || !user.isActive) {
+    // If user doesn't exist, return generic message (security: don't reveal if email exists)
+    if (!user) {
       return {
         success: true,
         message: 'Als dit emailadres bij ons bekend is, ontvang je binnen enkele minuten een email met instructies.'
@@ -349,12 +347,11 @@ export async function resetPassword(
       select: {
         id: true,
         email: true,
-        name: true,
-        isActive: true
+        name: true
       }
     });
 
-    if (!user || !user.isActive) {
+    if (!user) {
       tokenStore.delete(hashedToken);
 
       await createAuditLog('PASSWORD_RESET_USER_NOT_FOUND', null, {

@@ -8,9 +8,8 @@
  */
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/auth';
+import { prisma } from '@/lib/db/prisma';
+import { auth } from '@/lib/auth/auth';
 
 interface DashboardStats {
   // Basic stats (existing)
@@ -34,15 +33,15 @@ interface DashboardStats {
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
-    const tenantId = session.user.tenantId;
-    const userRole = session.user.role;
+    const userId = session.user.id as string;
+    const tenantId = session.user.tenantId as string;
+    const userRole = session.user.role as string;
 
     // Get date boundaries
     const now = new Date();
@@ -53,6 +52,17 @@ export async function GET() {
 
     const threeMonthsFromNow = new Date();
     threeMonthsFromNow.setMonth(threeMonthsFromNow.getMonth() + 3);
+
+    // Get employee ID for current user
+    const employee = await prisma.employees.findFirst({
+      where: {
+        user_id: userId,
+        tenant_id: tenantId,
+      },
+      select: { id: true },
+    });
+
+    const employeeId = employee?.id;
 
     // Fetch basic user stats in parallel
     const [
@@ -80,13 +90,13 @@ export async function GET() {
           userId,
           tenantId,
           status: 'APPROVED',
-          approvedAt: {
+          approved_at: {
             gte: startOfWeek
           }
         }
       }),
 
-      // Total hours this month
+      // Total hours this month (only completed timesheets with endTime set)
       prisma.timesheet.aggregate({
         where: {
           userId,
@@ -95,40 +105,40 @@ export async function GET() {
             gte: startOfMonth
           },
           endTime: {
-            not: null
+            not: undefined
           }
         },
         _sum: {
-          totalHours: true
+          total_hours: true
         }
       }),
 
       // Upcoming approved vacations
-      prisma.vacation.count({
+      employeeId ? prisma.vacations.count({
         where: {
-          userId,
-          tenantId,
+          employee_id: employeeId,
+          tenant_id: tenantId,
           status: 'APPROVED',
-          startDate: {
+          start_date: {
             gte: now
           }
         }
-      }),
+      }) : Promise.resolve(0),
 
       // Active sick leaves for user
-      prisma.sickLeave.count({
+      employeeId ? prisma.sick_leaves.count({
         where: {
-          userId,
-          tenantId,
-          endDate: null // Still ongoing
+          employee_id: employeeId,
+          tenant_id: tenantId,
+          end_date: null // Still ongoing
         }
-      }),
+      }) : Promise.resolve(0),
 
       // Expiring leave balances (within 3 months)
-      prisma.leaveBalance.count({
+      employeeId ? prisma.leaveBalance.count({
         where: {
-          userId,
-          tenantId,
+          employee_id: employeeId,
+          tenant_id: tenantId,
           year: now.getFullYear(),
           OR: [
             {
@@ -160,16 +170,16 @@ export async function GET() {
             }
           ]
         }
-      }),
+      }) : Promise.resolve(0),
 
       // Pending vacation requests
-      prisma.vacation.count({
+      employeeId ? prisma.vacations.count({
         where: {
-          userId,
-          tenantId,
+          employee_id: employeeId,
+          tenant_id: tenantId,
           status: 'PENDING'
         }
-      }),
+      }) : Promise.resolve(0),
 
       // Calculate overtime (assuming 8h/day standard)
       prisma.timesheet.findMany({
@@ -180,25 +190,25 @@ export async function GET() {
             gte: startOfMonth
           },
           endTime: {
-            not: null
+            not: undefined
           }
         },
         select: {
-          totalHours: true
+          total_hours: true
         }
       })
     ]);
 
     // Calculate overtime hours (hours > 8 per day considered overtime)
     const overtimeHours = overtimeData.reduce((acc, ts) => {
-      const hours = ts.totalHours || 0;
+      const hours = Number(ts.total_hours) || 0;
       return acc + Math.max(0, hours - 8);
     }, 0);
 
     const stats: DashboardStats = {
       pendingTimesheets,
       approvedThisWeek,
-      totalHoursThisMonth: Math.round((hoursThisMonth._sum.totalHours || 0) * 10) / 10,
+      totalHoursThisMonth: Math.round((Number(hoursThisMonth._sum.total_hours) || 0) * 10) / 10,
       upcomingVacations,
       activeSickLeaves,
       expiringLeaveWarnings: expiringLeaveBalances,
@@ -208,8 +218,8 @@ export async function GET() {
 
     // Add manager-specific stats if user is MANAGER, TENANT_ADMIN, or SUPERUSER
     if (['MANAGER', 'TENANT_ADMIN', 'SUPERUSER'].includes(userRole || '')) {
-      const fortyTwoDaysAgo = new Date();
-      fortyTwoDaysAgo.setDate(fortyTwoDaysAgo.getDate() - 42);
+      const thirtyFiveDaysAgo = new Date();
+      thirtyFiveDaysAgo.setDate(thirtyFiveDaysAgo.getDate() - 35);
 
       const [
         teamMembers,
@@ -218,18 +228,21 @@ export async function GET() {
         teamSickLeaves,
         uwvAlerts
       ] = await Promise.all([
-        // Team member count
-        prisma.tenantUser.count({
+        // Team member count (active employees: no end_date or end_date in future)
+        prisma.employees.count({
           where: {
-            tenantId,
-            isActive: true
+            tenant_id: tenantId,
+            OR: [
+              { end_date: null },
+              { end_date: { gte: now } }
+            ]
           }
         }),
 
         // Pending vacation requests for team
-        prisma.vacation.count({
+        prisma.vacations.count({
           where: {
-            tenantId,
+            tenant_id: tenantId,
             status: 'PENDING'
           }
         }),
@@ -243,21 +256,21 @@ export async function GET() {
         }),
 
         // Active sick leaves in team
-        prisma.sickLeave.count({
+        prisma.sick_leaves.count({
           where: {
-            tenantId,
-            endDate: null
+            tenant_id: tenantId,
+            end_date: null
           }
         }),
 
         // UWV alert count (sick leaves >= 35 days, approaching 42-day deadline)
-        prisma.sickLeave.count({
+        prisma.sick_leaves.count({
           where: {
-            tenantId,
-            endDate: null,
-            reportedToUwv: false,
-            startDate: {
-              lte: fortyTwoDaysAgo
+            tenant_id: tenantId,
+            end_date: null,
+            uwv_reported: false,
+            start_date: {
+              lte: thirtyFiveDaysAgo
             }
           }
         })
