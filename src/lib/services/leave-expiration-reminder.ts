@@ -342,7 +342,7 @@ export async function processLeaveExpirationReminders(): Promise<ReminderResult>
               action: 'LEAVE_EXPIRY_REMINDER_SENT',
               userId: userInfo.userId,
               tenantId: userInfo.tenantId,
-              details: JSON.stringify({
+              newValues: {
                 expiringItems: userInfo.expiringItems.map((item) => ({
                   type: item.type,
                   remainingDays: item.remainingDays,
@@ -350,7 +350,7 @@ export async function processLeaveExpirationReminders(): Promise<ReminderResult>
                   daysUntilExpiry: item.daysUntilExpiry,
                   urgencyLevel: item.urgencyLevel,
                 })),
-              }),
+              },
               ipAddress: 'system',
             },
           });

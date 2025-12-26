@@ -128,19 +128,17 @@ async function findUsersWithIncompleteTimesheets(
 /**
  * Check user notification preferences
  */
-async function shouldSendReminder(userId: string, tenantId: string): Promise<boolean> {
+async function shouldSendReminder(userId: string, _tenantId: string): Promise<boolean> {
   const preferences = await prisma.notificationPreference.findFirst({
     where: {
       userId,
-      tenantId,
-      type: 'TIMESHEET_REMINDER',
     },
   });
 
   // Default to true if no preference set
   if (!preferences) return true;
 
-  return preferences.emailEnabled;
+  return preferences.email_timesheet_reminder ?? true;
 }
 
 /**
@@ -268,14 +266,13 @@ export async function processFridayReminders(): Promise<ReminderResult> {
             data: {
               action: 'TIMESHEET_REMINDER_SENT',
               userId: user.id,
-              details: JSON.stringify({
+              newValues: {
                 type: 'friday_reminder',
                 weekStart: start.toISOString(),
                 weekEnd: end.toISOString(),
                 missingDays: user.missingDays,
-              }),
+              },
               ipAddress: 'system',
-              timestamp: new Date(),
             },
           });
         }
@@ -321,14 +318,13 @@ export async function processMondayEscalations(): Promise<ReminderResult> {
             data: {
               action: 'TIMESHEET_ESCALATION_SENT',
               userId: user.id,
-              details: JSON.stringify({
+              newValues: {
                 type: 'monday_escalation',
                 weekStart: start.toISOString(),
                 weekEnd: end.toISOString(),
                 missingDays: user.missingDays,
-              }),
+              },
               ipAddress: 'system',
-              timestamp: new Date(),
             },
           });
         }

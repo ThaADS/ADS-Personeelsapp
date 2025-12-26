@@ -345,14 +345,14 @@ export async function processUwvAlerts(): Promise<AlertResult> {
                 action: 'UWV_ALERT_SENT',
                 userId: recipient.user.id,
                 tenantId,
-                details: JSON.stringify({
+                newValues: {
                   alertCount: tenantData.alerts.length,
                   alerts: tenantData.alerts.map((a) => ({
                     employeeName: a.employeeName,
                     daysUntilDeadline: a.daysUntilDeadline,
                     alertLevel: a.alertLevel,
                   })),
-                }),
+                },
                 ipAddress: 'system',
               },
             });
