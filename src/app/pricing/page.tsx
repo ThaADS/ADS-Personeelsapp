@@ -1,28 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
   CheckCircleIcon,
   ArrowRightIcon,
   SparklesIcon,
-  UserGroupIcon,
-  BuildingOfficeIcon,
   RocketLaunchIcon,
+  CpuChipIcon,
+  BuildingOfficeIcon,
   ShieldCheckIcon,
   PhoneIcon,
   ChatBubbleLeftRightIcon,
+  UserGroupIcon,
+  MinusIcon,
+  PlusIcon,
 } from '@heroicons/react/24/outline';
 
-const tiers = [
+// Plan configuration with base fee + per user pricing
+const plans = [
   {
     name: 'Starter',
     id: 'starter',
-    description: 'Perfect voor kleine teams die willen starten met digitaal HR',
-    monthlyPrice: 19,
-    yearlyPrice: 190,
-    yearlyDiscount: '2 maanden gratis',
-    users: 'Tot 5 gebruikers',
+    description: 'Perfect voor kleine teams - Basis HR functionaliteit',
+    baseFeeMonthly: 15,
+    baseFeeYearly: 144, // 20% korting
+    perUserMonthly: 6,
+    perUserYearly: 57.60, // 20% korting
+    minUsers: 3,
     icon: RocketLaunchIcon,
     gradient: 'from-cyan-500 to-blue-500',
     popular: false,
@@ -39,14 +44,15 @@ const tiers = [
     ],
   },
   {
-    name: 'Team',
-    id: 'team',
-    description: 'Meest gekozen voor groeiende teams met uitgebreide behoeften',
-    monthlyPrice: 39,
-    yearlyPrice: 390,
-    yearlyDiscount: '2 maanden gratis',
-    users: 'Tot 15 gebruikers',
-    icon: UserGroupIcon,
+    name: 'Professional',
+    id: 'professional',
+    description: 'Voor groeiende teams - Uitgebreide HR & Fleet tracking',
+    baseFeeMonthly: 25,
+    baseFeeYearly: 240,
+    perUserMonthly: 5,
+    perUserYearly: 48,
+    minUsers: 3,
+    icon: CpuChipIcon,
     gradient: 'from-violet-500 to-fuchsia-500',
     popular: true,
     features: [
@@ -64,16 +70,17 @@ const tiers = [
   {
     name: 'Business',
     id: 'business',
-    description: 'Voor grotere organisaties met enterprise behoeften',
-    monthlyPrice: 79,
-    yearlyPrice: 790,
-    yearlyDiscount: '2 maanden gratis',
-    users: 'Tot 50 gebruikers',
+    description: 'Enterprise oplossing - Volledige controle & ondersteuning',
+    baseFeeMonthly: 39,
+    baseFeeYearly: 374.40,
+    perUserMonthly: 4,
+    perUserYearly: 38.40,
+    minUsers: 3,
     icon: BuildingOfficeIcon,
     gradient: 'from-amber-500 to-orange-500',
     popular: false,
     features: [
-      { text: 'Alles uit Team', included: true },
+      { text: 'Alles uit Professional', included: true },
       { text: 'Onbeperkte fleet integraties', included: true },
       { text: 'Custom rapportages', included: true },
       { text: 'Multi-tenant ondersteuning', included: true },
@@ -88,66 +95,68 @@ const tiers = [
 
 const enterpriseTier = {
   name: 'Enterprise',
-  description: 'Maatwerk voor grote organisaties',
+  description: 'Maatwerk voor grote organisaties met 50+ gebruikers',
   features: [
     'Onbeperkt aantal gebruikers',
+    'Volume kortingen',
     'Dedicated infrastructure',
     'Custom integraties',
     'On-premise optie beschikbaar',
     'GDPR Data Processing Agreement',
     '24/7 priority support',
-    'Training en onboarding',
     'Quarterly business reviews',
   ],
 };
 
 const faqs = [
   {
-    question: 'Kan ik op elk moment opzeggen?',
-    answer: 'Ja, ADSPersoneelapp is maandelijks opzegbaar. Er zijn geen langetermijnverplichtingen. Je kunt je abonnement op elk moment stopzetten via de instellingen.',
+    question: 'Hoe werkt de prijs per gebruiker?',
+    answer: 'Je betaalt een vaste base fee voor het platform, plus een bedrag per actieve gebruiker. Bij jaarlijkse betaling krijg je 20% korting op zowel de base fee als de gebruikersprijs.',
+  },
+  {
+    question: 'Wat is het minimum aantal gebruikers?',
+    answer: 'Alle plannen hebben een minimum van 3 gebruikers. Dit zorgt ervoor dat je direct met je team kunt starten.',
+  },
+  {
+    question: 'Kan ik later gebruikers toevoegen of verwijderen?',
+    answer: 'Ja, je kunt op elk moment gebruikers toevoegen. Extra gebruikers worden pro-rata berekend. Verwijderen kan bij de volgende facturatieperiode.',
   },
   {
     question: 'Wat gebeurt er na de gratis trial?',
-    answer: 'Na de 14 dagen gratis trial kun je kiezen voor een betaald abonnement. Als je niet doorgaat, wordt je account automatisch gedeactiveerd. Je data blijft 30 dagen beschikbaar voor export.',
+    answer: 'Na de 14 dagen gratis trial kun je kiezen voor een betaald abonnement. Als je niet doorgaat, wordt je account gedeactiveerd. Je data blijft 30 dagen beschikbaar voor export.',
   },
   {
-    question: 'Kan ik later upgraden of downgraden?',
-    answer: 'Absoluut! Je kunt op elk moment je abonnement wijzigen. Bij een upgrade krijg je direct toegang tot de extra functies. Bij een downgrade wordt de wijziging actief bij je volgende facturatieperiode.',
+    question: 'Kan ik op elk moment opzeggen?',
+    answer: 'Ja, maandelijkse abonnementen zijn maandelijks opzegbaar. Jaarlijkse abonnementen lopen tot het einde van de periode.',
   },
   {
     question: 'Zijn er extra kosten voor fleet tracking?',
-    answer: 'Nee, fleet tracking integraties zijn inbegrepen in het Team en Business abonnement zonder extra kosten. De Starter tier heeft geen fleet tracking ondersteuning.',
+    answer: 'Nee, fleet tracking integraties zijn inbegrepen in Professional en Business zonder extra kosten per voertuig.',
   },
   {
     question: 'Hoe werkt de facturatie?',
-    answer: 'Je ontvangt maandelijks een factuur via email. Betaling kan via iDEAL, creditcard of automatische incasso. Jaarlijks betalen geeft 2 maanden korting.',
-  },
-  {
-    question: 'Bieden jullie korting voor non-profits of startups?',
-    answer: 'Ja, we bieden speciale tarieven voor non-profit organisaties en startups in een accelerator programma. Neem contact met ons op voor meer informatie.',
-  },
-  {
-    question: 'Wat als ik meer dan 50 gebruikers heb?',
-    answer: 'Voor organisaties met meer dan 50 gebruikers bieden we Enterprise maatwerk. Neem contact op voor een offerte op maat met volume korting.',
+    answer: 'Je ontvangt maandelijks of jaarlijks een factuur via email. Betaling kan via iDEAL, creditcard of automatische incasso.',
   },
   {
     question: 'Is mijn data veilig?',
-    answer: 'Ja, we gebruiken AES-256 encryptie, dagelijkse backups en voldoen aan AVG/GDPR. Alle data wordt opgeslagen in EU datacenters met ISO 27001 certificering.',
+    answer: 'Ja, we gebruiken AES-256 encryptie, dagelijkse backups en voldoen aan AVG/GDPR. Alle data wordt opgeslagen in EU datacenters.',
   },
 ];
 
+// Comparison table data
 const comparisonFeatures = [
-  { feature: 'Gebruikers', starter: 'Tot 5', team: 'Tot 15', business: 'Tot 50' },
-  { feature: 'Urenregistratie', starter: '✓', team: '✓', business: '✓' },
-  { feature: 'GPS verificatie', starter: '✓', team: '✓', business: '✓' },
-  { feature: 'Verlofbeheer', starter: '✓', team: '✓', business: '✓' },
-  { feature: 'Ziekmeldingen', starter: '✓', team: '✓', business: '✓' },
-  { feature: 'UWV Poortwachter alerts', starter: '—', team: '✓', business: '✓' },
-  { feature: 'Fleet tracking', starter: '—', team: '✓', business: '✓' },
-  { feature: 'API toegang', starter: '—', team: '✓', business: '✓' },
-  { feature: 'SSO / SAML', starter: '—', team: '—', business: '✓' },
-  { feature: 'SLA garantie', starter: '—', team: '—', business: '99.9%' },
-  { feature: 'Support', starter: 'Email', team: 'Chat & Email', business: 'Priority' },
+  { feature: 'Base fee', starter: '€15/mnd', professional: '€25/mnd', business: '€39/mnd' },
+  { feature: 'Per gebruiker', starter: '€6/mnd', professional: '€5/mnd', business: '€4/mnd' },
+  { feature: 'Min. gebruikers', starter: '3', professional: '3', business: '3' },
+  { feature: 'Urenregistratie', starter: '✓', professional: '✓', business: '✓' },
+  { feature: 'GPS verificatie', starter: '✓', professional: '✓', business: '✓' },
+  { feature: 'Verlofbeheer', starter: '✓', professional: '✓', business: '✓' },
+  { feature: 'UWV Poortwachter', starter: '—', professional: '✓', business: '✓' },
+  { feature: 'Fleet tracking', starter: '—', professional: '✓', business: '✓' },
+  { feature: 'API toegang', starter: '—', professional: '✓', business: '✓' },
+  { feature: 'SSO / SAML', starter: '—', professional: '—', business: '✓' },
+  { feature: 'SLA garantie', starter: '—', professional: '—', business: '99.9%' },
+  { feature: 'Support', starter: 'Email', professional: 'Chat & Email', business: 'Priority' },
 ];
 
 // JSON-LD Structured Data
@@ -155,35 +164,57 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
   name: 'ADSPersoneelapp',
-  description: 'HR Software abonnementen voor Nederlandse bedrijven',
+  description: 'HR Software abonnementen voor Nederlandse bedrijven - Base fee + per gebruiker',
   offers: [
     {
       '@type': 'Offer',
       name: 'Starter',
-      price: '19',
+      price: '15',
       priceCurrency: 'EUR',
-      description: 'Tot 5 gebruikers',
+      description: 'Base fee €15/mnd + €6/gebruiker',
     },
     {
       '@type': 'Offer',
-      name: 'Team',
-      price: '39',
+      name: 'Professional',
+      price: '25',
       priceCurrency: 'EUR',
-      description: 'Tot 15 gebruikers',
+      description: 'Base fee €25/mnd + €5/gebruiker',
     },
     {
       '@type': 'Offer',
       name: 'Business',
-      price: '79',
+      price: '39',
       priceCurrency: 'EUR',
-      description: 'Tot 50 gebruikers',
+      description: 'Base fee €39/mnd + €4/gebruiker',
     },
   ],
 };
 
 export default function PricingPage() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [userCount, setUserCount] = useState(5);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  // Calculate prices based on user count and billing period
+  const calculatePrice = useMemo(() => {
+    return (plan: typeof plans[0]) => {
+      const users = Math.max(plan.minUsers, userCount);
+      if (billingPeriod === 'monthly') {
+        return plan.baseFeeMonthly + (users * plan.perUserMonthly);
+      } else {
+        // Yearly price shown per month
+        return (plan.baseFeeYearly + (users * plan.perUserYearly)) / 12;
+      }
+    };
+  }, [userCount, billingPeriod]);
+
+  // Calculate yearly savings
+  const calculateSavings = (plan: typeof plans[0]) => {
+    const users = Math.max(plan.minUsers, userCount);
+    const monthlyTotal = (plan.baseFeeMonthly + (users * plan.perUserMonthly)) * 12;
+    const yearlyTotal = plan.baseFeeYearly + (users * plan.perUserYearly);
+    return Math.round(monthlyTotal - yearlyTotal);
+  };
 
   const handleCheckout = async (planId: string) => {
     setLoadingPlan(planId);
@@ -197,6 +228,7 @@ export default function PricingPage() {
         body: JSON.stringify({
           plan: planId,
           billing: billingPeriod,
+          users: Math.max(3, userCount),
         }),
       });
 
@@ -214,6 +246,10 @@ export default function PricingPage() {
     } finally {
       setLoadingPlan(null);
     }
+  };
+
+  const adjustUsers = (delta: number) => {
+    setUserCount(prev => Math.max(3, Math.min(100, prev + delta)));
   };
 
   return (
@@ -250,7 +286,7 @@ export default function PricingPage() {
         </header>
 
         {/* Hero Section */}
-        <section className="relative pt-32 pb-16 overflow-hidden">
+        <section className="relative pt-32 pb-8 overflow-hidden">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-8">
               <SparklesIcon className="w-4 h-4 mr-2" />
@@ -258,48 +294,102 @@ export default function PricingPage() {
             </div>
 
             <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6">
-              Eenvoudige, transparante{' '}
+              Transparante{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">
                 prijzen
               </span>
             </h1>
 
             <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
-              Geen verborgen kosten, geen lange contracten. Kies het plan dat bij jouw team past.
+              Base fee + prijs per gebruiker. Geen verborgen kosten, schaal mee met je team.
             </p>
+          </div>
+        </section>
 
-            {/* Billing Toggle */}
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-white' : 'text-gray-400'}`}>
-                Maandelijks
-              </span>
-              <button
-                type="button"
-                onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'yearly' : 'monthly')}
-                aria-label={`Wissel naar ${billingPeriod === 'monthly' ? 'jaarlijks' : 'maandelijks'} factureren`}
-                className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors ${
-                  billingPeriod === 'yearly' ? 'bg-gradient-to-r from-emerald-500 to-green-500' : 'bg-white/20'
-                }`}
-              >
-                <span
-                  className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${
-                    billingPeriod === 'yearly' ? 'translate-x-9' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-white' : 'text-gray-400'}`}>
-                Jaarlijks
-              </span>
-              {billingPeriod === 'yearly' && (
-                <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full">
-                  2 maanden gratis!
-                </span>
-              )}
+        {/* User Slider + Billing Toggle */}
+        <section className="py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                {/* User Count Selector */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    <UserGroupIcon className="w-5 h-5 inline mr-2" />
+                    Aantal gebruikers
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => adjustUsers(-1)}
+                      disabled={userCount <= 3}
+                      className="p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      aria-label="Verminder gebruikers"
+                    >
+                      <MinusIcon className="w-5 h-5" />
+                    </button>
+                    <div className="flex-1">
+                      <input
+                        type="range"
+                        min="3"
+                        max="100"
+                        value={userCount}
+                        onChange={(e) => setUserCount(Number(e.target.value))}
+                        aria-label="Aantal gebruikers selecteren"
+                        title="Aantal gebruikers"
+                        className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-violet-500"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => adjustUsers(1)}
+                      disabled={userCount >= 100}
+                      className="p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      aria-label="Voeg gebruiker toe"
+                    >
+                      <PlusIcon className="w-5 h-5" />
+                    </button>
+                    <div className="w-20 text-center">
+                      <span className="text-3xl font-bold text-white">{userCount}</span>
+                      <span className="text-sm text-gray-400 block">users</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Billing Toggle */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    Facturatieperiode
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-white' : 'text-gray-400'}`}>
+                      Maandelijks
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'yearly' : 'monthly')}
+                      aria-label={`Wissel naar ${billingPeriod === 'monthly' ? 'jaarlijks' : 'maandelijks'} factureren`}
+                      className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors ${
+                        billingPeriod === 'yearly' ? 'bg-gradient-to-r from-emerald-500 to-green-500' : 'bg-white/20'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${
+                          billingPeriod === 'yearly' ? 'translate-x-9' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                    <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-white' : 'text-gray-400'}`}>
+                      Jaarlijks
+                    </span>
+                    {billingPeriod === 'yearly' && (
+                      <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-full">
+                        20% korting!
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <p className="text-sm text-gray-400">
-              Alle prijzen zijn exclusief BTW • Maandelijks opzegbaar
-            </p>
           </div>
         </section>
 
@@ -307,90 +397,100 @@ export default function PricingPage() {
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-3 gap-8">
-              {tiers.map((tier, index) => (
-                <div
-                  key={index}
-                  className={`relative backdrop-blur-xl bg-white/10 rounded-3xl p-8 border ${
-                    tier.popular ? 'border-violet-500 shadow-xl shadow-violet-500/20' : 'border-white/20'
-                  }`}
-                >
-                  {tier.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <span className="px-4 py-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold rounded-full">
-                        Meest gekozen
-                      </span>
-                    </div>
-                  )}
+              {plans.map((plan, index) => {
+                const totalPrice = calculatePrice(plan);
+                const savings = calculateSavings(plan);
+                const effectiveUsers = Math.max(plan.minUsers, userCount);
 
-                  <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${tier.gradient} mb-6`}>
-                    <tier.icon className="w-6 h-6 text-white" />
-                  </div>
-
-                  <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
-                  <p className="text-gray-400 text-sm mb-4">{tier.description}</p>
-
-                  <div className="mb-6">
-                    <div className="flex items-baseline">
-                      <span className="text-5xl font-bold text-white">
-                        €{billingPeriod === 'monthly' ? tier.monthlyPrice : tier.yearlyPrice}
-                      </span>
-                      <span className="text-gray-400 ml-2">
-                        /{billingPeriod === 'monthly' ? 'maand' : 'jaar'}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-500 mt-1">{tier.users}</div>
-                  </div>
-
-                  {billingPeriod === 'yearly' && (
-                    <div className="mb-6 p-3 bg-emerald-500/10 rounded-lg">
-                      <p className="text-sm text-emerald-400">
-                        {tier.yearlyDiscount} - Bespaar €{tier.monthlyPrice * 2}
-                      </p>
-                    </div>
-                  )}
-
-                  <ul className="space-y-3 mb-8">
-                    {tier.features.map((feature, i) => (
-                      <li key={i} className="flex items-start">
-                        {feature.included ? (
-                          <CheckCircleIcon className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
-                        ) : (
-                          <span className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0 text-center">—</span>
-                        )}
-                        <span className={feature.included ? 'text-gray-300' : 'text-gray-500'}>
-                          {feature.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    type="button"
-                    onClick={() => handleCheckout(tier.id)}
-                    disabled={loadingPlan === tier.id}
-                    className={`w-full inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all disabled:opacity-70 disabled:cursor-not-allowed ${
-                      tier.popular
-                        ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-700 hover:to-fuchsia-700'
-                        : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                return (
+                  <div
+                    key={index}
+                    className={`relative backdrop-blur-xl bg-white/10 rounded-3xl p-8 border ${
+                      plan.popular ? 'border-violet-500 shadow-xl shadow-violet-500/20' : 'border-white/20'
                     }`}
                   >
-                    {loadingPlan === tier.id ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Bezig...
-                      </>
-                    ) : (
-                      <>
-                        Start 14 dagen gratis
-                        <ArrowRightIcon className="ml-2 w-4 h-4" />
-                      </>
+                    {plan.popular && (
+                      <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span className="px-4 py-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold rounded-full">
+                          Meest gekozen
+                        </span>
+                      </div>
                     )}
-                  </button>
-                </div>
-              ))}
+
+                    <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${plan.gradient} mb-6`}>
+                      <plan.icon className="w-6 h-6 text-white" />
+                    </div>
+
+                    <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                    <p className="text-gray-400 text-sm mb-4">{plan.description}</p>
+
+                    {/* Pricing breakdown */}
+                    <div className="mb-4 p-4 bg-white/5 rounded-xl">
+                      <div className="flex justify-between text-sm text-gray-400 mb-1">
+                        <span>Base fee</span>
+                        <span>€{billingPeriod === 'monthly' ? plan.baseFeeMonthly : (plan.baseFeeYearly / 12).toFixed(0)}/mnd</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-400 mb-1">
+                        <span>{effectiveUsers} gebruikers × €{billingPeriod === 'monthly' ? plan.perUserMonthly : (plan.perUserYearly / 12).toFixed(2)}</span>
+                        <span>€{(effectiveUsers * (billingPeriod === 'monthly' ? plan.perUserMonthly : plan.perUserYearly / 12)).toFixed(0)}/mnd</span>
+                      </div>
+                      <div className="border-t border-white/10 mt-2 pt-2 flex justify-between">
+                        <span className="font-semibold text-white">Totaal</span>
+                        <span className="font-bold text-white">€{totalPrice.toFixed(0)}/mnd</span>
+                      </div>
+                    </div>
+
+                    {billingPeriod === 'yearly' && (
+                      <div className="mb-6 p-3 bg-emerald-500/10 rounded-lg">
+                        <p className="text-sm text-emerald-400">
+                          Bespaar €{savings}/jaar met jaarlijkse betaling
+                        </p>
+                      </div>
+                    )}
+
+                    <ul className="space-y-3 mb-8">
+                      {plan.features.map((feature, i) => (
+                        <li key={i} className="flex items-start">
+                          {feature.included ? (
+                            <CheckCircleIcon className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
+                          ) : (
+                            <span className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0 text-center">—</span>
+                          )}
+                          <span className={feature.included ? 'text-gray-300' : 'text-gray-500'}>
+                            {feature.text}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCheckout(plan.id)}
+                      disabled={loadingPlan === plan.id}
+                      className={`w-full inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold transition-all disabled:opacity-70 disabled:cursor-not-allowed ${
+                        plan.popular
+                          ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-700 hover:to-fuchsia-700'
+                          : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                      }`}
+                    >
+                      {loadingPlan === plan.id ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Bezig...
+                        </>
+                      ) : (
+                        <>
+                          Start 14 dagen gratis
+                          <ArrowRightIcon className="ml-2 w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -444,7 +544,7 @@ export default function PricingPage() {
                   <tr className="border-b border-white/10">
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Functie</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-gray-300">Starter</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-violet-400">Team</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-violet-400">Professional</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-gray-300">Business</th>
                   </tr>
                 </thead>
@@ -453,7 +553,7 @@ export default function PricingPage() {
                     <tr key={index} className="border-b border-white/5">
                       <td className="px-6 py-4 text-sm text-white">{row.feature}</td>
                       <td className="px-6 py-4 text-center text-sm text-gray-400">{row.starter}</td>
-                      <td className="px-6 py-4 text-center text-sm text-white bg-violet-500/5">{row.team}</td>
+                      <td className="px-6 py-4 text-center text-sm text-white bg-violet-500/5">{row.professional}</td>
                       <td className="px-6 py-4 text-center text-sm text-gray-400">{row.business}</td>
                     </tr>
                   ))}
@@ -528,8 +628,8 @@ export default function PricingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 type="button"
-                onClick={() => handleCheckout('team')}
-                disabled={loadingPlan === 'team-cta'}
+                onClick={() => handleCheckout('professional')}
+                disabled={loadingPlan === 'professional-cta'}
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-violet-600 bg-white rounded-xl hover:bg-gray-50 transition-all shadow-lg disabled:opacity-70"
               >
                 Start gratis trial

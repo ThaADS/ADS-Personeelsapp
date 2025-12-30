@@ -1,0 +1,264 @@
+/**
+ * Script to create Stripe products with Base Fee + Per User pricing
+ *
+ * New pricing model:
+ * - Starter: €15 base + €6/user (min 3 users)
+ * - Professional: €25 base + €5/user (min 3 users)
+ * - Business: €39 base + €4/user (min 3 users)
+ *
+ * Yearly: 20% discount
+ *
+ * Run with: npx ts-node scripts/create-stripe-products-v2.ts
+ */
+
+import Stripe from 'stripe';
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-08-27.basil',
+});
+
+interface PlanConfig {
+  name: string;
+  id: string;
+  description: string;
+  baseFeeMonthly: number;      // Base fee in cents
+  baseFeeYearly: number;       // Base fee yearly (20% discount)
+  perUserMonthly: number;      // Per user price in cents
+  perUserYearly: number;       // Per user yearly (20% discount)
+  minUsers: number;
+  features: string[];
+  metadata: {
+    tier: string;
+    minUsers: string;
+  };
+}
+
+const plans: PlanConfig[] = [
+  {
+    name: 'Starter',
+    id: 'starter',
+    description: 'Perfect voor kleine teams - Basis HR functionaliteit',
+    baseFeeMonthly: 1500,      // €15.00
+    baseFeeYearly: 14400,      // €144.00 (€12/mnd - 20% korting)
+    perUserMonthly: 600,       // €6.00
+    perUserYearly: 5760,       // €57.60/user/jaar (€4.80/mnd - 20% korting)
+    minUsers: 3,
+    features: [
+      'Urenregistratie met GPS',
+      'Verlof & TVT beheer',
+      'Ziekmeldingen',
+      'Goedkeuringsworkflows',
+      'Basis rapportages',
+      'Email support',
+    ],
+    metadata: {
+      tier: 'starter',
+      minUsers: '3',
+    },
+  },
+  {
+    name: 'Professional',
+    id: 'professional',
+    description: 'Voor groeiende teams - Uitgebreide HR & Fleet tracking',
+    baseFeeMonthly: 2500,      // €25.00
+    baseFeeYearly: 24000,      // €240.00 (€20/mnd - 20% korting)
+    perUserMonthly: 500,       // €5.00
+    perUserYearly: 4800,       // €48.00/user/jaar (€4/mnd - 20% korting)
+    minUsers: 3,
+    features: [
+      'Alles uit Starter',
+      'Fleet tracking integratie',
+      'Geavanceerde rapportages',
+      'Bulk goedkeuringen',
+      'Teamkalenders',
+      'UWV Poortwachter alerts',
+      'API toegang',
+      'Chat & email support',
+    ],
+    metadata: {
+      tier: 'professional',
+      minUsers: '3',
+    },
+  },
+  {
+    name: 'Business',
+    id: 'business',
+    description: 'Enterprise oplossing - Volledige controle & ondersteuning',
+    baseFeeMonthly: 3900,      // €39.00
+    baseFeeYearly: 37440,      // €374.40 (€31.20/mnd - 20% korting)
+    perUserMonthly: 400,       // €4.00
+    perUserYearly: 3840,       // €38.40/user/jaar (€3.20/mnd - 20% korting)
+    minUsers: 3,
+    features: [
+      'Alles uit Professional',
+      'Onbeperkte fleet integraties',
+      'Custom rapportages',
+      'Multi-tenant ondersteuning',
+      'SSO / SAML authenticatie',
+      'SLA garantie (99.9%)',
+      'Prioriteit support',
+      'Dedicated account manager',
+      'Onboarding sessies',
+    ],
+    metadata: {
+      tier: 'business',
+      minUsers: '3',
+    },
+  },
+];
+
+interface CreatedPrices {
+  plan: string;
+  productId: string;
+  baseFeeMonthlyId: string;
+  baseFeeYearlyId: string;
+  perUserMonthlyId: string;
+  perUserYearlyId: string;
+}
+
+async function createProducts() {
+  console.log('🚀 Creating Stripe products with Base Fee + Per User pricing...\n');
+
+  const createdProducts: CreatedPrices[] = [];
+
+  for (const plan of plans) {
+    console.log(`📦 Creating product: ${plan.name}...`);
+
+    try {
+      // Create or find the product
+      const existingProducts = await stripe.products.search({
+        query: `name:'${plan.name} v2' AND active:'true'`,
+      });
+
+      let product: Stripe.Product;
+
+      if (existingProducts.data.length > 0) {
+        product = existingProducts.data[0];
+        console.log(`  ⚠️  Product exists (${product.id}), updating...`);
+        product = await stripe.products.update(product.id, {
+          description: plan.description,
+          metadata: plan.metadata,
+        });
+      } else {
+        product = await stripe.products.create({
+          name: `${plan.name} v2`,
+          description: plan.description,
+          metadata: plan.metadata,
+        });
+        console.log(`  ✅ Product created: ${product.id}`);
+      }
+
+      // Create Base Fee prices
+      console.log(`  Creating base fee prices...`);
+
+      const baseFeeMonthly = await stripe.prices.create({
+        product: product.id,
+        unit_amount: plan.baseFeeMonthly,
+        currency: 'eur',
+        recurring: { interval: 'month' },
+        nickname: `${plan.name} Base Fee - Monthly`,
+        metadata: {
+          tier: plan.id,
+          type: 'base_fee',
+          billing: 'monthly',
+        },
+      });
+      console.log(`  ✅ Base fee monthly: ${baseFeeMonthly.id} (€${plan.baseFeeMonthly / 100}/mnd)`);
+
+      const baseFeeYearly = await stripe.prices.create({
+        product: product.id,
+        unit_amount: plan.baseFeeYearly,
+        currency: 'eur',
+        recurring: { interval: 'year' },
+        nickname: `${plan.name} Base Fee - Yearly`,
+        metadata: {
+          tier: plan.id,
+          type: 'base_fee',
+          billing: 'yearly',
+        },
+      });
+      console.log(`  ✅ Base fee yearly: ${baseFeeYearly.id} (€${plan.baseFeeYearly / 100}/jaar)`);
+
+      // Create Per User prices (metered)
+      console.log(`  Creating per-user prices...`);
+
+      const perUserMonthly = await stripe.prices.create({
+        product: product.id,
+        unit_amount: plan.perUserMonthly,
+        currency: 'eur',
+        recurring: {
+          interval: 'month',
+          usage_type: 'licensed',  // Fixed quantity per billing period
+        },
+        nickname: `${plan.name} Per User - Monthly`,
+        metadata: {
+          tier: plan.id,
+          type: 'per_user',
+          billing: 'monthly',
+        },
+      });
+      console.log(`  ✅ Per user monthly: ${perUserMonthly.id} (€${plan.perUserMonthly / 100}/user/mnd)`);
+
+      const perUserYearly = await stripe.prices.create({
+        product: product.id,
+        unit_amount: plan.perUserYearly,
+        currency: 'eur',
+        recurring: {
+          interval: 'year',
+          usage_type: 'licensed',
+        },
+        nickname: `${plan.name} Per User - Yearly`,
+        metadata: {
+          tier: plan.id,
+          type: 'per_user',
+          billing: 'yearly',
+        },
+      });
+      console.log(`  ✅ Per user yearly: ${perUserYearly.id} (€${plan.perUserYearly / 100}/user/jaar)`);
+
+      createdProducts.push({
+        plan: plan.name,
+        productId: product.id,
+        baseFeeMonthlyId: baseFeeMonthly.id,
+        baseFeeYearlyId: baseFeeYearly.id,
+        perUserMonthlyId: perUserMonthly.id,
+        perUserYearlyId: perUserYearly.id,
+      });
+
+      console.log('');
+    } catch (error) {
+      console.error(`  ❌ Error creating ${plan.name}:`, error);
+    }
+  }
+
+  // Output environment variables
+  console.log('\n📋 Add these to your .env.local file:\n');
+  console.log('# Stripe Price IDs v2 - Base Fee + Per User Model');
+  console.log('# Pricing: Base fee + per user (min 3 users), 20% yearly discount\n');
+
+  for (const item of createdProducts) {
+    const planId = item.plan.toUpperCase();
+    console.log(`# ${item.plan}`);
+    console.log(`STRIPE_PRICE_${planId}_BASE_MONTHLY="${item.baseFeeMonthlyId}"`);
+    console.log(`STRIPE_PRICE_${planId}_BASE_YEARLY="${item.baseFeeYearlyId}"`);
+    console.log(`STRIPE_PRICE_${planId}_USER_MONTHLY="${item.perUserMonthlyId}"`);
+    console.log(`STRIPE_PRICE_${planId}_USER_YEARLY="${item.perUserYearlyId}"`);
+    console.log('');
+  }
+
+  console.log('\n✅ Done! New pricing model products created in Stripe.');
+  console.log('\nPricing Summary:');
+  console.log('┌─────────────────┬───────────────┬────────────────┬─────────────┐');
+  console.log('│ Plan            │ Base Fee/mnd  │ Per User/mnd   │ Min (3 usr) │');
+  console.log('├─────────────────┼───────────────┼────────────────┼─────────────┤');
+  console.log('│ Starter         │ €15           │ €6             │ €33/mnd     │');
+  console.log('│ Professional    │ €25           │ €5             │ €40/mnd     │');
+  console.log('│ Business        │ €39           │ €4             │ €51/mnd     │');
+  console.log('└─────────────────┴───────────────┴────────────────┴─────────────┘');
+}
+
+createProducts().catch(console.error);
