@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     const emailBody = `
 ================================================================================
-                     ADS Personeelsapp - Support Aanvraag
+                     ADSPersoneelapp - Support Aanvraag
 ================================================================================
 
 GEBRUIKERSINFORMATIE
@@ -94,7 +94,7 @@ De gebruiker kon geen antwoord vinden op de bovenstaande vraag.
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'ADS Personeelsapp <noreply@adspersoneelapp.nl>',
+          from: 'ADSPersoneelapp <noreply@adspersoneelapp.nl>',
           to: [supportEmail],
           reply_to: finalUserEmail !== 'Niet opgegeven' ? finalUserEmail : undefined,
           subject: emailSubject,

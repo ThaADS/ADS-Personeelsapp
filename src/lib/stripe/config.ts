@@ -73,7 +73,7 @@ export const ensureStripeProducts = async () => {
 
 const createStandardProduct = async (): Promise<Stripe.Product> => {
   return await stripe.products.create({
-    name: 'ADS Personeelsapp Standard',
+    name: 'ADSPersoneelapp Standard',
     description: 'Complete HR management solution with advanced features',
     type: 'service',
     metadata: {

@@ -214,7 +214,7 @@ export default function SettingsPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Bedrijfsnaam</label>
                 <input
                   type="text"
-                  defaultValue="ADS Personeelsapp"
+                  defaultValue="ADSPersoneelapp"
                   aria-label="Bedrijfsnaam"
                   className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                 />

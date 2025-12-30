@@ -1,7 +1,7 @@
 /**
  * Email Templates
  *
- * Strakke HTML email templates in de stijl van de ADS Personeelsapp website.
+ * Strakke HTML email templates in de stijl van de ADSPersoneelapp website.
  * Gradient paars/violet thema met moderne styling.
  */
 
@@ -14,7 +14,7 @@ export function getEmailWrapper(content: string, preheader: string = ''): string
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>ADS Personeelsapp</title>
+  <title>ADSPersoneelapp</title>
   <!--[if mso]>
   <noscript>
     <xml>
@@ -260,7 +260,7 @@ export function getEmailWrapper(content: string, preheader: string = ''): string
           <div class="header">
             <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}" class="logo">
               <div class="logo-icon">A</div>
-              <span class="logo-text">ADS Personeelsapp</span>
+              <span class="logo-text">ADSPersoneelapp</span>
             </a>
           </div>
 
@@ -271,7 +271,7 @@ export function getEmailWrapper(content: string, preheader: string = ''): string
 
           <!-- Footer -->
           <div class="footer">
-            <p>Deze email is verzonden door ADS Personeelsapp</p>
+            <p>Deze email is verzonden door ADSPersoneelapp</p>
             <p>
               <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}">
                 ${process.env.NEXT_PUBLIC_APP_URL || 'ads-personeelsapp.nl'}
@@ -302,13 +302,13 @@ export function getPasswordResetEmail(data: {
   ipAddress?: string;
   userAgent?: string;
 }): { subject: string; html: string; text: string } {
-  const subject = 'Wachtwoord resetten - ADS Personeelsapp';
+  const subject = 'Wachtwoord resetten - ADSPersoneelapp';
 
   const content = `
     <h1>Wachtwoord resetten</h1>
     <p>Hallo ${data.userName},</p>
     <p>
-      We hebben een verzoek ontvangen om het wachtwoord van je ADS Personeelsapp account te resetten.
+      We hebben een verzoek ontvangen om het wachtwoord van je ADSPersoneelapp account te resetten.
       Klik op de onderstaande knop om een nieuw wachtwoord in te stellen.
     </p>
 
@@ -353,11 +353,11 @@ export function getPasswordResetEmail(data: {
   `;
 
   const text = `
-Wachtwoord resetten - ADS Personeelsapp
+Wachtwoord resetten - ADSPersoneelapp
 
 Hallo ${data.userName},
 
-We hebben een verzoek ontvangen om het wachtwoord van je ADS Personeelsapp account te resetten.
+We hebben een verzoek ontvangen om het wachtwoord van je ADSPersoneelapp account te resetten.
 
 Klik op de volgende link om een nieuw wachtwoord in te stellen:
 ${data.resetUrl}
@@ -367,13 +367,13 @@ Let op: Deze link is ${data.expiresIn} geldig. Na deze tijd moet je een nieuwe r
 Als je dit verzoek niet hebt gedaan, kun je deze email negeren. Je wachtwoord blijft ongewijzigd.
 
 ---
-ADS Personeelsapp
+ADSPersoneelapp
 ${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
 `;
 
   return {
     subject,
-    html: getEmailWrapper(content, 'Reset je wachtwoord voor ADS Personeelsapp'),
+    html: getEmailWrapper(content, 'Reset je wachtwoord voor ADSPersoneelapp'),
     text,
   };
 }
@@ -386,7 +386,7 @@ export function getPasswordChangedEmail(data: {
   changedAt: string;
   ipAddress?: string;
 }): { subject: string; html: string; text: string } {
-  const subject = 'Wachtwoord gewijzigd - ADS Personeelsapp';
+  const subject = 'Wachtwoord gewijzigd - ADSPersoneelapp';
 
   const content = `
     <h1>Wachtwoord gewijzigd</h1>
@@ -428,7 +428,7 @@ export function getPasswordChangedEmail(data: {
   `;
 
   const text = `
-Wachtwoord gewijzigd - ADS Personeelsapp
+Wachtwoord gewijzigd - ADSPersoneelapp
 
 Hallo ${data.userName},
 
@@ -439,7 +439,7 @@ Je kunt nu inloggen met je nieuwe wachtwoord.
 Als je deze wijziging niet zelf hebt gedaan, neem dan onmiddellijk contact met ons op via support@ads-personeelsapp.nl.
 
 ---
-ADS Personeelsapp
+ADSPersoneelapp
 ${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
 `;
 
@@ -459,10 +459,10 @@ export function getWelcomeEmail(data: {
   loginUrl: string;
   temporaryPassword?: string;
 }): { subject: string; html: string; text: string } {
-  const subject = `Welkom bij ${data.tenantName} - ADS Personeelsapp`;
+  const subject = `Welkom bij ${data.tenantName} - ADSPersoneelapp`;
 
   const content = `
-    <h1>Welkom bij ADS Personeelsapp! 🎉</h1>
+    <h1>Welkom bij ADSPersoneelapp! 🎉</h1>
     <p>Hallo ${data.userName},</p>
     <p>
       Je account voor <strong>${data.tenantName}</strong> is succesvol aangemaakt.
@@ -527,7 +527,7 @@ export function getWelcomeEmail(data: {
   `;
 
   const text = `
-Welkom bij ADS Personeelsapp!
+Welkom bij ADSPersoneelapp!
 
 Hallo ${data.userName},
 
@@ -548,7 +548,7 @@ Wat kun je allemaal doen?
 Vragen? Neem contact op met je manager of mail naar support@ads-personeelsapp.nl
 
 ---
-ADS Personeelsapp
+ADSPersoneelapp
 ${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
 `;
 
@@ -567,13 +567,13 @@ export function get2FACodeEmail(data: {
   code: string;
   expiresIn: string;
 }): { subject: string; html: string; text: string } {
-  const subject = 'Je verificatiecode - ADS Personeelsapp';
+  const subject = 'Je verificatiecode - ADSPersoneelapp';
 
   const content = `
     <h1>Verificatiecode</h1>
     <p>Hallo ${data.userName},</p>
     <p>
-      Gebruik onderstaande code om je identiteit te verifiëren en in te loggen bij ADS Personeelsapp.
+      Gebruik onderstaande code om je identiteit te verifiëren en in te loggen bij ADSPersoneelapp.
     </p>
 
     <div class="code-box">
@@ -595,7 +595,7 @@ export function get2FACodeEmail(data: {
   `;
 
   const text = `
-Je verificatiecode - ADS Personeelsapp
+Je verificatiecode - ADSPersoneelapp
 
 Hallo ${data.userName},
 
@@ -608,7 +608,7 @@ Deze code is ${data.expiresIn} geldig. Deel deze code met niemand.
 Als je niet geprobeerd hebt in te loggen, neem dan direct contact met ons op.
 
 ---
-ADS Personeelsapp
+ADSPersoneelapp
 ${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
 `;
 
@@ -674,7 +674,7 @@ export function getTimesheetReminderEmail(data: {
   `;
 
   const text = `
-${data.isEscalation ? 'URGENTE HERINNERING' : 'Weekstaat herinnering'} - ADS Personeelsapp
+${data.isEscalation ? 'URGENTE HERINNERING' : 'Weekstaat herinnering'} - ADSPersoneelapp
 
 Hallo ${data.userName},
 
@@ -691,7 +691,7 @@ Vul je weekstaat in via: ${data.dashboardUrl}
 ${data.isEscalation ? 'Je manager is ook op de hoogte gesteld.' : ''}
 
 ---
-ADS Personeelsapp
+ADSPersoneelapp
 ${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
 `;
 
@@ -746,7 +746,7 @@ export function getManagerEscalationEmail(data: {
   const employeeList = data.employees.map(emp => `- ${emp.name}: ${emp.pendingDays} dagen ontbreekt`).join('\n');
 
   const text = `
-Ontbrekende weekstaten - ADS Personeelsapp
+Ontbrekende weekstaten - ADSPersoneelapp
 
 Hallo ${data.managerName},
 
@@ -759,7 +759,7 @@ Deze medewerkers hebben ook een herinnering ontvangen.
 Ga naar het dashboard: ${data.dashboardUrl}
 
 ---
-ADS Personeelsapp
+ADSPersoneelapp
 ${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
 `;
 

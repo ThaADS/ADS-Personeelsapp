@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { LockClosedIcon, UserIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import { LockClosedIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -77,7 +77,7 @@ export default function LoginPage() {
               <LockClosedIcon className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-4xl font-bold text-white mb-2 tracking-tight">
-              ADS Personeelsapp
+              ADSPersoneelapp
             </h2>
             <p className="text-white">
               Welkom terug! Log in om door te gaan
@@ -92,23 +92,18 @@ export default function LoginPage() {
                 <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                   E-mailadres
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <UserIcon className="h-5 w-5 text-purple-300" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    className="block w-full pl-14 pr-4 py-3.5 border border-white/30 rounded-xl bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-base"
-                    placeholder="naam@bedrijf.nl"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                  />
-                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className="block w-full px-4 py-3.5 border border-white/30 rounded-xl bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-base"
+                  placeholder="naam@bedrijf.nl"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                />
               </div>
 
               {/* Password input */}
@@ -124,23 +119,18 @@ export default function LoginPage() {
                     Wachtwoord vergeten?
                   </a>
                 </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <LockClosedIcon className="h-5 w-5 text-purple-300" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    className="block w-full pl-14 pr-4 py-3.5 border border-white/30 rounded-xl bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-base"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                  />
-                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className="block w-full px-4 py-3.5 border border-white/30 rounded-xl bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-base"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                />
               </div>
 
               {/* Error message */}
@@ -178,12 +168,12 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowTestAccounts(!showTestAccounts)}
-                  className="w-full text-sm text-white hover:text-purple-300 transition-colors flex items-center justify-center group"
+                  className="w-full text-sm text-white hover:text-white/80 transition-colors flex items-center justify-center group"
                 >
                   <span className="group-hover:underline">
                     {showTestAccounts ? 'Verberg testaccounts' : 'Toon testaccounts voor demo'}
                   </span>
-                  <ChevronRightIcon className={`ml-1 h-4 w-4 transition-transform ${showTestAccounts ? 'rotate-90' : ''}`} />
+                  <ChevronRightIcon className={`ml-1 h-4 w-4 text-white transition-transform ${showTestAccounts ? 'rotate-90' : ''}`} />
                 </button>
               </div>
             </div>
@@ -256,7 +246,7 @@ export default function LoginPage() {
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-sm text-white/60">
-              © 2025 ADS Personeelsapp. Professioneel HR-beheer voor moderne organisaties.
+              © 2025 ADSPersoneelapp. Professioneel HR-beheer voor moderne organisaties.
             </p>
           </div>
         </div>

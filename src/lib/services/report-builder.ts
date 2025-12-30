@@ -258,7 +258,7 @@ export async function generatePDFReport(
       .fontSize(24)
       .font("Helvetica-Bold")
       .fillColor("#2c3e50")
-      .text("ADS Personeelsapp", { align: "center" });
+      .text("ADSPersoneelapp", { align: "center" });
 
     doc.moveDown(0.5);
 
@@ -401,7 +401,7 @@ export async function generatePDFReport(
       .fontSize(8)
       .fillColor("#95a5a6")
       .text(
-        `Dit rapport is automatisch gegenereerd door ADS Personeelsapp op ${new Date().toLocaleString("nl-NL")}`,
+        `Dit rapport is automatisch gegenereerd door ADSPersoneelapp op ${new Date().toLocaleString("nl-NL")}`,
         50,
         780,
         { align: "center" }
@@ -497,7 +497,7 @@ export async function buildAndSendMonthlyReport(config: ReportConfig): Promise<{
             Dit is een automatisch gegenereerd rapport.
           </p>
 
-          <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+          <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
         </div>
       `;
 

@@ -7,7 +7,7 @@ export default function Footer() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-600 text-white font-bold">A</span>
-            <span className="font-bold text-black">ADS Personeelsapp</span>
+            <span className="font-bold text-black">ADSPersoneelapp</span>
           </div>
           <p className="text-black font-medium">Alles-in-één personeelsapp voor uren, verlof en goedkeuringen.</p>
         </div>
@@ -39,7 +39,7 @@ export default function Footer() {
       </div>
       <div className="border-t py-4 text-xs text-black font-medium">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-          <span>© {new Date().getFullYear()} ADS Personeelsapp</span>
+          <span>© {new Date().getFullYear()} ADSPersoneelapp</span>
           <div className="flex gap-4">
             <a href="#" className="hover:underline">Security</a>
             <a href="#" className="hover:underline">Responsible Disclosure</a>

@@ -155,7 +155,7 @@ export default function AdminDashboard() {
             Platform Dashboard
           </h2>
           <p className="mt-1 text-sm text-gray-500">
-            Welcome to the ADS Personeelsapp admin panel
+            Welcome to the ADSPersoneelapp admin panel
           </p>
         </div>
         <div className="mt-4 flex md:mt-0 md:ml-4">

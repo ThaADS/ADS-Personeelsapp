@@ -72,10 +72,10 @@ export default function DashboardLayout({
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
                 <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-                  ADS Personeelsapp
+                  ADSPersoneelapp
                 </h1>
               </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <div className="hidden lg:ml-6 lg:flex lg:space-x-4 xl:space-x-6">
                 {getNavigationItems().map((item) => (
                   <Link
                     key={item.name}
@@ -84,18 +84,18 @@ export default function DashboardLayout({
                       item.current
                         ? 'border-purple-500 text-purple-700 dark:text-white font-semibold bg-purple-50 dark:bg-white/5'
                         : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-purple-700 dark:hover:text-white hover:border-purple-400/50 hover:bg-purple-50 dark:hover:bg-white/5 font-medium'
-                    } inline-flex items-center px-3 pt-1 border-b-2 text-sm transition-all duration-200 rounded-t-lg`}
+                    } inline-flex items-center px-2 xl:px-3 pt-1 border-b-2 text-sm transition-all duration-200 rounded-t-lg whitespace-nowrap`}
                   >
                     {item.name}
                   </Link>
                 ))}
               </div>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:items-center">
+            <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <div className="ml-3 relative">
                 <div className="flex items-center space-x-4">
                   <ThemeToggle />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium hidden xl:inline">
                     {session?.user?.name} <span className="text-purple-600 dark:text-purple-400">({session?.user?.role})</span>
                   </span>
                   <button
@@ -119,8 +119,9 @@ export default function DashboardLayout({
               </div>
             </div>
 
-            {/* Mobile hamburger button */}
-            <div className="sm:hidden flex items-center">
+            {/* Mobile/Tablet hamburger button - visible on screens smaller than lg */}
+            <div className="lg:hidden flex items-center space-x-3">
+              <ThemeToggle />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-white/10 focus:outline-none transition-colors"
@@ -141,9 +142,9 @@ export default function DashboardLayout({
           </div>
         </div>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile/Tablet Menu Dropdown - visible on screens smaller than lg */}
         {mobileMenuOpen && (
-          <div className="sm:hidden border-t border-white/20 dark:border-purple-500/20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+          <div className="lg:hidden border-t border-white/20 dark:border-purple-500/20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
             <div className="px-4 py-3 space-y-1">
               {getNavigationItems().map((item) => (
                 <Link
@@ -169,7 +170,6 @@ export default function DashboardLayout({
                   <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">
                     {session?.user?.role}
                   </span>
-                  <ThemeToggle />
                 </div>
                 <button
                   onClick={handleLogout}
@@ -194,7 +194,7 @@ export default function DashboardLayout({
         )}
       </nav>
 
-      {/* Mobile bottom bar */}
+      {/* Mobile bottom bar - only on small screens, hidden on tablets and up */}
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-t border-white/20 dark:border-purple-500/20 px-4 py-2 shadow-glass">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 overflow-x-auto">
@@ -217,7 +217,7 @@ export default function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <main className="relative z-10 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-20 sm:pb-6">
+      <main className="relative z-10 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-20 sm:pb-6 lg:pb-6">
         {children}
       </main>
 

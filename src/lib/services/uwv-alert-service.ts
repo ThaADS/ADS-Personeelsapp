@@ -267,11 +267,11 @@ async function sendUwvAlertEmail(
       </p>
 
       <p style="color: #7f8c8d; font-size: 14px; margin-top: 30px;">
-        Dit is een automatische herinnering vanuit ADS Personeelsapp om te helpen
+        Dit is een automatische herinnering vanuit ADSPersoneelapp om te helpen
         bij het naleven van de wettelijke verplichtingen.
       </p>
 
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `;
 

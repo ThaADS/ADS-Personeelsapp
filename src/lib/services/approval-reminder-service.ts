@@ -342,7 +342,7 @@ async function sendApprovalReminderEmail(manager: ManagerPendingApprovals): Prom
         U kunt deze meldingen uitschakelen in uw profielinstellingen.
       </p>
 
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `;
 

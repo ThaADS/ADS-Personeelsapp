@@ -31,7 +31,7 @@ const emailConfig: EmailConfig = {
     user: process.env.SMTP_USER || 'user@example.com',
     pass: process.env.SMTP_PASS || 'password',
   },
-  from: process.env.EMAIL_FROM || 'ADS Personeelsapp <noreply@example.com>',
+  from: process.env.EMAIL_FROM || 'ADSPersoneelapp <noreply@example.com>',
 };
 
 // Maak een transporter voor het versturen van emails
@@ -114,9 +114,9 @@ export async function sendApprovalNotification(
         {{/description}}
       </div>
       
-      <p>U kunt deze aanvraag bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">ADS Personeelsapp portaal</a>.</p>
+      <p>U kunt deze aanvraag bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">ADSPersoneelapp portaal</a>.</p>
       
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `, data);
 
@@ -151,9 +151,9 @@ export async function sendStatusUpdateNotification(
         {{/comment}}
       </div>
       
-      <p>U kunt al uw aanvragen bekijken via het <a href="{{portalUrl}}" style="color: #3498db;">ADS Personeelsapp portaal</a>.</p>
+      <p>U kunt al uw aanvragen bekijken via het <a href="{{portalUrl}}" style="color: #3498db;">ADSPersoneelapp portaal</a>.</p>
       
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `, data);
 
@@ -183,9 +183,9 @@ export async function sendReminderNotification(
         <p><strong>Oudste aanvraag:</strong> {{oldestDate}}</p>
       </div>
 
-      <p>U kunt deze aanvragen bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">ADS Personeelsapp portaal</a>.</p>
+      <p>U kunt deze aanvragen bekijken en goedkeuren via het <a href="{{approvalUrl}}" style="color: #3498db;">ADSPersoneelapp portaal</a>.</p>
 
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `, data);
 
@@ -202,13 +202,13 @@ export async function sendPasswordResetEmail(
   to: string,
   data: EmailTemplateData
 ): Promise<boolean> {
-  const subject = 'Wachtwoord Reset - ADS Personeelsapp';
+  const subject = 'Wachtwoord Reset - ADSPersoneelapp';
 
   const html = renderTemplate(`
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2c3e50;">Wachtwoord Reset Aangevraagd</h2>
       <p>Beste {{userName}},</p>
-      <p>U heeft een wachtwoord reset aangevraagd voor uw ADS Personeelsapp account.</p>
+      <p>U heeft een wachtwoord reset aangevraagd voor uw ADSPersoneelapp account.</p>
 
       <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; text-align: center;">
         <a href="{{resetUrl}}" style="display: inline-block; background-color: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
@@ -228,7 +228,7 @@ export async function sendPasswordResetEmail(
 
       <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
 
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `, data);
 
@@ -245,13 +245,13 @@ export async function sendPasswordChangedEmail(
   to: string,
   data: EmailTemplateData
 ): Promise<boolean> {
-  const subject = 'Wachtwoord Gewijzigd - ADS Personeelsapp';
+  const subject = 'Wachtwoord Gewijzigd - ADSPersoneelapp';
 
   const html = renderTemplate(`
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2c3e50;">Wachtwoord Succesvol Gewijzigd</h2>
       <p>Beste {{userName}},</p>
-      <p>Uw wachtwoord voor ADS Personeelsapp is succesvol gewijzigd.</p>
+      <p>Uw wachtwoord voor ADSPersoneelapp is succesvol gewijzigd.</p>
 
       <div style="background-color: #d4edda; padding: 15px; border-radius: 5px; margin: 20px 0; border: 1px solid #c3e6cb;">
         <p style="color: #155724; margin: 0;">
@@ -264,7 +264,7 @@ export async function sendPasswordChangedEmail(
         direct contact op met uw beheerder.
       </p>
 
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `, data);
 

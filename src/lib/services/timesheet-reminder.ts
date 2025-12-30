@@ -189,7 +189,7 @@ async function sendFridayReminder(user: UserWithIncompleteTimesheet): Promise<bo
         Je kunt deze meldingen uitschakelen in je profielinstellingen.
       </p>
 
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `;
 
@@ -230,7 +230,7 @@ async function sendMondayEscalation(user: UserWithIncompleteTimesheet): Promise<
         Neem contact op met je manager als je vragen hebt over je urenregistratie.
       </p>
 
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `;
 
@@ -404,7 +404,7 @@ export async function notifyManagersAboutIncompleteTimesheets(): Promise<Reminde
               </a>
             </p>
 
-            <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+            <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
           </div>
         `;
 

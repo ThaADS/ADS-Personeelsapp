@@ -15,11 +15,14 @@ import {
   TruckIcon,
   MapPinIcon,
   BoltIcon,
-  LinkIcon
+  LinkIcon,
+  Bars3Icon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 export default function HomePage() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const features = [
     {
@@ -69,7 +72,7 @@ export default function HomePage() {
 
   const testimonials = [
     {
-      quote: "ADS Personeelsapp heeft onze HR-processen gestroomlijnd. We besparen wekelijks uren aan administratie.",
+      quote: "ADSPersoneelapp heeft onze HR-processen gestroomlijnd. We besparen wekelijks uren aan administratie.",
       author: "Lisa van den Berg",
       role: "HR Manager",
       company: "TechCorp NL"
@@ -90,8 +93,102 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      {/* Navigation Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-lg border-b border-white/10">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link href="/" className="flex items-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-lg mr-3"></div>
+              <span className="text-xl font-bold text-white">ADSPersoneelapp</span>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="#features" className="text-gray-300 hover:text-white transition-colors">
+                Features
+              </Link>
+              <Link href="#fleet" className="text-gray-300 hover:text-white transition-colors">
+                Fleet Tracking
+              </Link>
+              <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">
+                Prijzen
+              </Link>
+              <Link href="#contact" className="text-gray-300 hover:text-white transition-colors">
+                Contact
+              </Link>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link
+                href="/login"
+                className="text-white hover:text-violet-300 transition-colors font-medium"
+              >
+                Inloggen
+              </Link>
+              <Link
+                href="/login"
+                className="px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold rounded-lg hover:from-violet-700 hover:to-fuchsia-700 transition-all"
+              >
+                Start Demo
+              </Link>
+            </div>
+
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              className="md:hidden text-white p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <XMarkIcon className="w-6 h-6" />
+              ) : (
+                <Bars3Icon className="w-6 h-6" />
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <div className="md:hidden py-4 border-t border-white/10">
+              <div className="flex flex-col space-y-4">
+                <Link href="#features" className="text-gray-300 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                  Features
+                </Link>
+                <Link href="#fleet" className="text-gray-300 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                  Fleet Tracking
+                </Link>
+                <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                  Prijzen
+                </Link>
+                <Link href="#contact" className="text-gray-300 hover:text-white transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                  Contact
+                </Link>
+                <div className="pt-4 border-t border-white/10 flex flex-col space-y-3">
+                  <Link
+                    href="/login"
+                    className="text-white hover:text-violet-300 transition-colors font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Inloggen
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold rounded-lg hover:from-violet-700 hover:to-fuchsia-700 transition-all text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Start Demo
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+        </nav>
+      </header>
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-32 lg:pt-32 lg:pb-40">
+      <section className="relative overflow-hidden pt-32 pb-32 lg:pt-40 lg:pb-40">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-violet-900/20 to-fuchsia-900/20"></div>
 

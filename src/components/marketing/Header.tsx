@@ -22,7 +22,7 @@ export default function Header() {
         {/* Logo */}
         <Link href="/marketing" className="flex items-center gap-2">
           <span className="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-600 text-white font-bold">A</span>
-          <span className="font-bold text-black dark:text-white">ADS Personeelsapp</span>
+          <span className="font-bold text-black dark:text-white">ADSPersoneelapp</span>
         </Link>
 
         {/* Desktop Navigation */}

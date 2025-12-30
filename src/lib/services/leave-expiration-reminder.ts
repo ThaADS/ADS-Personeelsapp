@@ -305,7 +305,7 @@ async function sendLeaveExpiryEmail(info: ExpiringLeaveInfo): Promise<boolean> {
         Je kunt deze meldingen uitschakelen in je profielinstellingen.
       </p>
 
-      <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+      <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
     </div>
   `;
 
@@ -463,7 +463,7 @@ export async function notifyManagersAboutExpiringLeave(): Promise<ReminderResult
                 </a>
               </p>
 
-              <p>Met vriendelijke groet,<br>ADS Personeelsapp</p>
+              <p>Met vriendelijke groet,<br>ADSPersoneelapp</p>
             </div>
           `;
 

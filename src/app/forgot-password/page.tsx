@@ -177,7 +177,7 @@ export default function ForgotPasswordPage() {
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-sm text-white/60">
-              © 2025 ADS Personeelsapp. Professioneel HR-beheer voor moderne organisaties.
+              © 2025 ADSPersoneelapp. Professioneel HR-beheer voor moderne organisaties.
             </p>
           </div>
         </div>

@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ADS Personeelsapp",
+  title: "ADSPersoneelapp",
   description: "Complete HR Management SaaS Platform - 14 dagen gratis trial",
 };
 
