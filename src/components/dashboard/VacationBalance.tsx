@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import Link from "next/link";
 
 interface VacationBalanceData {
@@ -10,7 +10,8 @@ interface VacationBalanceData {
   remaining: number;
 }
 
-export function VacationBalance() {
+// Memoized component to prevent unnecessary re-renders
+export const VacationBalance = memo(function VacationBalance() {
   const [balance, setBalance] = useState<VacationBalanceData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,15 +37,15 @@ export function VacationBalance() {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl p-6 shadow-lg border border-white/20 dark:border-purple-500/20">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-          <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+          <div className="h-6 bg-gray-200 dark:bg-purple-500/20 rounded w-1/3 mb-4"></div>
+          <div className="h-16 bg-gray-200 dark:bg-purple-500/20 rounded mb-4"></div>
+          <div className="h-4 bg-gray-200 dark:bg-purple-500/20 rounded w-full mb-2"></div>
           <div className="grid grid-cols-3 gap-2">
-            <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-16 bg-gray-200 dark:bg-purple-500/20 rounded"></div>
+            <div className="h-16 bg-gray-200 dark:bg-purple-500/20 rounded"></div>
+            <div className="h-16 bg-gray-200 dark:bg-purple-500/20 rounded"></div>
           </div>
         </div>
       </div>
@@ -53,7 +54,7 @@ export function VacationBalance() {
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl p-6 shadow-lg border border-white/20 dark:border-purple-500/20">
         <div className="text-center text-red-500 dark:text-red-400">
           <svg
             className="w-8 h-8 mx-auto mb-2"
@@ -79,7 +80,7 @@ export function VacationBalance() {
   const usedPercentage = (balance.used / balance.total) * 100;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+    <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl p-6 shadow-lg border border-white/20 dark:border-purple-500/20">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
           <span className="text-2xl mr-2">🏖️</span>
@@ -87,7 +88,7 @@ export function VacationBalance() {
         </h3>
         <Link
           href="/vacation"
-          className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+          className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium"
         >
           Aanvragen →
         </Link>
@@ -107,7 +108,7 @@ export function VacationBalance() {
           <span>Gebruikt: {balance.used}</span>
           <span>Totaal: {balance.total}</span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+        <div className="w-full backdrop-blur-sm bg-white/30 dark:bg-white/10 rounded-full h-2.5 border border-white/20 dark:border-purple-500/20">
           <div
             className="bg-gradient-to-r from-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-500"
             style={{ width: `${Math.min(usedPercentage, 100)}%` }}
@@ -117,19 +118,19 @@ export function VacationBalance() {
 
       {/* Breakdown */}
       <div className="grid grid-cols-3 gap-2 text-center">
-        <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-2">
+        <div className="backdrop-blur-sm bg-purple-500/10 dark:bg-purple-500/20 rounded-lg p-2 border border-purple-500/20">
           <div className="text-lg font-semibold text-purple-600 dark:text-purple-400">
             {balance.used}
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400">Gebruikt</div>
         </div>
-        <div className="bg-pink-50 dark:bg-pink-900/30 rounded-lg p-2">
+        <div className="backdrop-blur-sm bg-pink-500/10 dark:bg-pink-500/20 rounded-lg p-2 border border-pink-500/20">
           <div className="text-lg font-semibold text-pink-600 dark:text-pink-400">
             {balance.pending}
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400">Aangevraagd</div>
         </div>
-        <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-2">
+        <div className="backdrop-blur-sm bg-green-500/10 dark:bg-green-500/20 rounded-lg p-2 border border-green-500/20">
           <div className="text-lg font-semibold text-green-600 dark:text-green-400">
             {balance.remaining}
           </div>
@@ -138,4 +139,6 @@ export function VacationBalance() {
       </div>
     </div>
   );
-}
+});
+
+VacationBalance.displayName = "VacationBalance";

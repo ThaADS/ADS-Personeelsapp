@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NextRequest } from 'next/server';
 
 // Type definitions for test mocks
 interface MockTimesheet {
@@ -7,17 +6,6 @@ interface MockTimesheet {
   tenantId: string;
   userId?: string;
   status?: string;
-}
-
-interface MockUser {
-  id: string;
-  email: string;
-  name: string;
-}
-
-interface MockTenantUser {
-  userId: string;
-  role: string;
 }
 
 // Mock the tenant access functions

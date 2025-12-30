@@ -65,11 +65,14 @@ export default function ApprovalsPage() {
         };
 
         // Als we op het "all" tabblad zijn, haal dan de aantallen op voor de andere tabbladen
+        // OPTIMIZED: Fetch counts in parallel instead of sequentially (3x faster)
         if (activeTab === "all") {
           try {
-            const timesheetResponse = await fetchApprovals("timesheet", "PENDING", 1, 1);
-            const vacationResponse = await fetchApprovals("vacation", "PENDING", 1, 1);
-            const sickleaveResponse = await fetchApprovals("sickleave", "PENDING", 1, 1);
+            const [timesheetResponse, vacationResponse, sickleaveResponse] = await Promise.all([
+              fetchApprovals("timesheet", "PENDING", 1, 1),
+              fetchApprovals("vacation", "PENDING", 1, 1),
+              fetchApprovals("sickleave", "PENDING", 1, 1),
+            ]);
 
             newCounts.timesheet = timesheetResponse.pagination.total;
             newCounts.vacation = vacationResponse.pagination.total;
@@ -185,7 +188,7 @@ export default function ApprovalsPage() {
 
       {/* Foutmelding indien nodig */}
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4">
+        <div className="backdrop-blur-sm bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 rounded-2xl p-4">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg
@@ -202,14 +205,14 @@ export default function ApprovalsPage() {
               </svg>
             </div>
             <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
+              <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Tabbladen en goedkeuringslijst */}
-      <div className="bg-white shadow rounded-lg">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
         <ApprovalTabs
           activeTab={activeTab}
           setActiveTab={(tab) => {
@@ -239,7 +242,7 @@ export default function ApprovalsPage() {
       </div>
 
       {/* Smart validation informatie */}
-      <div className="bg-blue-50 shadow rounded-lg p-6">
+      <div className="backdrop-blur-sm bg-blue-500/10 dark:bg-blue-500/10 shadow-lg rounded-2xl border border-blue-500/20 p-6">
         <div className="flex items-center">
           <div className="flex-shrink-0">
             <svg
@@ -258,10 +261,10 @@ export default function ApprovalsPage() {
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800">
+            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300">
               Slimme validatie
             </h3>
-            <div className="mt-2 text-sm text-blue-700">
+            <div className="mt-2 text-sm text-blue-700 dark:text-blue-400">
               <p>
                 Het systeem markeert automatisch afwijkende registraties zoals:
               </p>

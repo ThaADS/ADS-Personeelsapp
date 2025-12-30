@@ -38,7 +38,7 @@ export function SickLeaveCard({ sickLeave, onDetailsClick }: SickLeaveCardProps)
   const isOngoing = !sickLeave.endDate;
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+    <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 border border-white/20 dark:border-purple-500/20 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all">
       {/* Header */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center">
@@ -58,7 +58,7 @@ export function SickLeaveCard({ sickLeave, onDetailsClick }: SickLeaveCardProps)
       </div>
 
       {/* Date Info */}
-      <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 mb-3">
+      <div className="backdrop-blur-sm bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-3">
         <div className="flex items-center justify-between">
           <div className="text-center flex-1">
             <div className="text-xs text-gray-600 dark:text-gray-400">Start</div>
@@ -111,7 +111,7 @@ export function SickLeaveCard({ sickLeave, onDetailsClick }: SickLeaveCardProps)
 
       {/* Reason */}
       {sickLeave.reason && (
-        <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg mb-3">
+        <div className="p-3 backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10 rounded-lg mb-3">
           <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Reden</div>
           <div className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
             {sickLeave.reason}
@@ -120,14 +120,14 @@ export function SickLeaveCard({ sickLeave, onDetailsClick }: SickLeaveCardProps)
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+      <div className="flex items-center justify-between pt-3 border-t border-white/20 dark:border-purple-500/10">
         <div className="text-xs text-gray-500 dark:text-gray-400">
           Gemeld op {new Date(sickLeave.createdAt).toLocaleDateString("nl-NL")}
         </div>
         {onDetailsClick && (
           <button
             onClick={() => onDetailsClick(sickLeave.id)}
-            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 font-medium text-sm flex items-center min-h-[44px] px-3"
+            className="text-purple-600 dark:text-purple-400 hover:text-purple-800 font-medium text-sm flex items-center min-h-[44px] px-3"
           >
             Details
             <svg

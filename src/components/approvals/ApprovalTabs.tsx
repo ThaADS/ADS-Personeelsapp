@@ -13,15 +13,15 @@ interface ApprovalTabsProps {
 
 export default function ApprovalTabs({ activeTab, setActiveTab, counts }: ApprovalTabsProps) {
   return (
-    <div className="border-b border-gray-200">
-      <nav className="-mb-px flex" aria-label="Tabs">
+    <div className="border-b border-white/20 dark:border-purple-500/20">
+      <nav className="-mb-px flex overflow-x-auto" aria-label="Tabs">
         <button
           onClick={() => setActiveTab("all")}
           className={`${
             activeTab === "all"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-black hover:text-blue-600 hover:border-blue-300"
-          } w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm`}
+              ? "border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400"
+              : "border-transparent text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300"
+          } flex-1 min-w-0 py-4 px-1 text-center border-b-2 font-medium text-sm min-h-[44px] transition-colors`}
         >
           Alle ({counts.all})
         </button>
@@ -29,9 +29,9 @@ export default function ApprovalTabs({ activeTab, setActiveTab, counts }: Approv
           onClick={() => setActiveTab("timesheet")}
           className={`${
             activeTab === "timesheet"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-black hover:text-blue-600 hover:border-blue-300"
-          } w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm`}
+              ? "border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400"
+              : "border-transparent text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300"
+          } flex-1 min-w-0 py-4 px-1 text-center border-b-2 font-medium text-sm min-h-[44px] transition-colors`}
         >
           Tijdregistraties ({counts.timesheet})
         </button>
@@ -39,9 +39,9 @@ export default function ApprovalTabs({ activeTab, setActiveTab, counts }: Approv
           onClick={() => setActiveTab("vacation")}
           className={`${
             activeTab === "vacation"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-black hover:text-blue-600 hover:border-blue-300"
-          } w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm`}
+              ? "border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400"
+              : "border-transparent text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300"
+          } flex-1 min-w-0 py-4 px-1 text-center border-b-2 font-medium text-sm min-h-[44px] transition-colors`}
         >
           Vakanties ({counts.vacation})
         </button>
@@ -49,9 +49,9 @@ export default function ApprovalTabs({ activeTab, setActiveTab, counts }: Approv
           onClick={() => setActiveTab("sickleave")}
           className={`${
             activeTab === "sickleave"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-black hover:text-blue-600 hover:border-blue-300"
-          } w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm`}
+              ? "border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400"
+              : "border-transparent text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300"
+          } flex-1 min-w-0 py-4 px-1 text-center border-b-2 font-medium text-sm min-h-[44px] transition-colors`}
         >
           Ziekmeldingen ({counts.sickleave})
         </button>

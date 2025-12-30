@@ -13,7 +13,7 @@ import {
   HeartIcon,
   DocumentCheckIcon
 } from '@heroicons/react/24/outline';
-import { QuickClockIn, VacationBalance } from '@/components/dashboard';
+import { QuickClockIn, VacationBalance, TripsWidget, FleetTrackingFAQ } from '@/components/dashboard';
 
 interface DashboardStats {
   // Basic stats
@@ -214,11 +214,16 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 md:space-y-8 pb-20 md:pb-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-xl md:rounded-2xl p-6 md:p-8 text-white">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">Welkom terug!</h1>
-        <p className="text-violet-100 text-sm md:text-base">
-          Hier is je overzicht voor vandaag
-        </p>
+      <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-xl">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-pink-500/20 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+        <div className="relative">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Welkom terug!</h1>
+          <p className="text-violet-100 text-sm md:text-base">
+            Hier is je overzicht voor vandaag
+          </p>
+        </div>
       </div>
 
       {/* Mobile: Quick Clock In + Vacation Balance side by side */}
@@ -227,6 +232,9 @@ export default function DashboardPage() {
         <VacationBalance />
       </div>
 
+      {/* RouteVision Trips Widget - Only shown if configured */}
+      <TripsWidget />
+
       {/* Stats Grid - Basic KPIs */}
       <div>
         <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4">Mijn statistieken</h2>
@@ -234,7 +242,7 @@ export default function DashboardPage() {
           {statCards.map((stat, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-6 hover:shadow-md transition-shadow"
+              className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border border-white/20 dark:border-purple-500/20 p-4 md:p-6 hover:shadow-xl hover:border-purple-500/30 dark:hover:border-purple-500/40 transition-all duration-300 hover:-translate-y-1"
             >
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div className={`p-2 md:p-3 rounded-xl ${stat.color}`}>
@@ -264,10 +272,10 @@ export default function DashboardPage() {
           {extendedStatCards.map((stat, index) => (
             <div
               key={index}
-              className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-4 md:p-6 hover:shadow-md transition-shadow ${
+              className={`backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border p-4 md:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
                 stat.highlight
-                  ? 'border-amber-300 dark:border-amber-600 ring-1 ring-amber-200 dark:ring-amber-700'
-                  : 'border-gray-100 dark:border-gray-700'
+                  ? 'border-amber-400/50 dark:border-amber-500/50 ring-2 ring-amber-400/20 dark:ring-amber-500/20'
+                  : 'border-white/20 dark:border-purple-500/20 hover:border-purple-500/30 dark:hover:border-purple-500/40'
               }`}
             >
               <div className="flex items-center justify-between mb-3 md:mb-4">
@@ -298,10 +306,10 @@ export default function DashboardPage() {
             {managerStatCards.map((stat, index) => (
               <div
                 key={index}
-                className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-4 md:p-6 hover:shadow-md transition-shadow ${
+                className={`backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border p-4 md:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
                   stat.highlight
-                    ? 'border-red-300 dark:border-red-600 ring-1 ring-red-200 dark:ring-red-700'
-                    : 'border-gray-100 dark:border-gray-700'
+                    ? 'border-red-400/50 dark:border-red-500/50 ring-2 ring-red-400/20 dark:ring-red-500/20'
+                    : 'border-white/20 dark:border-purple-500/20 hover:border-purple-500/30 dark:hover:border-purple-500/40'
                 }`}
               >
                 <div className="flex items-center justify-between mb-3 md:mb-4">
@@ -333,7 +341,7 @@ export default function DashboardPage() {
             <Link
               key={index}
               href={action.href}
-              className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 md:p-6 hover:shadow-lg transition-all duration-300 overflow-hidden min-h-[120px] md:min-h-[160px]"
+              className="group relative backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border border-white/20 dark:border-purple-500/20 p-4 md:p-6 hover:shadow-xl hover:border-purple-500/30 dark:hover:border-purple-500/40 transition-all duration-300 overflow-hidden min-h-[120px] md:min-h-[160px] hover:-translate-y-1"
             >
               {/* Gradient overlay on hover */}
               <div className={`absolute inset-0 ${action.color} opacity-0 group-hover:opacity-5 transition-opacity`}></div>
@@ -354,28 +362,37 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <div>
-        <div className="flex items-center justify-between mb-4 md:mb-6">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Recente activiteit</h2>
-          <Link
-            href="/timesheet"
-            className="text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-medium min-h-[44px] flex items-center"
-          >
-            Bekijk alles →
-          </Link>
-        </div>
+      {/* Recent Activity + FAQ Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <div>
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Recente activiteit</h2>
+            <Link
+              href="/timesheet"
+              className="text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-medium min-h-[44px] flex items-center"
+            >
+              Bekijk alles →
+            </Link>
+          </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-center py-8 md:py-12 text-gray-500 dark:text-gray-400">
-            <div className="text-center">
-              <BellIcon className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
-              <p className="text-sm md:text-base">Geen recente activiteit</p>
-              <p className="text-xs md:text-sm text-gray-400 dark:text-gray-500 mt-1">
-                Start met het registreren van je uren
-              </p>
+          <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border border-white/20 dark:border-purple-500/20 p-6">
+            <div className="flex items-center justify-center py-8 md:py-12 text-gray-500 dark:text-gray-400">
+              <div className="text-center">
+                <BellIcon className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 text-gray-400 dark:text-purple-400/50" />
+                <p className="text-sm md:text-base dark:text-gray-300">Geen recente activiteit</p>
+                <p className="text-xs md:text-sm text-gray-400 dark:text-gray-500 mt-1">
+                  Start met het registreren van je uren
+                </p>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Fleet Tracking FAQ */}
+        <div>
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6">Hulp & FAQ</h2>
+          <FleetTrackingFAQ />
         </div>
       </div>
     </div>

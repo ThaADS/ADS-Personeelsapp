@@ -136,44 +136,42 @@ export default function SickLeavePage() {
   const pendingCount = records.filter(r => r.status === 'pending').length;
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Ziekmeldingen</h1>
-        <p className="text-gray-600 dark:text-gray-400">Beheer je ziekmeldingen en herstelregistraties</p>
+    <div className="space-y-4 md:space-y-6 pb-20 md:pb-6">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Ziekmeldingen</h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Beheer je ziekmeldingen en herstelregistraties</p>
       </div>
 
       {/* Error message */}
       {error && (
-        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="backdrop-blur-sm bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 rounded-2xl p-4">
           <p className="text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
       {/* Tabs */}
-      <div className="mb-6">
-        <div className="border-b border-gray-200 dark:border-gray-700">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setSelectedTab('overview')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                selectedTab === 'overview'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600'
-              }`}
-            >
-              Overzicht
-            </button>
-            <button
-              onClick={() => setSelectedTab('report')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                selectedTab === 'report'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600'
-              }`}
-            >
-              Ziekmelding
-            </button>
-          </nav>
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
+        <div className="flex overflow-x-auto border-b border-white/20 dark:border-purple-500/20">
+          <button
+            onClick={() => setSelectedTab('overview')}
+            className={`flex-1 min-w-0 py-3 px-4 text-sm font-medium text-center whitespace-nowrap min-h-[44px] transition-colors ${
+              selectedTab === 'overview'
+                ? 'border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400'
+                : 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
+            }`}
+          >
+            Overzicht
+          </button>
+          <button
+            onClick={() => setSelectedTab('report')}
+            className={`flex-1 min-w-0 py-3 px-4 text-sm font-medium text-center whitespace-nowrap min-h-[44px] transition-colors ${
+              selectedTab === 'report'
+                ? 'border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400'
+                : 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
+            }`}
+          >
+            Ziekmelding
+          </button>
         </div>
       </div>
 
@@ -181,31 +179,31 @@ export default function SickLeavePage() {
       {selectedTab === 'overview' && (
         <div className="space-y-6">
           {/* Statistics */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Totaal</h3>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-6">
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Totaal</h3>
               <div className="text-3xl font-bold text-red-600 dark:text-red-400">{totalDays}</div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Ziektedagen</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Gemiddeld</h3>
+            <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-6">
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Gemiddeld</h3>
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{avgDays}</div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Dagen per melding</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Meldingen</h3>
-              <div className="text-3xl font-bold text-gray-600 dark:text-gray-300">{records.length}</div>
+            <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-6">
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Meldingen</h3>
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{records.length}</div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Totaal aantal</p>
             </div>
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">In behandeling</h3>
+            <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-6">
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">In behandeling</h3>
               <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{pendingCount}</div>
               <p className="text-sm text-gray-500 dark:text-gray-400">Wachtende meldingen</p>
             </div>
           </div>
 
           {/* Recent Records */}
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
             <div className="px-4 py-5 sm:p-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Recente Ziekmeldingen</h3>
 
@@ -219,30 +217,30 @@ export default function SickLeavePage() {
                   <p>Geen ziekmeldingen gevonden.</p>
                 </div>
               ) : (
-                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-white/10 md:rounded-lg">
-                  <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-700">
+                <div className="overflow-hidden shadow-lg ring-1 ring-white/20 dark:ring-purple-500/20 md:rounded-lg">
+                  <table className="min-w-full divide-y divide-white/20 dark:divide-purple-500/20">
+                    <thead className="bg-purple-100/80 dark:bg-white/5">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Periode
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Dagen
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Reden
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Ingediend
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody className="bg-white/70 dark:bg-white/5 divide-y divide-purple-200/50 dark:divide-purple-500/20">
                       {records.map((record) => (
-                        <tr key={record.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <tr key={record.id} className="hover:bg-purple-500/5 dark:hover:bg-purple-500/10 transition-colors">
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {new Date(record.startDate).toLocaleDateString('nl-NL')} - {new Date(record.endDate).toLocaleDateString('nl-NL')}
                           </td>
@@ -298,10 +296,10 @@ export default function SickLeavePage() {
 
       {/* Report Tab */}
       {selectedTab === 'report' && (
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Nieuwe Ziekmelding</h3>
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4 mb-6">
+            <div className="backdrop-blur-sm bg-yellow-500/10 dark:bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-4 mb-6">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
@@ -358,7 +356,7 @@ export default function SickLeavePage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
+                  className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 font-medium min-h-[44px] transition-all duration-200"
                 >
                   {isSubmitting ? 'Bezig met indienen...' : 'Ziekmelding Indienen'}
                 </button>

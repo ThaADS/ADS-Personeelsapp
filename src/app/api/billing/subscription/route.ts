@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { StripeSubscriptionService } from '@/lib/stripe/subscription-service';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 import { canManageBilling } from '@/lib/rbac';
 import { z } from 'zod';
 import type Stripe from 'stripe';
@@ -12,15 +12,14 @@ interface StripeSubscriptionWithPeriod extends Stripe.Subscription {
   current_period_end?: number;
 }
 
-const prisma = new PrismaClient();
-
 const updateSubscriptionSchema = z.object({
   userCount: z.number().min(1).max(100).optional(),
   interval: z.enum(['month', 'year']).optional(),
 });
 
 // GET /api/billing/subscription - Get current subscription details
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_request: NextRequest) {
   try {
     const session = await auth();
     

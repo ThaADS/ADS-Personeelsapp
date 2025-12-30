@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="nl"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Approvals App</title>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Custom Configuration to match specific colors -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            app: {
+              bg: '#2E1C4E', // Updated deep purple start
+              card: 'rgba(255, 255, 255, 0.1)', // Semi-transparent card
+              input: 'rgba(255, 255, 255, 0.1)', // Semi-transparent input
+              tab: 'transparent', // Transparent tab track
+              tabActive: 'rgba(255, 255, 255, 0.2)', // Semi-transparent active tab
+              green: '#4CD964', // iOS Green
+              red: '#FF3B30', // iOS Red
+              textMeta: '#9CA3AF', 
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for specific layout tweaks -->
+<style data-purpose="layout">
+    body {
+      background: linear-gradient(180deg, #2E1C4E 0%, #101A35 100%);
+      min-height: 100vh;
+      color: white;
+    }
+    /* Hide scrollbar for clean mobile look if needed */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased font-sans pb-24">
+<!-- BEGIN: MainHeader -->
+<!-- Top navigation bar with Back button, Title, and Profile -->
+<header class="flex items-center justify-between px-4 py-4 pt-6 sticky top-0 z-20 bg-[#242055]/90 backdrop-blur-sm">
+<div class="flex items-center space-x-2 text-white/90">
+<button class="flex items-center focus:outline-none">
+<i class="fa-solid fa-chevron-left text-white text-lg mr-1"></i>
+<span class="text-lg font-normal">Back</span>
+</button>
+</div>
+<div class="absolute left-1/2 transform -translate-x-1/2">
+<h1 class="text-lg font-semibold text-white">Approvals</h1>
+</div>
+<button class="focus:outline-none">
+<i class="fa-solid fa-user-circle text-gray-300 text-3xl"></i>
+</button>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: NavigationTabs -->
+<!-- Segmented control for filtering requests -->
+<section class="px-4 mb-4">
+<div class="flex p-1 bg-[rgba(255,255,255,0.1)] rounded-lg">
+<!-- Active Tab -->
+<button class="flex-1 py-1.5 bg-[rgba(100,100,100,0.5)] rounded text-sm font-medium text-white shadow-sm">
+        Alle
+      </button>
+<!-- Inactive Tabs -->
+<button class="flex-1 py-1.5 text-sm font-medium text-gray-400 hover:text-white bg-transparent">
+        Verlof
+      </button>
+<button class="flex-1 py-1.5 text-sm font-medium text-gray-400 hover:text-white bg-transparent">
+        Tijd
+      </button>
+<button class="flex-1 py-1.5 text-sm font-medium text-gray-400 hover:text-white bg-transparent">
+        Onkosten
+      </button>
+<button class="flex-1 py-1.5 text-sm font-medium text-gray-400 hover:text-white bg-transparent">
+        Ziek
+      </button>
+</div>
+</section>
+<!-- END: NavigationTabs -->
+<!-- BEGIN: SearchBar -->
+<!-- Search input field -->
+<section class="px-4 mb-6">
+<div class="relative flex items-center bg-app-input rounded-xl overflow-hidden h-10">
+<div class="pl-3 pr-2 opacity-50">
+<i class="fa-solid fa-search text-white"></i>
+</div>
+<input class="w-full bg-transparent border-none text-white placeholder-gray-400 focus:ring-0 text-sm h-full pt-1 pb-1" placeholder="Zoek op medewerker of verzoek" type="text"/>
+</div>
+</section>
+<!-- END: SearchBar -->
+<!-- BEGIN: MainContent -->
+<!-- List of approval cards -->
+<main class="px-4 space-y-4">
+<!-- Card 1: Verlof -->
+<article class="bg-app-card rounded-2xl p-4 shadow-lg backdrop-blur-md" data-purpose="approval-card">
+<div class="mb-4">
+<p class="text-gray-400 text-sm font-medium mb-0.5">Verlof</p>
+<h2 class="text-xl font-semibold text-white mb-2">Anne de Vries</h2>
+<!-- Details -->
+<div class="space-y-1.5">
+<div class="flex items-center text-gray-300 text-sm">
+<i class="fa-solid fa-calendar-alt mr-2"></i>
+<span>10 Okt - 12 Okt <span class="text-gray-400">(3 dagen)</span></span>
+</div>
+<div class="flex items-center text-[#FFCC00] text-sm font-medium">
+<i class="fa-solid fa-clock mr-2"></i>
+<span>In behandeling</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex gap-2">
+<button class="flex-1 bg-app-green hover:bg-green-500 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center transition-colors">
+<i class="fa-solid fa-check mr-2"></i>
+          Keur goed
+        </button>
+<button class="flex-1 bg-app-red hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center transition-colors">
+<i class="fa-solid fa-times mr-2"></i>
+          Afwijzen
+        </button>
+</div>
+</article>
+<!-- Card 2: Tijdregistratie -->
+<article class="bg-app-card rounded-2xl p-4 shadow-lg backdrop-blur-md" data-purpose="approval-card">
+<div class="mb-4">
+<p class="text-gray-400 text-sm font-medium mb-0.5">Tijdregistratie</p>
+<h2 class="text-xl font-semibold text-white mb-2">Peter Janssen</h2>
+<!-- Details -->
+<div class="space-y-1.5">
+<div class="flex items-center text-gray-300 text-sm">
+<i class="fa-solid fa-clock mr-2"></i>
+<span>05 Okt <span class="text-gray-400">(8 uur)</span></span>
+</div>
+<div class="flex items-center text-gray-400 text-sm">
+<!-- Using opacity-70 for gray look -->
+<i class="fa-solid fa-exclamation-circle mr-2"></i>
+<span>Overwerk</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex gap-2">
+<button class="flex-1 bg-app-green hover:bg-green-500 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center transition-colors">
+<i class="fa-solid fa-check mr-2"></i>
+          Keur goed
+        </button>
+<button class="flex-1 bg-app-red hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center transition-colors">
+<i class="fa-solid fa-times mr-2"></i>
+          Afwijzen
+        </button>
+</div>
+</article>
+<!-- Card 3: Onkosten -->
+<article class="bg-app-card rounded-2xl p-4 shadow-lg backdrop-blur-md" data-purpose="approval-card">
+<div class="mb-4">
+<p class="text-gray-400 text-sm font-medium mb-0.5">Onkosten</p>
+<h2 class="text-xl font-semibold text-white mb-2">Fatima Yilmaz</h2>
+<!-- Details -->
+<div class="space-y-1.5">
+<div class="flex items-center text-gray-300 text-sm">
+<i class="fa-solid fa-tag mr-2"></i>
+<span>€150,00 - Reiskosten</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex gap-2">
+<button class="flex-1 bg-app-green hover:bg-green-500 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center transition-colors">
+<i class="fa-solid fa-check mr-2"></i>
+          Keur goed
+        </button>
+<button class="flex-1 bg-app-red hover:bg-red-600 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center transition-colors">
+<i class="fa-solid fa-times mr-2"></i>
+          Afwijzen
+        </button>
+</div>
+</article>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: BottomNavigation -->
+<!-- Fixed bottom navigation bar -->
+<nav class="fixed bottom-0 w-full bg-[#0B1021] border-t border-white/5 pt-2 pb-5 px-2 z-30">
+<ul class="flex justify-between items-end">
+<!-- Item: Dashboard -->
+<li class="flex-1 flex flex-col items-center">
+<button class="flex flex-col items-center group">
+<div class="w-6 h-6 mb-1 text-[#888888]">
+<i class="fa-solid fa-th-large text-xl"></i>
+</div>
+<span class="text-[10px] text-[#888888]">Dashboard</span>
+</button>
+</li>
+<!-- Item: Medewerkers -->
+<li class="flex-1 flex flex-col items-center">
+<button class="flex flex-col items-center group">
+<div class="w-6 h-6 mb-1 text-[#888888]">
+<i class="fa-solid fa-users text-xl"></i>
+</div>
+<span class="text-[10px] text-[#888888]">Medewerkers</span>
+</button>
+</li>
+<!-- Item: Approvals (Active) -->
+<li class="flex-1 flex flex-col items-center">
+<button class="flex flex-col items-center relative">
+<!-- Active indicator highlight could go here if design requires, keeping it simple as per image -->
+<div class="w-6 h-6 mb-1 bg-white rounded flex items-center justify-center">
+<i class="fa-solid fa-check-square text-[#16142e] text-base"></i>
+</div>
+<span class="text-[10px] text-white font-medium">Approvals</span>
+<!-- Active underline bar -->
+<div class="absolute -bottom-5 w-8 h-1 bg-white rounded-t-full"></div>
+</button>
+</li>
+<!-- Item: Tijd -->
+<li class="flex-1 flex flex-col items-center">
+<button class="flex flex-col items-center group">
+<div class="w-6 h-6 mb-1 text-[#888888]">
+<i class="fa-solid fa-clock text-xl"></i>
+</div>
+<span class="text-[10px] text-[#888888]">Tijd</span>
+</button>
+</li>
+<!-- Item: Verlof -->
+<li class="flex-1 flex flex-col items-center">
+<button class="flex flex-col items-center group">
+<div class="w-6 h-6 mb-1 text-[#888888]">
+<i class="fa-solid fa-plane-departure text-xl"></i>
+</div>
+<span class="text-[10px] text-[#888888]">Verlof</span>
+</button>
+</li>
+<!-- Item: Profiel -->
+<li class="flex-1 flex flex-col items-center">
+<button class="flex flex-col items-center group">
+<div class="w-6 h-6 mb-1 text-[#888888]">
+<i class="fa-solid fa-user text-xl"></i>
+</div>
+<span class="text-[10px] text-[#888888]">Profiel</span>
+</button>
+</li>
+</ul>
+</nav>
+<!-- END: BottomNavigation -->
+</body></html>

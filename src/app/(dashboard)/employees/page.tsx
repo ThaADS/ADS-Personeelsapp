@@ -3,7 +3,12 @@
 import { useSession } from 'next-auth/react';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { EmployeeCard } from '@/components/mobile';
+import Image from 'next/image';
+import Link from 'next/link';
+import { EmployeeDetailModal } from '@/components/employees/EmployeeDetailModal';
+
+// View mode type
+type ViewMode = 'list' | 'grid';
 
 interface Employee {
   id: string;
@@ -21,6 +26,33 @@ interface Employee {
   contractType: string | null;
   workHoursPerWeek: number | null;
   createdAt: string;
+  // Additional personal details
+  dateOfBirth: string | null;
+  gender: string | null;
+  nationality: string | null;
+  maritalStatus: string | null;
+  // Address
+  address: string | null;
+  city: string | null;
+  postalCode: string | null;
+  // Emergency contact
+  emergencyContact: string | null;
+  emergencyPhone: string | null;
+  emergencyRelationship: string | null;
+  // Employment details
+  hoursPerWeek: number | null;
+  costCenter: string | null;
+  endDate: string | null;
+  // Skills and qualifications
+  skills: string[];
+  certifications: string[];
+  educationLevel: string | null;
+  languages: string[];
+  // Work preferences
+  remoteWorkAllowed: boolean;
+  workLocation: string | null;
+  // Notes
+  notes: string | null;
 }
 
 interface EmployeesResponse {
@@ -48,6 +80,8 @@ export default function EmployeesPage() {
   const [departments, setDepartments] = useState<string[]>([]);
   const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 50, totalPages: 1 });
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
 
   const canManageEmployees = session?.user?.role === 'TENANT_ADMIN' || session?.user?.role === 'MANAGER';
 
@@ -126,11 +160,18 @@ export default function EmployeesPage() {
   };
 
   const handleView = (id: string) => {
-    router.push(`/employees/${id}`);
+    const employee = employees.find(e => e.id === id);
+    if (employee) {
+      setSelectedEmployee(employee);
+    }
   };
 
   const handleEdit = (id: string) => {
     router.push(`/employees/${id}/edit`);
+  };
+
+  const closeModal = () => {
+    setSelectedEmployee(null);
   };
 
   if (isLoading && employees.length === 0) {
@@ -160,26 +201,83 @@ export default function EmployeesPage() {
   return (
     <div className="space-y-4 md:space-y-6 pb-20 md:pb-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Werknemers</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Overzicht van alle medewerkers</p>
           </div>
           <div className="flex items-center gap-2">
+            {/* View mode switcher */}
+            <div className="hidden md:flex items-center backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-purple-500/30 rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-purple-500 text-white' : 'text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400'}`}
+                title="Lijstweergave"
+                aria-label="Lijstweergave"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-purple-500 text-white' : 'text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400'}`}
+                title="Gridweergave"
+                aria-label="Gridweergave"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+            </div>
             {/* Filter toggle - mobile */}
             <button
+              type="button"
               onClick={() => setShowFilters(!showFilters)}
-              className="md:hidden inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 min-h-[44px]"
+              className="md:hidden inline-flex items-center px-3 py-2 border border-purple-500/30 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 backdrop-blur-sm bg-white/50 dark:bg-white/5 hover:bg-purple-50 dark:hover:bg-purple-500/10 min-h-[44px] transition-colors"
+              title="Filters tonen/verbergen"
+              aria-label="Filters tonen/verbergen"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
             </button>
-            {canManageEmployees && (
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px] text-sm font-medium">
-                + Nieuw
+            {/* View mode switcher - mobile */}
+            <div className="md:hidden flex items-center backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-purple-500/30 rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-purple-500 text-white' : 'text-gray-600 dark:text-gray-400'}`}
+                title="Lijstweergave"
+                aria-label="Lijstweergave"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
               </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-purple-500 text-white' : 'text-gray-600 dark:text-gray-400'}`}
+                title="Gridweergave"
+                aria-label="Gridweergave"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+            </div>
+            {canManageEmployees && (
+              <Link
+                href="/employees/new"
+                className="hidden md:inline-flex bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[44px] text-sm font-medium transition-all duration-200 items-center"
+                title="Nieuwe medewerker toevoegen"
+              >
+                + Nieuw
+              </Link>
             )}
           </div>
         </div>
@@ -187,14 +285,14 @@ export default function EmployeesPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="backdrop-blur-sm bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 rounded-2xl p-4">
           <p className="text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
       {/* Filters - collapsible on mobile */}
       <div className={`${showFilters ? 'block' : 'hidden'} md:block`}>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <input
@@ -210,6 +308,8 @@ export default function EmployeesPage() {
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
                 className="w-full md:w-auto border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-h-[44px]"
+                title="Filter op afdeling"
+                aria-label="Filter op afdeling"
               >
                 <option value="all">Alle afdelingen</option>
                 {departments.map(dept => (
@@ -222,28 +322,28 @@ export default function EmployeesPage() {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
-          <h3 className="text-sm md:text-lg font-medium text-gray-900 dark:text-white mb-1 md:mb-2">Totaal</h3>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 md:mb-2">Totaal</h3>
           <div className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">{pagination.total}</div>
           <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Medewerkers</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
-          <h3 className="text-sm md:text-lg font-medium text-gray-900 dark:text-white mb-1 md:mb-2">Actief</h3>
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 md:mb-2">Actief</h3>
           <div className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">
             {employees.filter(e => e.isActive).length}
           </div>
           <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">In dienst</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
-          <h3 className="text-sm md:text-lg font-medium text-gray-900 dark:text-white mb-1 md:mb-2">Afdelingen</h3>
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 md:mb-2">Afdelingen</h3>
           <div className="text-2xl md:text-3xl font-bold text-purple-600 dark:text-purple-400">
             {departments.length}
           </div>
           <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">Uniek</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
-          <h3 className="text-sm md:text-lg font-medium text-gray-900 dark:text-white mb-1 md:mb-2">Getoond</h3>
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
+          <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 md:mb-2">Getoond</h3>
           <div className="text-2xl md:text-3xl font-bold text-gray-600 dark:text-gray-400">
             {employees.length}
           </div>
@@ -252,8 +352,8 @@ export default function EmployeesPage() {
       </div>
 
       {/* Employee List */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-        <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
+        <div className="px-4 py-5 border-b border-white/20 dark:border-purple-500/20">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Medewerkers ({employees.length})
           </h3>
@@ -271,123 +371,124 @@ export default function EmployeesPage() {
           </div>
         ) : (
           <>
-            {/* Mobile Card View */}
-            <div className="block md:hidden p-4 space-y-3">
-              {employees.map((employee) => (
-                <EmployeeCard
-                  key={employee.id}
-                  employee={employee}
-                  canManage={canManageEmployees}
-                  onView={handleView}
-                  onEdit={canManageEmployees ? handleEdit : undefined}
-                />
-              ))}
-            </div>
-
-            {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                      Naam
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                      Afdeling
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                      Functie
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                      Contact
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                      Rol
-                    </th>
-                    {canManageEmployees && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
-                        Acties
-                      </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {employees.map((employee) => (
-                    <tr key={employee.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          {employee.image ? (
-                            <img
-                              src={employee.image}
-                              alt=""
-                              className="h-10 w-10 rounded-full mr-3 object-cover"
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mr-3">
-                              <span className="text-white font-medium">
-                                {employee.name?.charAt(0) || employee.email.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                          <div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
-                              {employee.name || 'Geen naam'}
-                            </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">{employee.email}</div>
-                            {employee.employeeId && (
-                              <div className="text-xs text-gray-400 dark:text-gray-500">#{employee.employeeId}</div>
-                            )}
-                          </div>
+            {/* List View */}
+            {viewMode === 'list' && (
+              <div className="divide-y divide-white/10 dark:divide-purple-500/20">
+                {employees.map((employee) => (
+                  <div
+                    key={employee.id}
+                    onClick={() => handleView(employee.id)}
+                    className="flex items-center justify-between p-4 hover:bg-purple-500/5 dark:hover:bg-purple-500/10 cursor-pointer transition-colors"
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      {employee.image ? (
+                        <Image
+                          src={employee.image}
+                          alt=""
+                          width={48}
+                          height={48}
+                          className="h-12 w-12 rounded-full object-cover border-2 border-white/20 dark:border-purple-500/30 flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 border-2 border-white/20 dark:border-purple-500/30">
+                          <span className="text-white font-bold text-lg">
+                            {employee.name?.charAt(0) || employee.email.charAt(0).toUpperCase()}
+                          </span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {employee.department || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 dark:text-white">{employee.position || '-'}</div>
-                        {employee.startDate && (
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            Sinds {formatDate(employee.startDate)}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {employee.phone ? (
-                          <a href={`tel:${employee.phone}`} className="text-blue-600 dark:text-blue-400 hover:text-blue-800">
-                            {employee.phone}
-                          </a>
-                        ) : (
-                          <span className="text-gray-500 dark:text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(employee.role)}`}>
-                          {getRoleLabel(employee.role)}
-                        </span>
-                      </td>
-                      {canManageEmployees && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleView(employee.id)}
-                              className="text-blue-600 dark:text-blue-400 hover:text-blue-900 min-h-[44px] px-2"
-                            >
-                              Bekijken
-                            </button>
-                            <button
-                              onClick={() => handleEdit(employee.id)}
-                              className="text-green-600 dark:text-green-400 hover:text-green-900 min-h-[44px] px-2"
-                            >
-                              Bewerken
-                            </button>
-                          </div>
-                        </td>
                       )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      <div className="min-w-0">
+                        <div className="text-base font-bold text-gray-900 dark:text-white truncate">
+                          {employee.name || 'Geen naam'}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                          {employee.position || employee.department || getRoleLabel(employee.role)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      {/* Status indicator */}
+                      <div className="flex items-center gap-1.5">
+                        <span className={`w-2 h-2 rounded-full ${employee.isActive ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+                        <span className={`text-sm font-medium ${employee.isActive ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          {employee.isActive ? 'Actief' : 'Inactief'}
+                        </span>
+                      </div>
+                      {/* Chevron */}
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Grid View */}
+            {viewMode === 'grid' && (
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {employees.map((employee) => (
+                  <div
+                    key={employee.id}
+                    className="backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-white/20 dark:border-purple-500/20 rounded-2xl p-4 hover:shadow-lg transition-all"
+                  >
+                    {/* Avatar & Status */}
+                    <div className="flex flex-col items-center text-center mb-3">
+                      {employee.image ? (
+                        <Image
+                          src={employee.image}
+                          alt=""
+                          width={64}
+                          height={64}
+                          className="h-16 w-16 rounded-full object-cover border-2 border-white/30 dark:border-purple-500/30 mb-2"
+                        />
+                      ) : (
+                        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-2 border-2 border-white/30 dark:border-purple-500/30">
+                          <span className="text-white font-bold text-xl">
+                            {employee.name?.split(' ').map(n => n[0]).join('').slice(0, 2) || employee.email.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                      <h4 className="font-bold text-gray-900 dark:text-white text-sm truncate w-full">
+                        {employee.name || 'Geen naam'}
+                      </h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate w-full">
+                        {employee.position || getRoleLabel(employee.role)}
+                      </p>
+                      {employee.department && (
+                        <p className="text-xs text-gray-400 dark:text-gray-500 truncate w-full">
+                          {employee.department}
+                        </p>
+                      )}
+                      {/* Status badge */}
+                      <div className={`mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${employee.isActive ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${employee.isActive ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+                        {employee.isActive ? 'Actief' : 'Inactief'}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleView(employee.id)}
+                        className="flex-1 px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-xs font-semibold transition-colors min-h-[36px]"
+                      >
+                        Bekijken
+                      </button>
+                      {canManageEmployees && (
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(employee.id)}
+                          className="flex-1 px-3 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg text-xs font-semibold transition-colors min-h-[36px]"
+                        >
+                          Bewerken
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
 
@@ -400,6 +501,7 @@ export default function EmployeesPage() {
               </p>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
                   className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px]"
@@ -407,6 +509,7 @@ export default function EmployeesPage() {
                   Vorige
                 </button>
                 <button
+                  type="button"
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page === pagination.totalPages}
                   className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px]"
@@ -418,6 +521,34 @@ export default function EmployeesPage() {
           </div>
         )}
       </div>
+
+      {/* FAB Button - Mobile only */}
+      {canManageEmployees && (
+        <Link
+          href="/employees/new"
+          className="md:hidden fixed bottom-24 right-4 w-14 h-14 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all z-40"
+          title="Nieuwe medewerker toevoegen"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+        </Link>
+      )}
+
+      {/* Employee Detail Modal */}
+      {selectedEmployee && (
+        <EmployeeDetailModal
+          employee={selectedEmployee}
+          canManage={canManageEmployees}
+          onClose={closeModal}
+          onEdit={() => {
+            closeModal();
+            handleEdit(selectedEmployee.id);
+          }}
+          getRoleLabel={getRoleLabel}
+          formatDate={formatDate}
+        />
+      )}
     </div>
   );
 }

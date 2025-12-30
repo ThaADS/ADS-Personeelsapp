@@ -9,10 +9,13 @@ import {
   CheckCircleIcon,
   ChartBarIcon,
   ShieldCheckIcon,
-  BoltIcon,
   SparklesIcon,
   ArrowRightIcon,
-  PlayCircleIcon
+  PlayCircleIcon,
+  TruckIcon,
+  MapPinIcon,
+  BoltIcon,
+  LinkIcon
 } from '@heroicons/react/24/outline';
 
 export default function MarketingHomePage() {
@@ -229,8 +232,150 @@ export default function MarketingHomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Fleet Tracking Integration Section */}
       <section className="py-24 bg-gradient-to-br from-slate-900/50 to-purple-900/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-cyan-100 text-cyan-700 text-sm font-medium mb-6">
+              <TruckIcon className="w-4 h-4 mr-2" />
+              Nieuw: Fleet Tracking Integraties
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+              Automatische Ritregistratie
+            </h2>
+            <p className="text-xl text-gray-200 max-w-3xl mx-auto">
+              Koppel uw bestaande fleet tracking systeem en bespaar 2+ uur per week op handmatige registratie.
+              Ritten worden automatisch gekoppeld aan tijdregistraties.
+            </p>
+          </div>
+
+          {/* Benefits Grid */}
+          <div className="grid md:grid-cols-4 gap-6 mb-16">
+            <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 text-center">
+              <div className="inline-flex p-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
+                <ClockIcon className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-2">2+ Uur Bespaard</h4>
+              <p className="text-sm text-gray-300">Per week aan handmatige invoer</p>
+            </div>
+            <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 text-center">
+              <div className="inline-flex p-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 mb-4">
+                <MapPinIcon className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-2">GPS Verificatie</h4>
+              <p className="text-sm text-gray-300">100% betrouwbare data</p>
+            </div>
+            <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 text-center">
+              <div className="inline-flex p-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 mb-4">
+                <BoltIcon className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-2">Automatisch Matchen</h4>
+              <p className="text-sm text-gray-300">Ritten gekoppeld aan uren</p>
+            </div>
+            <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 text-center">
+              <div className="inline-flex p-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 mb-4">
+                <ChartBarIcon className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-2">Fiscaal Compliant</h4>
+              <p className="text-sm text-gray-300">Voldoet aan Belastingdienst</p>
+            </div>
+          </div>
+
+          {/* Provider Logos */}
+          <div className="backdrop-blur-xl bg-white/5 rounded-3xl p-8 border border-white/10">
+            <h3 className="text-center text-lg font-medium text-gray-300 mb-8">
+              Ondersteunde Fleet Tracking Providers
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+              {/* RouteVision */}
+              <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <TruckIcon className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-center">
+                  <span className="text-white font-semibold text-sm">RouteVision</span>
+                  <span className="block text-xs text-orange-400">NL</span>
+                </div>
+              </div>
+
+              {/* FleetGO */}
+              <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <TruckIcon className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-center">
+                  <span className="text-white font-semibold text-sm">FleetGO</span>
+                  <span className="block text-xs text-orange-400">NL</span>
+                </div>
+              </div>
+
+              {/* Samsara */}
+              <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div className="text-center">
+                  <span className="text-white font-semibold text-sm">Samsara</span>
+                  <span className="block text-xs text-blue-400">Global</span>
+                </div>
+              </div>
+
+              {/* Webfleet */}
+              <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <MapPinIcon className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-center">
+                  <span className="text-white font-semibold text-sm">Webfleet</span>
+                  <span className="block text-xs text-green-400">EU</span>
+                </div>
+              </div>
+
+              {/* TrackJack */}
+              <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <MapPinIcon className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-center">
+                  <span className="text-white font-semibold text-sm">TrackJack</span>
+                  <span className="block text-xs text-orange-400">NL</span>
+                </div>
+              </div>
+
+              {/* Verizon Connect */}
+              <div className="flex flex-col items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <ChartBarIcon className="w-8 h-8 text-white" />
+                </div>
+                <div className="text-center">
+                  <span className="text-white font-semibold text-sm">Verizon</span>
+                  <span className="block text-xs text-blue-400">Global</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mt-8">
+              <p className="text-gray-400 text-sm mb-4">
+                Gebruikt u een andere provider? Neem contact op voor integratiemogelijkheden.
+              </p>
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 text-violet-400 hover:text-violet-300 font-medium transition-colors"
+              >
+                <LinkIcon className="w-4 h-4" />
+                Bekijk alle integraties
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-24 bg-gradient-to-br from-purple-900/30 to-slate-900/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">

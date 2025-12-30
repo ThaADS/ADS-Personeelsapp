@@ -103,34 +103,6 @@ export default function TimesheetPage() {
     fetchTimesheets();
   }, [fetchTimesheets]);
 
-  // Functie om de status kleur te bepalen
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "APPROVED":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
-      case "REJECTED":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-    }
-  };
-
-  // Functie om de status in het Nederlands weer te geven
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "APPROVED":
-        return "Goedgekeurd";
-      case "PENDING":
-        return "In behandeling";
-      case "REJECTED":
-        return "Afgekeurd";
-      default:
-        return status;
-    }
-  };
-
   // Functie om het formulier te verwerken
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,7 +204,7 @@ export default function TimesheetPage() {
   return (
     <div className="space-y-4 md:space-y-6 pb-20 md:pb-6">
       {/* Paginatitel */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
             Tijdregistratie
@@ -241,7 +213,7 @@ export default function TimesheetPage() {
             {/* Filter toggle - mobile only */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="md:hidden inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 min-h-[44px]"
+              className="md:hidden inline-flex items-center px-3 py-2 border border-purple-500/30 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 backdrop-blur-sm bg-white/50 dark:bg-white/5 hover:bg-purple-50 dark:hover:bg-purple-500/10 min-h-[44px] transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -254,7 +226,7 @@ export default function TimesheetPage() {
             </button>
             <button
               onClick={() => setShowNewEntryForm(!showNewEntryForm)}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 min-h-[44px]"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-lg text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 min-h-[44px] transition-all duration-200"
             >
               {showNewEntryForm ? "Annuleren" : "Nieuwe registratie"}
             </button>
@@ -264,7 +236,7 @@ export default function TimesheetPage() {
 
       {/* Filters - collapsible on mobile, always visible on desktop */}
       <div className={`${showFilters ? "block" : "hidden"} md:block`}>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 space-y-4">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 space-y-4">
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filters</h3>
           <DateRangeFilter
             onChange={(start, end) => {
@@ -282,14 +254,14 @@ export default function TimesheetPage() {
 
       {/* Error message */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="backdrop-blur-sm bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 rounded-2xl p-4">
           <p className="text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
       {/* Formulier voor nieuwe tijdregistratie */}
       {showNewEntryForm && (
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
           <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             Nieuwe tijdregistratie
           </h2>
@@ -306,7 +278,7 @@ export default function TimesheetPage() {
                   value={formData.date}
                   onChange={handleChange}
                   required
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-h-[44px]"
+                  className="mt-1 focus:ring-purple-500 focus:border-purple-500 block w-full shadow-sm sm:text-sm rounded-lg backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white min-h-[44px]"
                 />
               </div>
               <div>
@@ -320,14 +292,14 @@ export default function TimesheetPage() {
                   value={formData.startTime}
                   onChange={handleChange}
                   required
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-h-[44px]"
+                  className="mt-1 focus:ring-purple-500 focus:border-purple-500 block w-full shadow-sm sm:text-sm rounded-lg backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white min-h-[44px]"
                 />
                 {/* Improved GPS Button - 44px+ touch target */}
                 <button
                   type="button"
                   onClick={() => captureLocation("start")}
                   disabled={gpsLoading === "start"}
-                  className="mt-2 w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm min-h-[44px] disabled:opacity-50"
+                  className="mt-2 w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold hover:from-purple-700 hover:to-pink-700 active:from-purple-800 active:to-pink-800 transition-all shadow-lg min-h-[44px] disabled:opacity-50"
                 >
                   {gpsLoading === "start" ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
@@ -373,14 +345,14 @@ export default function TimesheetPage() {
                   value={formData.endTime}
                   onChange={handleChange}
                   required
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-h-[44px]"
+                  className="mt-1 focus:ring-purple-500 focus:border-purple-500 block w-full shadow-sm sm:text-sm rounded-lg backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white min-h-[44px]"
                 />
                 {/* Improved GPS Button - 44px+ touch target */}
                 <button
                   type="button"
                   onClick={() => captureLocation("end")}
                   disabled={gpsLoading === "end"}
-                  className="mt-2 w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm min-h-[44px] disabled:opacity-50"
+                  className="mt-2 w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold hover:from-purple-700 hover:to-pink-700 active:from-purple-800 active:to-pink-800 transition-all shadow-lg min-h-[44px] disabled:opacity-50"
                 >
                   {gpsLoading === "end" ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
@@ -428,7 +400,7 @@ export default function TimesheetPage() {
                   value={formData.breakDuration}
                   onChange={handleChange}
                   required
-                  className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-h-[44px]"
+                  className="mt-1 focus:ring-purple-500 focus:border-purple-500 block w-full shadow-sm sm:text-sm rounded-lg backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white min-h-[44px]"
                 />
               </div>
             </div>
@@ -442,14 +414,14 @@ export default function TimesheetPage() {
                 rows={3}
                 value={formData.description}
                 onChange={handleChange}
-                className="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="mt-1 focus:ring-purple-500 focus:border-purple-500 block w-full shadow-sm sm:text-sm rounded-lg backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white p-3"
               />
             </div>
             <div className="flex justify-end">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 min-h-[44px]"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-lg text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 min-h-[44px] transition-all"
               >
                 {isSubmitting ? "Bezig met opslaan..." : "Opslaan"}
               </button>
@@ -459,7 +431,7 @@ export default function TimesheetPage() {
       )}
 
       {/* GPS Info Banner */}
-      <div className="bg-blue-50 dark:bg-blue-900/20 shadow rounded-lg p-4 md:p-6">
+      <div className="backdrop-blur-sm bg-blue-500/10 dark:bg-blue-500/10 shadow-lg rounded-2xl border border-blue-500/20 p-4 md:p-6">
         <div className="flex items-center">
           <div className="flex-shrink-0">
             <svg
@@ -490,14 +462,14 @@ export default function TimesheetPage() {
       </div>
 
       {/* Tijdregistraties */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-        <div className="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
+        <div className="px-4 py-5 sm:px-6 border-b border-white/20 dark:border-purple-500/20">
           <h2 className="text-lg font-medium text-gray-900 dark:text-white">Recente tijdregistraties</h2>
         </div>
 
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
             <p className="mt-2 text-gray-500 dark:text-gray-400">Laden...</p>
           </div>
         ) : timesheets.length === 0 ? (
@@ -531,36 +503,36 @@ export default function TimesheetPage() {
 
             {/* Desktop Table View */}
             <div className="hidden md:block overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+              <table className="min-w-full divide-y divide-white/20 dark:divide-purple-500/20">
+                <thead className="bg-purple-100/80 dark:bg-white/5">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                       Datum
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                       Tijd
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                       Omschrijving
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                       GPS
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                       Acties
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="bg-white/70 dark:bg-white/5 divide-y divide-purple-200/50 dark:divide-purple-500/20">
                   {timesheets.map((entry) => {
                     const { hours, minutes } = calculateWorkTime(entry);
                     const hasGpsData = entry.startLat !== null || entry.endLat !== null;
 
                     return (
-                      <tr key={entry.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <tr key={entry.id} className="hover:bg-white/30 dark:hover:bg-white/10">
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                           {new Date(entry.date).toLocaleDateString("nl-NL")}
                         </td>
@@ -585,7 +557,7 @@ export default function TimesheetPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <Link
                             href={`/timesheet/${entry.id}`}
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                            className="text-purple-600 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300"
                           >
                             Details
                           </Link>
@@ -601,7 +573,7 @@ export default function TimesheetPage() {
 
         {/* Pagination */}
         {pagination && pagination.pages > 1 && (
-          <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-3 border-t border-white/20 dark:border-purple-500/20">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="text-sm text-gray-700 dark:text-gray-300">
                 Pagina {pagination.page} van {pagination.pages} ({pagination.total} resultaten)
@@ -610,14 +582,14 @@ export default function TimesheetPage() {
                 <button
                   onClick={() => fetchTimesheets(pagination.page - 1)}
                   disabled={pagination.page <= 1}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px]"
+                  className="px-4 py-2 border border-purple-500/30 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm bg-white/50 dark:bg-white/5 hover:bg-white/70 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors"
                 >
                   Vorige
                 </button>
                 <button
                   onClick={() => fetchTimesheets(pagination.page + 1)}
                   disabled={pagination.page >= pagination.pages}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 min-h-[44px]"
+                  className="px-4 py-2 border border-purple-500/30 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm bg-white/50 dark:bg-white/5 hover:bg-white/70 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 min-h-[44px] transition-colors"
                 >
                   Volgende
                 </button>

@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         'Content-Disposition': `attachment; filename="timesheets_${status.toLowerCase()}.csv"`,
       }
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Export failed' }, { status: 500 });
   }
 }

@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 import { UserRole, SubscriptionStatus } from '@/types';
 import { createTenantSlug, isSlugAvailable } from '@/lib/tenant';
 import { z } from 'zod';
 import { hash } from 'bcrypt';
-
-const prisma = new PrismaClient();
 
 const createTenantSchema = z.object({
   name: z.string().min(1, 'Company name is required'),

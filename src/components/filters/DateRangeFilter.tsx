@@ -81,8 +81,8 @@ export function DateRangeFilter({ onChange, initialPreset = "week" }: DateRangeF
             onClick={() => handlePresetChange(p.value)}
             className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
               preset === p.value
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                : "backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-700 dark:text-gray-300 hover:bg-white/70 dark:hover:bg-white/10"
             }`}
           >
             {p.label}
@@ -101,7 +101,7 @@ export function DateRangeFilter({ onChange, initialPreset = "week" }: DateRangeF
               type="date"
               value={startDate}
               onChange={(e) => handleCustomDateChange("start", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[44px]"
+              className="w-full px-3 py-2 rounded-lg text-sm backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 min-h-[44px] transition-colors"
             />
           </div>
           <div>
@@ -112,7 +112,7 @@ export function DateRangeFilter({ onChange, initialPreset = "week" }: DateRangeF
               type="date"
               value={endDate}
               onChange={(e) => handleCustomDateChange("end", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[44px]"
+              className="w-full px-3 py-2 rounded-lg text-sm backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 min-h-[44px] transition-colors"
             />
           </div>
         </div>

@@ -52,10 +52,10 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
   if (pages <= 1) return null;
 
   return (
-    <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+    <div className="backdrop-blur-sm bg-white/50 dark:bg-white/5 px-4 py-3 flex items-center justify-between border-t border-white/20 dark:border-purple-500/20 sm:px-6">
       <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
             Toont <span className="font-medium">{(page - 1) * pagination.limit + 1}</span> tot{" "}
             <span className="font-medium">
               {Math.min(page * pagination.limit, total)}
@@ -64,14 +64,14 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
           </p>
         </div>
         <div>
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <nav className="relative z-0 inline-flex rounded-lg shadow-sm -space-x-px" aria-label="Pagination">
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page === 1}
-              className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+              className={`relative inline-flex items-center px-2 py-2 rounded-l-lg border backdrop-blur-sm text-sm font-medium min-h-[44px] transition-colors ${
                 page === 1
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "text-gray-500 hover:bg-gray-50"
+                  ? "border-gray-200 dark:border-purple-500/20 bg-white/30 dark:bg-white/5 text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                  : "border-gray-200 dark:border-purple-500/30 bg-white/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-white/70 dark:hover:bg-white/10"
               }`}
             >
               <span className="sr-only">Vorige</span>
@@ -89,12 +89,12 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
                 />
               </svg>
             </button>
-            
+
             {getPageNumbers().map((pageNumber, index) => (
               pageNumber === -1 ? (
                 <span
                   key={`ellipsis-${index}`}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                  className="relative inline-flex items-center px-4 py-2 border border-gray-200 dark:border-purple-500/20 backdrop-blur-sm bg-white/30 dark:bg-white/5 text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   ...
                 </span>
@@ -102,24 +102,24 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
                 <button
                   key={pageNumber}
                   onClick={() => onPageChange(pageNumber)}
-                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium min-h-[44px] transition-colors ${
                     page === pageNumber
-                      ? "z-10 bg-blue-50 border-blue-500 text-blue-600"
-                      : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                      ? "z-10 backdrop-blur-sm bg-purple-500/20 dark:bg-purple-500/20 border-purple-500/50 text-purple-600 dark:text-purple-400"
+                      : "backdrop-blur-sm bg-white/50 dark:bg-white/5 border-gray-200 dark:border-purple-500/20 text-gray-500 dark:text-gray-400 hover:bg-white/70 dark:hover:bg-white/10"
                   }`}
                 >
                   {pageNumber}
                 </button>
               )
             ))}
-            
+
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page === pages}
-              className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+              className={`relative inline-flex items-center px-2 py-2 rounded-r-lg border backdrop-blur-sm text-sm font-medium min-h-[44px] transition-colors ${
                 page === pages
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "text-gray-500 hover:bg-gray-50"
+                  ? "border-gray-200 dark:border-purple-500/20 bg-white/30 dark:bg-white/5 text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                  : "border-gray-200 dark:border-purple-500/30 bg-white/50 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-white/70 dark:hover:bg-white/10"
               }`}
             >
               <span className="sr-only">Volgende</span>

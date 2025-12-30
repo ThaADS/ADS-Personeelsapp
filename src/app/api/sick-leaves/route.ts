@@ -3,10 +3,8 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext, createAuditLog, addTenantFilter } from "@/lib/auth/tenant-access";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
 
 const sickLeaveSchema = z.object({
   startDate: z.string().refine((date) => !isNaN(Date.parse(date)), {

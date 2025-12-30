@@ -1,4 +1,5 @@
-import { createTenantSlug } from '@/lib/tenant'
+import { describe, it, expect } from 'vitest';
+import { createTenantSlug } from '@/lib/tenant';
 
 describe('createTenantSlug', () => {
   it('lowercases input and trims spaces', () => {

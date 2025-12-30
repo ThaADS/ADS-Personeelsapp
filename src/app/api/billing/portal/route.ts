@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { StripeSubscriptionService } from '@/lib/stripe/subscription-service';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 import { canManageBilling } from '@/lib/rbac';
-
-const prisma = new PrismaClient();
 
 // POST /api/billing/portal - Create Stripe customer portal session
 export async function POST(request: NextRequest) {

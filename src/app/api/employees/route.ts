@@ -3,9 +3,8 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/db/prisma";
+import bcrypt from "bcryptjs";
 
 /**
  * GET /api/employees
@@ -42,7 +41,7 @@ export async function GET(request: NextRequest) {
       whereClause.role = role;
     }
 
-    // Fetch employees (TenantUsers with User data)
+    // Fetch employees (TenantUsers with User data and employee record)
     const employees = await prisma.tenantUser.findMany({
       where: whereClause,
       include: {
@@ -60,6 +59,41 @@ export async function GET(request: NextRequest) {
             contractType: true,
             workHoursPerWeek: true,
             createdAt: true,
+            // Additional personal details
+            dateOfBirth: true,
+            gender: true,
+            nationality: true,
+            maritalStatus: true,
+            // Address
+            address: true,
+            city: true,
+            postalCode: true,
+            // Employee record
+            employees: {
+              select: {
+                id: true,
+                employee_number: true,
+                position: true,
+                contract_type: true,
+                hours_per_week: true,
+                start_date: true,
+                end_date: true,
+                phone_number: true,
+                emergency_contact: true,
+                emergency_phone: true,
+                emergency_relationship: true,
+                hourly_rate: true,
+                manager_id: true,
+                cost_center: true,
+                skills: true,
+                certifications: true,
+                education_level: true,
+                languages: true,
+                remote_work_allowed: true,
+                work_location: true,
+                notes: true,
+              },
+            },
           },
         },
       },
@@ -120,25 +154,55 @@ export async function GET(request: NextRequest) {
     )].sort();
 
     // Transform to response format
-    const formattedEmployees = filteredEmployees.map((emp) => ({
-      id: emp.id,
-      tenantId: emp.tenantId,
-      userId: emp.userId,
-      role: emp.role,
-      isActive: emp.isActive,
-      // User details
-      name: emp.user.name,
-      email: emp.user.email,
-      image: emp.user.image,
-      phone: emp.user.phone,
-      department: emp.user.department,
-      position: emp.user.position,
-      employeeId: emp.user.employeeId,
-      startDate: emp.user.startDate?.toISOString() || null,
-      contractType: emp.user.contractType,
-      workHoursPerWeek: emp.user.workHoursPerWeek,
-      createdAt: emp.user.createdAt?.toISOString(),
-    }));
+    const formattedEmployees = filteredEmployees.map((emp) => {
+      const employeeRecord = emp.user.employees;
+      return {
+        id: emp.id,
+        tenantId: emp.tenantId,
+        userId: emp.userId,
+        role: emp.role,
+        isActive: emp.isActive,
+        // User details
+        name: emp.user.name,
+        email: emp.user.email,
+        image: emp.user.image,
+        phone: emp.user.phone || employeeRecord?.phone_number || null,
+        department: emp.user.department,
+        position: emp.user.position || employeeRecord?.position || null,
+        employeeId: emp.user.employeeId || employeeRecord?.employee_number || null,
+        startDate: emp.user.startDate?.toISOString() || employeeRecord?.start_date?.toISOString() || null,
+        contractType: emp.user.contractType || employeeRecord?.contract_type || null,
+        workHoursPerWeek: emp.user.workHoursPerWeek,
+        createdAt: emp.user.createdAt?.toISOString(),
+        // Additional personal details
+        dateOfBirth: emp.user.dateOfBirth?.toISOString() || null,
+        gender: emp.user.gender,
+        nationality: emp.user.nationality,
+        maritalStatus: emp.user.maritalStatus,
+        // Address
+        address: emp.user.address,
+        city: emp.user.city,
+        postalCode: emp.user.postalCode,
+        // Emergency contact (from employee record)
+        emergencyContact: employeeRecord?.emergency_contact || null,
+        emergencyPhone: employeeRecord?.emergency_phone || null,
+        emergencyRelationship: employeeRecord?.emergency_relationship || null,
+        // Employment details (from employee record)
+        hoursPerWeek: employeeRecord?.hours_per_week ? Number(employeeRecord.hours_per_week) : null,
+        costCenter: employeeRecord?.cost_center || null,
+        endDate: employeeRecord?.end_date?.toISOString() || null,
+        // Skills and qualifications
+        skills: employeeRecord?.skills || [],
+        certifications: employeeRecord?.certifications || [],
+        educationLevel: employeeRecord?.education_level || null,
+        languages: employeeRecord?.languages || [],
+        // Work preferences
+        remoteWorkAllowed: employeeRecord?.remote_work_allowed ?? false,
+        workLocation: employeeRecord?.work_location || null,
+        // Notes
+        notes: employeeRecord?.notes || null,
+      };
+    });
 
     return NextResponse.json({
       employees: formattedEmployees,
@@ -155,6 +219,133 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error in employees GET:", error);
+    return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/employees
+ * Maakt een nieuwe werknemer aan met volledige onboarding data
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const context = await getTenantContext();
+    if (!context) {
+      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+    }
+
+    // Controleer of gebruiker rechten heeft
+    if (context.userRole !== "TENANT_ADMIN" && context.userRole !== "MANAGER") {
+      return NextResponse.json({ error: "Onvoldoende rechten" }, { status: 403 });
+    }
+
+    const body = await request.json();
+
+    // Validatie
+    if (!body.email || !body.name || !body.password) {
+      return NextResponse.json(
+        { error: "E-mail, naam en wachtwoord zijn verplicht" },
+        { status: 400 }
+      );
+    }
+
+    // Check of email al bestaat
+    const existingUser = await prisma.user.findUnique({
+      where: { email: body.email },
+    });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "Er bestaat al een account met dit e-mailadres" },
+        { status: 400 }
+      );
+    }
+
+    // Hash het wachtwoord
+    const hashedPassword = await bcrypt.hash(body.password, 12);
+
+    // Maak user aan
+    const user = await prisma.user.create({
+      data: {
+        email: body.email,
+        name: body.name,
+        password: hashedPassword,
+        phone: body.phone || null,
+        department: body.department || null,
+        position: body.position || null,
+        employeeId: body.employeeId || null,
+        startDate: body.startDate ? new Date(body.startDate) : null,
+        contractType: body.contractType || null,
+        workHoursPerWeek: body.hoursPerWeek ? parseFloat(body.hoursPerWeek) : null,
+        dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
+        gender: body.gender || null,
+        nationality: body.nationality || null,
+        maritalStatus: body.maritalStatus || null,
+        address: body.address || null,
+        city: body.city || null,
+        postalCode: body.postalCode || null,
+        bankAccountNumber: body.bankAccountNumber || null,
+        bankAccountName: body.bankAccountName || null,
+        bsnNumber: body.bsnNumber || null,
+        role: body.role || "USER",
+      },
+    });
+
+    // Maak TenantUser koppeling
+    await prisma.tenantUser.create({
+      data: {
+        tenantId: context.tenantId,
+        userId: user.id,
+        role: body.role || "USER",
+        isActive: true,
+      },
+    });
+
+    // Maak employees record voor extra velden
+    const employeeRecord = await prisma.employees.create({
+      data: {
+        user_id: user.id,
+        tenant_id: context.tenantId,
+        employee_number: body.employeeId || null,
+        position: body.position || null,
+        contract_type: (body.contractType as 'FULLTIME' | 'PARTTIME' | 'FLEX' | 'TEMPORARY' | 'INTERN') || 'FULLTIME',
+        hours_per_week: body.hoursPerWeek ? parseFloat(body.hoursPerWeek) : 40,
+        start_date: body.startDate ? new Date(body.startDate) : new Date(),
+        phone_number: body.phone || null,
+        emergency_contact: body.emergencyContact || null,
+        emergency_phone: body.emergencyPhone || null,
+        emergency_relationship: body.emergencyRelationship || null,
+        hourly_rate: body.hourlyRate ? parseFloat(body.hourlyRate) : null,
+        cost_center: body.costCenter || null,
+        skills: body.skills || [],
+        certifications: body.certifications || [],
+        education_level: body.educationLevel || null,
+        languages: body.languages || [],
+        remote_work_allowed: body.remoteWorkAllowed ?? false,
+        work_location: body.workLocation || null,
+      },
+    });
+
+    // Koppel voertuigen als meegegeven
+    if (body.vehicleIds && body.vehicleIds.length > 0) {
+      await prisma.vehicleMapping.updateMany({
+        where: {
+          tenant_id: context.tenantId,
+          id: { in: body.vehicleIds },
+        },
+        data: {
+          employee_id: employeeRecord.id,
+        },
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      userId: user.id,
+      employeeId: employeeRecord.id,
+    });
+  } catch (error) {
+    console.error("Error in employees POST:", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }

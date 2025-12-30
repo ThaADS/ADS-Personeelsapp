@@ -1,11 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { PrismaClient } from '@prisma/client';
-import { compare } from 'bcryptjs';
+import type { Mock } from 'vitest';
 
 // Mock bcryptjs
 vi.mock('bcryptjs', () => ({
   compare: vi.fn(),
 }));
+
+// Import after mock
+import { compare } from 'bcryptjs';
+const mockCompare = compare as Mock;
 
 // Create mock PrismaClient
 const mockPrismaClient = {
@@ -19,8 +22,8 @@ vi.mock('@prisma/client', () => ({
   PrismaClient: vi.fn(() => mockPrismaClient),
 }));
 
-// Import the module after mocking
-const { auth } = await import('../auth');
+// Import the module after mocking (module needed for mock setup)
+await import('../auth');
 
 describe('Authentication Tests', () => {
   beforeEach(() => {
@@ -51,7 +54,7 @@ describe('Authentication Tests', () => {
       };
 
       mockPrismaClient.user.findUnique.mockResolvedValue(mockUser);
-      vi.mocked(compare).mockResolvedValue(true);
+      mockCompare.mockResolvedValue(true);
 
       // Act - This would normally be called internally by NextAuth
       // We're testing the authorize function logic
@@ -74,7 +77,7 @@ describe('Authentication Tests', () => {
       };
 
       mockPrismaClient.user.findUnique.mockResolvedValue(mockUser);
-      vi.mocked(compare).mockResolvedValue(false); // Invalid password
+      mockCompare.mockResolvedValue(false); // Invalid password
 
       // Act & Assert
       const isValid = await compare('wrongpassword', mockUser.password);
@@ -128,7 +131,7 @@ describe('Authentication Tests', () => {
       };
 
       mockPrismaClient.user.findUnique.mockResolvedValue(mockSuperuser);
-      vi.mocked(compare).mockResolvedValue(true);
+      mockCompare.mockResolvedValue(true);
 
       // Act
       const result = mockSuperuser;
@@ -161,7 +164,7 @@ describe('Authentication Tests', () => {
       };
 
       mockPrismaClient.user.findUnique.mockResolvedValue(mockTenantManager);
-      vi.mocked(compare).mockResolvedValue(true);
+      mockCompare.mockResolvedValue(true);
 
       // Act
       const result = mockTenantManager;
@@ -258,7 +261,7 @@ describe('Authentication Tests', () => {
 
     it('should handle bcrypt comparison errors', async () => {
       // Arrange
-      vi.mocked(compare).mockRejectedValue(new Error('Bcrypt error'));
+      mockCompare.mockRejectedValue(new Error('Bcrypt error'));
 
       // Act & Assert
       await expect(compare('password', 'hash'))

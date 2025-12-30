@@ -10,10 +10,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
 
 // Validation schema for report settings
 const reportSettingsSchema = z.object({

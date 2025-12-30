@@ -1,5 +1,7 @@
 "use client";
 
+import Image from 'next/image';
+
 interface Employee {
   id: string;
   name: string | null;
@@ -25,25 +27,25 @@ export function EmployeeCard({ employee, canManage, onView, onEdit }: EmployeeCa
     switch (role) {
       case "TENANT_ADMIN":
         return {
-          bg: "bg-purple-100 dark:bg-purple-900/30",
+          bg: "backdrop-blur-sm bg-purple-500/20 dark:bg-purple-500/20 border border-purple-500/30",
           text: "text-purple-800 dark:text-purple-300",
           label: "Admin",
         };
       case "MANAGER":
         return {
-          bg: "bg-blue-100 dark:bg-blue-900/30",
+          bg: "backdrop-blur-sm bg-blue-500/20 dark:bg-blue-500/20 border border-blue-500/30",
           text: "text-blue-800 dark:text-blue-300",
           label: "Manager",
         };
       case "USER":
         return {
-          bg: "bg-gray-100 dark:bg-gray-700",
+          bg: "backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/20",
           text: "text-gray-800 dark:text-gray-300",
           label: "Medewerker",
         };
       default:
         return {
-          bg: "bg-gray-100 dark:bg-gray-700",
+          bg: "backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/20",
           text: "text-gray-800 dark:text-gray-300",
           label: role,
         };
@@ -72,13 +74,15 @@ export function EmployeeCard({ employee, canManage, onView, onEdit }: EmployeeCa
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+    <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 border border-white/20 dark:border-purple-500/20 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all">
       {/* Header: Avatar + Name */}
       <div className="flex items-start space-x-3 mb-3">
         {employee.image ? (
-          <img
+          <Image
             src={employee.image}
             alt={employee.name || "Avatar"}
+            width={48}
+            height={48}
             className="w-12 h-12 rounded-full object-cover"
           />
         ) : (
@@ -108,7 +112,7 @@ export function EmployeeCard({ employee, canManage, onView, onEdit }: EmployeeCa
 
       {/* Details Grid */}
       <div className="grid grid-cols-2 gap-3 mb-3">
-        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
+        <div className="backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10 rounded-lg p-2">
           <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-1">
             <svg
               className="w-3 h-3 mr-1"
@@ -129,7 +133,7 @@ export function EmployeeCard({ employee, canManage, onView, onEdit }: EmployeeCa
             {employee.department || "-"}
           </div>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
+        <div className="backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10 rounded-lg p-2">
           <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-1">
             <svg
               className="w-3 h-3 mr-1"
@@ -153,11 +157,11 @@ export function EmployeeCard({ employee, canManage, onView, onEdit }: EmployeeCa
       </div>
 
       {/* Contact Info */}
-      <div className="space-y-2 mb-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+      <div className="space-y-2 mb-3 p-3 backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10 rounded-lg">
         {employee.phone && (
           <a
             href={`tel:${employee.phone}`}
-            className="flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 min-h-[44px]"
+            className="flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 min-h-[44px]"
           >
             <svg
               className="w-4 h-4 mr-2"
@@ -177,7 +181,7 @@ export function EmployeeCard({ employee, canManage, onView, onEdit }: EmployeeCa
         )}
         <a
           href={`mailto:${employee.email}`}
-          className="flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 min-h-[44px]"
+          className="flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-800 min-h-[44px]"
         >
           <svg
             className="w-4 h-4 mr-2"
@@ -205,10 +209,10 @@ export function EmployeeCard({ employee, canManage, onView, onEdit }: EmployeeCa
 
       {/* Actions */}
       {canManage && (
-        <div className="flex space-x-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex space-x-2 pt-3 border-t border-white/20 dark:border-purple-500/10">
           <button
             onClick={() => onView(employee.id)}
-            className="flex-1 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/50 min-h-[44px] flex items-center justify-center"
+            className="flex-1 px-3 py-2 backdrop-blur-sm bg-purple-500/10 dark:bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-purple-300 rounded-lg text-sm font-medium hover:bg-purple-500/20 dark:hover:bg-purple-500/20 min-h-[44px] flex items-center justify-center transition-colors"
           >
             <svg
               className="w-4 h-4 mr-1"
@@ -234,7 +238,7 @@ export function EmployeeCard({ employee, canManage, onView, onEdit }: EmployeeCa
           {onEdit && (
             <button
               onClick={() => onEdit(employee.id)}
-              className="flex-1 px-3 py-2 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg text-sm font-medium hover:bg-green-100 dark:hover:bg-green-900/50 min-h-[44px] flex items-center justify-center"
+              className="flex-1 px-3 py-2 backdrop-blur-sm bg-green-500/10 dark:bg-green-500/10 border border-green-500/20 text-green-700 dark:text-green-300 rounded-lg text-sm font-medium hover:bg-green-500/20 dark:hover:bg-green-500/20 min-h-[44px] flex items-center justify-center transition-colors"
             >
               <svg
                 className="w-4 h-4 mr-1"

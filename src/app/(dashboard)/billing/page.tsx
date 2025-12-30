@@ -100,7 +100,7 @@ function SubscriptionCard({ data, onManageSubscription, onUpgrade }: {
     : 0;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border border-white/20 dark:border-purple-500/20 overflow-hidden">
       <div className="p-6">
         <div className="flex items-start justify-between">
           <div>
@@ -115,7 +115,7 @@ function SubscriptionCard({ data, onManageSubscription, onUpgrade }: {
         </div>
 
         {isTrial && (
-          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="mt-4 p-4 backdrop-blur-sm bg-blue-500/10 dark:bg-blue-500/10 rounded-xl border border-blue-500/20">
             <div className="flex items-center gap-3">
               <ClockIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <div>
@@ -135,7 +135,7 @@ function SubscriptionCard({ data, onManageSubscription, onUpgrade }: {
         )}
 
         {stripeSubscription?.cancelAtPeriodEnd && (
-          <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <div className="mt-4 p-4 backdrop-blur-sm bg-yellow-500/10 dark:bg-yellow-500/10 rounded-xl border border-yellow-500/20">
             <div className="flex items-center gap-3">
               <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
               <div>
@@ -151,12 +151,12 @@ function SubscriptionCard({ data, onManageSubscription, onUpgrade }: {
         )}
 
         <div className="mt-6 grid grid-cols-2 gap-4">
-          <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="p-4 backdrop-blur-sm bg-white/30 dark:bg-white/5 rounded-xl border border-white/20 dark:border-purple-500/10">
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
               <UserGroupIcon className="w-4 h-4" />
               <span className="text-sm">Gebruikers</span>
             </div>
-            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="mt-1 text-2xl font-bold text-purple-600 dark:text-purple-400">
               {usage.activeUsers}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -164,12 +164,12 @@ function SubscriptionCard({ data, onManageSubscription, onUpgrade }: {
             </p>
           </div>
 
-          <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="p-4 backdrop-blur-sm bg-white/30 dark:bg-white/5 rounded-xl border border-white/20 dark:border-purple-500/10">
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
               <CreditCardIcon className="w-4 h-4" />
               <span className="text-sm">Maandelijks</span>
             </div>
-            <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+            <p className="mt-1 text-2xl font-bold text-purple-600 dark:text-purple-400">
               €{usage.totalMonthlyPrice.toFixed(2)}
             </p>
             {usage.extraUserCost > 0 && (
@@ -181,7 +181,7 @@ function SubscriptionCard({ data, onManageSubscription, onUpgrade }: {
         </div>
 
         {subscription && (
-          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+          <div className="mt-4 p-4 backdrop-blur-sm bg-white/30 dark:bg-white/5 rounded-xl border border-white/20 dark:border-purple-500/10">
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
               <CalendarDaysIcon className="w-4 h-4" />
               <span className="text-sm">Huidige periode</span>
@@ -193,11 +193,11 @@ function SubscriptionCard({ data, onManageSubscription, onUpgrade }: {
         )}
       </div>
 
-      <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700 flex gap-3">
+      <div className="px-6 py-4 backdrop-blur-sm bg-white/30 dark:bg-white/5 border-t border-white/20 dark:border-purple-500/20 flex gap-3">
         {isFreemium ? (
           <button
             onClick={onUpgrade}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg shadow-lg transition-all duration-200 font-medium min-h-[44px]"
           >
             <SparklesIcon className="w-5 h-5" />
             Upgraden naar Standaard
@@ -206,14 +206,14 @@ function SubscriptionCard({ data, onManageSubscription, onUpgrade }: {
           <>
             <button
               onClick={onManageSubscription}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg shadow-lg transition-all duration-200 font-medium min-h-[44px]"
             >
               <CreditCardIcon className="w-5 h-5" />
               Beheer Abonnement
             </button>
             <button
               onClick={onUpgrade}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
+              className="px-4 py-3 backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-purple-500/10 transition-colors font-medium min-h-[44px]"
             >
               Wijzigen
             </button>
@@ -246,20 +246,20 @@ function PricingCard({
   const savings = interval === "year" ? Math.round(((price * 12 - yearlyPrice) / (price * 12)) * 100) : 0;
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border-2 overflow-hidden ${
+    <div className={`backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg overflow-hidden ${
       isCurrentPlan
-        ? "border-blue-500 dark:border-blue-400"
-        : "border-gray-200 dark:border-gray-700"
+        ? "border-2 border-purple-500 dark:border-purple-400"
+        : "border border-white/20 dark:border-purple-500/20"
     }`}>
       {isCurrentPlan && (
-        <div className="bg-blue-500 text-white text-center py-1 text-sm font-medium">
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-1 text-sm font-medium">
           Huidig plan
         </div>
       )}
       <div className="p-6">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white">{name}</h3>
         <div className="mt-4">
-          <span className="text-4xl font-bold text-gray-900 dark:text-white">
+          <span className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             €{displayPrice.toFixed(2)}
           </span>
           <span className="text-gray-500 dark:text-gray-400">/maand</span>
@@ -272,7 +272,7 @@ function PricingCard({
         <ul className="mt-6 space-y-3">
           {features.map((feature, index) => (
             <li key={index} className="flex items-start gap-2">
-              <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <CheckCircleIcon className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
               <span className="text-sm text-gray-600 dark:text-gray-300">{feature}</span>
             </li>
           ))}
@@ -282,10 +282,10 @@ function PricingCard({
         <button
           onClick={() => onSelect(interval)}
           disabled={isCurrentPlan}
-          className={`w-full py-3 rounded-lg font-medium transition-colors ${
+          className={`w-full py-3 rounded-lg font-medium transition-all duration-200 min-h-[44px] ${
             isCurrentPlan
-              ? "bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed"
-              : "bg-blue-600 text-white hover:bg-blue-700"
+              ? "backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 text-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
           }`}
         >
           {isCurrentPlan ? "Huidig plan" : "Selecteren"}
@@ -314,10 +314,10 @@ function InvoiceRow({ invoice }: { invoice: Invoice }) {
   };
 
   return (
-    <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
+    <div className="flex items-center justify-between py-3 px-3 rounded-lg backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10 mb-2 last:mb-0">
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-          <CreditCardIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+        <div className="w-10 h-10 backdrop-blur-sm bg-purple-100/50 dark:bg-purple-500/20 rounded-lg flex items-center justify-center">
+          <CreditCardIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
         </div>
         <div>
           <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -346,7 +346,7 @@ function InvoiceRow({ invoice }: { invoice: Invoice }) {
             href={invoice.hostedInvoiceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="p-2 text-purple-400 hover:text-purple-600 dark:hover:text-purple-300 transition-colors"
           >
             <ArrowTopRightOnSquareIcon className="w-5 h-5" />
           </a>
@@ -444,14 +444,14 @@ export default function BillingPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <ArrowPathIcon className="w-8 h-8 text-gray-400 animate-spin" />
+        <ArrowPathIcon className="w-8 h-8 text-purple-500 animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+      <div className="p-6 backdrop-blur-sm bg-red-500/10 dark:bg-red-500/10 rounded-2xl border border-red-500/20">
         <div className="flex items-center gap-3">
           <XCircleIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
           <p className="text-red-800 dark:text-red-200">{error}</p>
@@ -489,13 +489,13 @@ export default function BillingPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 pb-20 md:pb-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
           Facturatie & Abonnement
         </h1>
-        <p className="mt-1 text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Beheer je abonnement, bekijk facturen en pas je plan aan
         </p>
       </div>
@@ -511,28 +511,28 @@ export default function BillingPage() {
 
       {/* Upgrade Modal / Section */}
       {showUpgradeModal && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border border-white/20 dark:border-purple-500/20 p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Kies je plan
             </h2>
-            <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+            <div className="flex items-center backdrop-blur-sm bg-white/30 dark:bg-white/5 rounded-lg p-1 border border-white/20 dark:border-purple-500/20">
               <button
                 onClick={() => setBillingInterval("month")}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 min-h-[40px] ${
                   billingInterval === "month"
-                    ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
-                    : "text-gray-500 dark:text-gray-400"
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                    : "text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400"
                 }`}
               >
                 Maandelijks
               </button>
               <button
                 onClick={() => setBillingInterval("year")}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 min-h-[40px] ${
                   billingInterval === "year"
-                    ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
-                    : "text-gray-500 dark:text-gray-400"
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
+                    : "text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400"
                 }`}
               >
                 Jaarlijks
@@ -569,22 +569,22 @@ export default function BillingPage() {
       )}
 
       {/* Invoice History */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border border-white/20 dark:border-purple-500/20">
+        <div className="p-6 border-b border-white/20 dark:border-purple-500/20">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Factuurgeschiedenis
           </h2>
         </div>
         <div className="p-6">
           {invoices.length > 0 ? (
-            <div className="space-y-1">
+            <div className="space-y-2">
               {invoices.map((invoice) => (
                 <InvoiceRow key={invoice.id} invoice={invoice} />
               ))}
             </div>
           ) : (
             <div className="text-center py-8">
-              <CreditCardIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto" />
+              <CreditCardIcon className="w-12 h-12 text-purple-300 dark:text-purple-500/50 mx-auto" />
               <p className="mt-4 text-gray-500 dark:text-gray-400">
                 Nog geen facturen beschikbaar
               </p>
@@ -595,9 +595,9 @@ export default function BillingPage() {
 
       {/* Processing overlay */}
       {isProcessing && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 flex items-center gap-4">
-            <ArrowPathIcon className="w-6 h-6 text-blue-600 animate-spin" />
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/50 flex items-center justify-center z-50">
+          <div className="backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 rounded-2xl p-6 flex items-center gap-4 border border-white/20 dark:border-purple-500/20 shadow-lg">
+            <ArrowPathIcon className="w-6 h-6 text-purple-600 animate-spin" />
             <p className="text-gray-900 dark:text-white font-medium">
               Even geduld...
             </p>

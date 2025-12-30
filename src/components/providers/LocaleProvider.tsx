@@ -12,20 +12,20 @@ interface LocaleContextType {
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
+const SUPPORTED_LOCALES: { code: Locale; name: string; flag: string }[] = [
+  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'pl', name: 'Polski', flag: '🇵🇱' },
+];
+
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('nl');
-
-  const locales = [
-    { code: 'nl' as Locale, name: 'Nederlands', flag: '🇳🇱' },
-    { code: 'en' as Locale, name: 'English', flag: '🇺🇸' },
-    { code: 'de' as Locale, name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'pl' as Locale, name: 'Polski', flag: '🇵🇱' },
-  ];
 
   useEffect(() => {
     // Load locale from localStorage or cookie
     const savedLocale = localStorage.getItem('locale') as Locale;
-    if (savedLocale && locales.some(l => l.code === savedLocale)) {
+    if (savedLocale && SUPPORTED_LOCALES.some(l => l.code === savedLocale)) {
       setLocaleState(savedLocale);
     }
   }, []);
@@ -42,7 +42,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale, locales }}>
+    <LocaleContext.Provider value={{ locale, setLocale, locales: SUPPORTED_LOCALES }}>
       {children}
     </LocaleContext.Provider>
   );

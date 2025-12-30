@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Security Settings - Dark</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#2b7cee",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101822",
+          },
+          fontFamily: {
+            "display": ["Manrope", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-dark dark group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-dark p-4 pb-2 justify-between">
+<div class="text-white flex size-12 shrink-0 items-center">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Security Settings</h2>
+<div class="flex size-12 shrink-0 items-center"></div>
+</div>
+<div class="flex flex-col gap-4 px-4 pt-4">
+<!-- Section 1: Authentication -->
+<div class="flex flex-col">
+<h3 class="text-white/50 text-sm font-bold uppercase leading-tight tracking-widest px-4 pb-2 pt-4">AUTHENTICATION</h3>
+<div class="bg-[#1e1e1e] rounded-xl overflow-hidden">
+<div class="flex items-center gap-4 bg-transparent px-4 min-h-[72px] py-2 justify-between border-b border-white/10">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">key</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Change Password</p>
+<p class="text-[#a0a0a0] text-sm font-normal leading-normal line-clamp-2">Update your account password</p>
+</div>
+</div>
+<div class="shrink-0">
+<div class="text-white/50 flex size-7 items-center justify-center">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-transparent px-4 min-h-[72px] py-2 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">shield</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Two-Factor Authentication</p>
+<p class="text-[#a0a0a0] text-sm font-normal leading-normal line-clamp-2">Enabled</p>
+</div>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none p-0.5 has-[:checked]:justify-end bg-[#333] has-[:checked]:bg-primary">
+<div class="h-full w-[27px] rounded-full bg-white" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 8px, rgba(0, 0, 0, 0.06) 0px 3px 1px;"></div>
+<input checked="" class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Sessions -->
+<div class="flex flex-col">
+<h3 class="text-white/50 text-sm font-bold uppercase leading-tight tracking-widest px-4 pb-2 pt-4">SESSIONS</h3>
+<div class="bg-[#1e1e1e] rounded-xl overflow-hidden mb-4">
+<div class="flex items-center gap-4 bg-transparent px-4 min-h-[72px] py-2 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">devices</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Active Sessions</p>
+<p class="text-[#a0a0a0] text-sm font-normal leading-normal line-clamp-2">Manage your logged-in devices</p>
+</div>
+</div>
+<div class="shrink-0">
+<div class="text-white/50 flex size-7 items-center justify-center">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full text-white bg-primary font-semibold py-3.5 rounded-xl text-base">Log Out All Other Devices</button>
+</div>
+<!-- Section 3: Activity -->
+<div class="flex flex-col">
+<h3 class="text-white/50 text-sm font-bold uppercase leading-tight tracking-widest px-4 pb-2 pt-4">ACTIVITY</h3>
+<div class="bg-[#1e1e1e] rounded-xl overflow-hidden">
+<div class="flex items-center gap-4 bg-transparent px-4 min-h-[72px] py-2 justify-between">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/20 shrink-0 size-12">
+<span class="material-symbols-outlined">history</span>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-white text-base font-medium leading-normal line-clamp-1">Login History &amp; Audit Log</p>
+<p class="text-[#a0a0a0] text-sm font-normal leading-normal line-clamp-2">Review recent account activity</p>
+</div>
+</div>
+<div class="shrink-0">
+<div class="text-white/50 flex size-7 items-center justify-center">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

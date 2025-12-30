@@ -3,10 +3,8 @@
  */
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
 
 const profileUpdateSchema = z.object({
   name: z.string().min(2, "Naam moet minimaal 2 karakters bevatten").optional(),

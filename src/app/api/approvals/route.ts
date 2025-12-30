@@ -37,8 +37,7 @@ export async function GET(request: NextRequest) {
       throw err;
     }
 
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
+    const { prisma } = await import('@/lib/db/prisma');
 
     type Item = {
       id: string;

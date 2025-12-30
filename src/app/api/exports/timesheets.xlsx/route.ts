@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission } from "@/lib/auth/tenant-access";
+import { prisma } from "@/lib/db/prisma";
 import { Workbook } from 'exceljs';
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_request: NextRequest) {
   try {
     const context = await requirePermission('timesheet:approve');
-    const prisma = new (await import('@prisma/client')).PrismaClient();
 
     const rows = await prisma.timesheet.findMany({
       where: { tenantId: context.tenantId },
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
         'Content-Disposition': 'attachment; filename="timesheets.xlsx"',
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Export failed' }, { status: 500 });
   }
 }

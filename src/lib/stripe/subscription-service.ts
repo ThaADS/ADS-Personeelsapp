@@ -1,9 +1,7 @@
-import { stripe, STRIPE_CONFIG, formatAmountForStripe } from './config';
-import { PrismaClient } from '@prisma/client';
+import { stripe, STRIPE_CONFIG } from './config';
+import { prisma } from '@/lib/db/prisma';
 import { SubscriptionStatus, PlanType } from '@/types';
 import Stripe from 'stripe';
-
-const prisma = new PrismaClient();
 
 export interface CreateSubscriptionParams {
   tenantId: string;

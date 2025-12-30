@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="nl"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Medewerkers App Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'app-bg': '#0F1122', // Updated Deep navy/black
+            'card-bg': '#1E203C', // Updated Lighter purple/navy
+            'nav-bg': '#16182E', 
+            'search-bg': '#16182E',
+            'accent-green': '#4CD964', // Updated Green
+            'accent-blue': '#3B82F6',
+            'accent-red': '#EF4444',
+            'accent-purple': '#6C5CE7', // Updated Purple for active tab
+            'text-secondary': '#A0A3BD', // Updated Greyish-blue
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- Using Google Fonts for Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="custom-utilities">
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    
+    /* Simulate the slide effect for the swiped card */
+    .slide-reveal-container {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .slide-content {
+      position: relative;
+      z-index: 10;
+      transition: transform 0.3s ease;
+      /* Initial state simulating a swipe */
+      transform: translateX(-140px); 
+    }
+    
+    .slide-actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      z-index: 0;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-white font-sans h-screen flex flex-col overflow-hidden">
+<!-- BEGIN: Header -->
+<header class="flex items-center justify-between px-4 py-4 pt-10 bg-app-bg sticky top-0 z-50">
+<!-- Back Button -->
+<button aria-label="Ga terug" class="p-2 text-white hover:text-gray-300 transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M15.75 19.5L8.25 12l7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<!-- Title -->
+<h1 class="text-xl font-bold tracking-wide">Medewerkers</h1>
+<!-- Add Button -->
+<button aria-label="Nieuwe medewerker toevoegen" class="p-2 text-white hover:text-gray-300 transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: Search Area -->
+<section class="px-4 py-2 mb-4">
+<div class="flex items-center gap-3">
+<!-- Search Input -->
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<input class="w-full border border-gray-600 text-white text-sm rounded-xl py-3 pl-10 pr-4 placeholder-gray-500 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-all bg-[#16182E]" placeholder="Zoek medewerker..." type="text"/>
+</div>
+<!-- Filter Icon -->
+<button aria-label="Filteren" class="p-2 text-gray-400 hover:text-white transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg></button>
+</div>
+</section>
+<!-- END: Search Area -->
+<!-- BEGIN: Main Content (Employee List) -->
+<main class="flex-1 overflow-y-auto no-scrollbar px-4 pb-24 space-y-3">
+<!-- Employee Card 1 -->
+<article class="bg-card-bg rounded-xl p-4 flex items-center justify-between shadow-lg">
+<div class="flex items-center gap-4">
+<img alt="Anna Janssen" class="w-12 h-12 rounded-full object-cover border-2 border-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyS4zeW_WS9K7bXCBwis3xzRHbj1tvBhkhQCHNUnNQhbH1iD1JNiYSnMFWyTNnAISontd_4nX_5CBFJeMRTb2fyF3qKMV1QsD0F3rQ9ZH6uGNo2kGbMMG9i7HjhItEjQGE6IxCo-Zr2e4tlAMUZ1B8NlTOwjpSgU3MvuiBZco6J6rJNCa0CFNYpkXkKy-jcgKwLxhAopvh6wGjhkZ72-0VJ6KYpj9oOVQmfNne0KpRcJdbBi2PySafnQ1u6gNP1O_DpWXEy3V7X4"/>
+<div>
+<h3 class="text-white text-lg font-bold">Anna Janssen</h3>
+<p class="text-text-secondary text-sm">HR Manager</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-accent-green"></span>
+<span class="text-accent-green text-sm font-medium">Actief</span>
+</div>
+<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</article>
+<!-- Employee Card 2 -->
+<article class="bg-card-bg rounded-xl p-4 flex items-center justify-between shadow-lg">
+<div class="flex items-center gap-4">
+<img alt="Borid Stoneen" class="w-12 h-12 rounded-full object-cover border-2 border-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7BfqCRCol_CgMRats0udjlKqO2BQ1j-R_l5KLqRtwMTyBEip43b0Q_SzMoicJJccokISveUKnXJcwhzo6zhH_y6sam94z3LoiA1qbcVGtupT6lrKLe5LQJLrwnObilD6-ea0MLkOref6DCcuaay87BwVDHLjuTd40TOy4k9P__COcftnllAHvpFFFej_3ly0XzAQdanDxGcLeE84bi6Eq7ZurZY4cR-ydDFxTYH7pvhfiPLoSPvMTogYGKnZ96V6ZzA1kOWmbFrs"/>
+<div>
+<h3 class="text-white text-lg font-bold">Borid Stoneen</h3>
+<p class="text-text-secondary text-sm">HR Manager</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-accent-green"></span>
+<span class="text-accent-green text-sm font-medium">Actief</span>
+</div>
+<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</article>
+<!-- Employee Card 3 (SWIPED STATE) -->
+<!-- This container simulates the swipe action revealing buttons behind -->
+<div class="relative w-full h-20 rounded-xl overflow-hidden shadow-lg">
+<!-- Background Actions (Reveal) -->
+<div class="absolute inset-0 flex justify-end">
+<button class="bg-[#3B99FC] text-white w-[80px] h-full flex items-center justify-center text-sm font-medium">
+                Bewerk
+            </button>
+<button class="bg-[#FF453A] text-white w-[90px] h-full flex items-center justify-center text-sm font-medium rounded-r-xl">
+                Verwijder
+            </button>
+</div>
+<!-- Foreground Card (Swiped Left) -->
+<article class="absolute top-0 left-0 w-full h-full bg-card-bg rounded-xl p-4 flex items-center justify-between transition-transform" style="transform: translateX(-170px);">
+<div class="flex items-center min-w-0 ml-[170px]">
+<div class="min-w-0">
+<h3 class="text-white font-bold text-lg truncate">meelinan</h3>
+<p class="text-text-secondary text-sm">Manager</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-accent-green"></span>
+<span class="text-accent-green text-sm font-medium">Actief</span>
+</div>
+<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</article>
+</div>
+<!-- Employee Card 4 -->
+<article class="bg-card-bg rounded-xl p-4 flex items-center justify-between shadow-lg">
+<div class="flex items-center gap-4">
+<img alt="Anna Janssen" class="w-12 h-12 rounded-full object-cover border-2 border-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyS4zeW_WS9K7bXCBwis3xzRHbj1tvBhkhQCHNUnNQhbH1iD1JNiYSnMFWyTNnAISontd_4nX_5CBFJeMRTb2fyF3qKMV1QsD0F3rQ9ZH6uGNo2kGbMMG9i7HjhItEjQGE6IxCo-Zr2e4tlAMUZ1B8NlTOwjpSgU3MvuiBZco6J6rJNCa0CFNYpkXkKy-jcgKwLxhAopvh6wGjhkZ72-0VJ6KYpj9oOVQmfNne0KpRcJdbBi2PySafnQ1u6gNP1O_DpWXEy3V7X4"/>
+<div>
+<h3 class="text-white text-lg font-bold">Anna Janssen</h3>
+<p class="text-text-secondary text-sm">HR Manager</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-accent-green"></span>
+<span class="text-accent-green text-sm font-medium">Actief</span>
+</div>
+<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</article>
+<!-- Employee Card 5 -->
+<article class="bg-card-bg rounded-xl p-4 flex items-center justify-between shadow-lg">
+<div class="flex items-center gap-4">
+<img alt="Borid Eicklam" class="w-12 h-12 rounded-full object-cover border-2 border-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7BfqCRCol_CgMRats0udjlKqO2BQ1j-R_l5KLqRtwMTyBEip43b0Q_SzMoicJJccokISveUKnXJcwhzo6zhH_y6sam94z3LoiA1qbcVGtupT6lrKLe5LQJLrwnObilD6-ea0MLkOref6DCcuaay87BwVDHLjuTd40TOy4k9P__COcftnllAHvpFFFej_3ly0XzAQdanDxGcLeE84bi6Eq7ZurZY4cR-ydDFxTYH7pvhfiPLoSPvMTogYGKnZ96V6ZzA1kOWmbFrs"/>
+<div>
+<h3 class="text-white text-lg font-bold">Borid Eicklam</h3>
+<p class="text-text-secondary text-sm">HR Manager</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-accent-green"></span>
+<span class="text-accent-green text-sm font-medium">Actief</span>
+</div>
+<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</article>
+<!-- Employee Card 6 -->
+<article class="bg-card-bg rounded-xl p-4 flex items-center justify-between shadow-lg">
+<div class="flex items-center gap-4">
+<img alt="Anna Janssen" class="w-12 h-12 rounded-full object-cover border-2 border-white/10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuyS4zeW_WS9K7bXCBwis3xzRHbj1tvBhkhQCHNUnNQhbH1iD1JNiYSnMFWyTNnAISontd_4nX_5CBFJeMRTb2fyF3qKMV1QsD0F3rQ9ZH6uGNo2kGbMMG9i7HjhItEjQGE6IxCo-Zr2e4tlAMUZ1B8NlTOwjpSgU3MvuiBZco6J6rJNCa0CFNYpkXkKy-jcgKwLxhAopvh6wGjhkZ72-0VJ6KYpj9oOVQmfNne0KpRcJdbBi2PySafnQ1u6gNP1O_DpWXEy3V7X4"/>
+<div>
+<h3 class="text-white text-lg font-bold">Anna Janssen</h3>
+<p class="text-text-secondary text-sm">HR Manager</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-accent-green"></span>
+<span class="text-accent-green text-sm font-medium">Actief</span>
+</div>
+<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19.5 8.25l-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+</article>
+</main>
+<!-- END: Main Content -->
+<!-- BEGIN: Bottom Navigation -->
+<nav class="bg-nav-bg border-t border-white/5 px-2 py-2 pb-6 flex justify-around items-end fixed bottom-0 w-full z-50">
+<!-- Dashboard -->
+<a class="flex flex-col items-center gap-1 group w-1/5" href="#">
+<div class="p-1 rounded-lg group-hover:bg-white/5 transition">
+<svg class="w-6 h-6 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[10px] text-gray-400 group-hover:text-white">Dashboard</span>
+</a>
+<!-- Medewerkers (Active) -->
+<a class="flex flex-col items-center gap-1 group w-1/5" href="#">
+<div class="p-1 rounded-lg transition">
+<svg class="w-6 h-6 text-accent-purple" fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM15.75 9.75a3 3 0 116 0 3 3 0 01-6 0zM2.25 9.75a3 3 0 116 0 3 3 0 01-6 0zM6.31 15.117A6.745 6.745 0 0112 12a6.745 6.745 0 016.709 7.498.75.75 0 01-.372.568A12.696 12.696 0 0112 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 01-.372-.568 6.787 6.787 0 011.019-4.38z" fill-rule="evenodd"></path>
+<path d="M5.082 14.254a8.287 8.287 0 00-1.308 5.135 9.687 9.687 0 01-1.764-.44l-.115-.04a.563.563 0 01-.373-.487l-.01-.121a3.75 3.75 0 013.57-4.047zM20.226 19.389a8.287 8.287 0 00-1.308-5.135 3.75 3.75 0 013.57 4.047l-.01.121a.563.563 0 01-.373.486l-.115.04c-.567.2-1.156.349-1.764.441z"></path>
+</svg>
+</div>
+<span class="text-[10px] text-accent-purple font-medium">Medewerkers</span>
+</a>
+<!-- Goedkeuringen -->
+<a class="flex flex-col items-center gap-1 group w-1/5" href="#">
+<div class="p-1 rounded-lg group-hover:bg-white/5 transition">
+<svg class="w-6 h-6 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[10px] text-gray-400 group-hover:text-white">Goedkeuringen</span>
+</a>
+<!-- Tijdregistratie -->
+<a class="flex flex-col items-center gap-1 group w-1/5" href="#">
+<div class="p-1 rounded-lg group-hover:bg-white/5 transition">
+<svg class="w-6 h-6 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[10px] text-gray-400 group-hover:text-white">Tijdregistratie</span>
+</a>
+<!-- Profiel -->
+<a class="flex flex-col items-center gap-1 group w-1/5" href="#">
+<div class="p-1 rounded-lg group-hover:bg-white/5 transition">
+<svg class="w-6 h-6 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<span class="text-[10px] text-gray-400 group-hover:text-white">Profiel</span>
+</a>
+</nav>
+<!-- END: Bottom Navigation -->
+</body></html>

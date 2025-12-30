@@ -5,6 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import FAQChatbot from "@/components/chat/FAQChatbot";
 
 export default function DashboardLayout({
   children,
@@ -65,7 +66,7 @@ export default function DashboardLayout({
       </div>
 
       {/* Navigation - Glassmorphism */}
-      <nav className="backdrop-blur-glass bg-white/70 dark:bg-white/5 shadow-lg dark:shadow-glass border-b border-gray-200 dark:border-white/10 sticky top-0 z-50 transition-colors duration-300">
+      <nav className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/60 shadow-lg dark:shadow-glass border-b border-white/20 dark:border-purple-500/20 sticky top-0 z-50 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -142,7 +143,7 @@ export default function DashboardLayout({
 
         {/* Mobile Menu Dropdown */}
         {mobileMenuOpen && (
-          <div className="sm:hidden border-t border-gray-200 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg">
+          <div className="sm:hidden border-t border-white/20 dark:border-purple-500/20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
             <div className="px-4 py-3 space-y-1">
               {getNavigationItems().map((item) => (
                 <Link
@@ -194,7 +195,7 @@ export default function DashboardLayout({
       </nav>
 
       {/* Mobile bottom bar */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-glass bg-white/80 dark:bg-slate-900/80 border-t border-gray-200 dark:border-white/10 px-4 py-2">
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-t border-white/20 dark:border-purple-500/20 px-4 py-2 shadow-glass">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 overflow-x-auto">
             {getNavigationItems().slice(0, 4).map((item) => (
@@ -219,6 +220,9 @@ export default function DashboardLayout({
       <main className="relative z-10 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 pb-20 sm:pb-6">
         {children}
       </main>
+
+      {/* FAQ Chatbot - Available on all dashboard pages */}
+      <FAQChatbot />
     </div>
   );
 }

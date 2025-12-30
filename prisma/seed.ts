@@ -351,6 +351,138 @@ async function main() {
     });
   }
 
+  // Create employees records for CKW users (links User to employees table)
+  console.log('👷 Creating CKW employee records...');
+
+  const ckwEmployeeRecords = [
+    {
+      user: ckwAdmin,
+      employee_number: 'CKW001',
+      position: 'Directeur',
+      hours_per_week: 40,
+      start_date: new Date('2015-01-01'),
+      emergency_contact: 'Marieke van Admin',
+      emergency_phone: '+31 6 98765432',
+      emergency_relationship: 'Partner',
+      skills: ['Management', 'Strategie', 'Financiën'],
+      certifications: ['MBA'],
+      education_level: 'WO',
+      languages: ['Nederlands', 'Engels', 'Duits'],
+      remote_work_allowed: true,
+      work_location: 'Utrecht',
+    },
+    {
+      user: ckwManager,
+      employee_number: 'CKW002',
+      position: 'Operations Manager',
+      hours_per_week: 40,
+      start_date: new Date('2018-03-15'),
+      emergency_contact: 'Jan Manager',
+      emergency_phone: '+31 6 87654321',
+      emergency_relationship: 'Partner',
+      skills: ['Operations', 'Teamleiding', 'Planning'],
+      certifications: ['Prince2', 'ITIL'],
+      education_level: 'HBO',
+      languages: ['Nederlands', 'Engels'],
+      remote_work_allowed: true,
+      work_location: 'Utrecht',
+    },
+    {
+      user: ckwUser,
+      employee_number: 'CKW003',
+      position: 'Developer',
+      hours_per_week: 40,
+      start_date: new Date('2021-06-01'),
+      emergency_contact: 'Anna Gebruiker',
+      emergency_phone: '+31 6 76543210',
+      emergency_relationship: 'Ouder',
+      skills: ['TypeScript', 'React', 'Node.js', 'PostgreSQL'],
+      certifications: ['AWS Developer'],
+      education_level: 'HBO',
+      languages: ['Nederlands', 'Engels'],
+      remote_work_allowed: true,
+      work_location: 'Utrecht / Remote',
+    },
+  ];
+
+  // Add remaining CKW employees
+  const ckwEmployeeDetails = [
+    { email: 'jan.devries@ckw.nl', number: 'CKW004', position: 'Senior Developer', skills: ['Java', 'Python', 'AWS'], certifications: ['AWS Solutions Architect'], education_level: 'WO', start_date: new Date('2019-09-01') },
+    { email: 'maria.janssen@ckw.nl', number: 'CKW005', position: 'HR Manager', skills: ['HR', 'Recruitment', 'Arbeidsrecht'], certifications: ['SHRM-CP'], education_level: 'HBO', start_date: new Date('2017-04-15') },
+    { email: 'piet.bakker@ckw.nl', number: 'CKW006', position: 'Accountant', skills: ['Boekhouden', 'Excel', 'SAP'], certifications: ['RA'], education_level: 'WO', start_date: new Date('2020-01-10') },
+    { email: 'lisa.dejong@ckw.nl', number: 'CKW007', position: 'System Administrator', skills: ['Linux', 'Docker', 'Kubernetes'], certifications: ['RHCE', 'CKA'], education_level: 'HBO', start_date: new Date('2022-02-01') },
+    { email: 'tom.vandijk@ckw.nl', number: 'CKW008', position: 'Logistics Coordinator', skills: ['Logistiek', 'WMS', 'Supply Chain'], certifications: ['APICS'], education_level: 'MBO', start_date: new Date('2021-08-15') },
+  ];
+
+  for (const emp of ckwEmployeeRecords) {
+    await prisma.employees.upsert({
+      where: { user_id: emp.user.id },
+      update: {
+        position: emp.position,
+        hours_per_week: emp.hours_per_week,
+        emergency_contact: emp.emergency_contact,
+        emergency_phone: emp.emergency_phone,
+        emergency_relationship: emp.emergency_relationship,
+        skills: emp.skills,
+        certifications: emp.certifications,
+        education_level: emp.education_level,
+        languages: emp.languages,
+        remote_work_allowed: emp.remote_work_allowed,
+        work_location: emp.work_location,
+      },
+      create: {
+        user_id: emp.user.id,
+        tenant_id: ckwTenant.id,
+        employee_number: emp.employee_number,
+        position: emp.position,
+        contract_type: 'FULLTIME',
+        hours_per_week: emp.hours_per_week,
+        start_date: emp.start_date,
+        emergency_contact: emp.emergency_contact,
+        emergency_phone: emp.emergency_phone,
+        emergency_relationship: emp.emergency_relationship,
+        skills: emp.skills,
+        certifications: emp.certifications,
+        education_level: emp.education_level,
+        languages: emp.languages,
+        remote_work_allowed: emp.remote_work_allowed,
+        work_location: emp.work_location,
+      },
+    });
+  }
+
+  for (let i = 0; i < createdEmployees.length; i++) {
+    const user = createdEmployees[i];
+    const details = ckwEmployeeDetails[i];
+    await prisma.employees.upsert({
+      where: { user_id: user.id },
+      update: {
+        position: details.position,
+        skills: details.skills,
+        certifications: details.certifications,
+        education_level: details.education_level,
+      },
+      create: {
+        user_id: user.id,
+        tenant_id: ckwTenant.id,
+        employee_number: details.number,
+        position: details.position,
+        contract_type: 'FULLTIME',
+        hours_per_week: 40,
+        start_date: details.start_date,
+        emergency_contact: 'Noodcontact ' + user.name?.split(' ')[0],
+        emergency_phone: '+31 6 ' + String(Math.floor(10000000 + Math.random() * 90000000)),
+        emergency_relationship: 'Partner',
+        skills: details.skills,
+        certifications: details.certifications,
+        education_level: details.education_level,
+        languages: ['Nederlands', 'Engels'],
+        remote_work_allowed: Math.random() > 0.3,
+        work_location: 'Utrecht',
+      },
+    });
+  }
+
   // Create sample timesheets for CKW users
   console.log('⏰ Creating sample timesheets...');
   const today = new Date();
@@ -643,6 +775,135 @@ async function main() {
         userId: employee.id,
         role: UserRole.USER,
         isActive: true,
+      },
+    });
+  }
+
+  // Create employees records for Demo Company users
+  console.log('👷 Creating Demo Company employee records...');
+
+  const demoEmployeeRecords = [
+    {
+      user: demoAdmin,
+      employee_number: 'DEMO001',
+      position: 'CEO',
+      hours_per_week: 40,
+      start_date: new Date('2010-01-01'),
+      emergency_contact: 'Petra Admin',
+      emergency_phone: '+31 20 111 9999',
+      emergency_relationship: 'Partner',
+      skills: ['Strategie', 'Leiderschap', 'Finance'],
+      certifications: ['MBA', 'CPA'],
+      education_level: 'WO',
+      languages: ['Nederlands', 'Engels', 'Frans'],
+      remote_work_allowed: true,
+      work_location: 'Amsterdam',
+    },
+    {
+      user: demoManager,
+      employee_number: 'DEMO002',
+      position: 'Sales Manager',
+      hours_per_week: 40,
+      start_date: new Date('2015-06-01'),
+      emergency_contact: 'Rick Manager',
+      emergency_phone: '+31 20 222 8888',
+      emergency_relationship: 'Partner',
+      skills: ['Sales', 'Klantrelaties', 'Negotiation'],
+      certifications: ['Salesforce Certified'],
+      education_level: 'HBO',
+      languages: ['Nederlands', 'Engels'],
+      remote_work_allowed: true,
+      work_location: 'Amsterdam',
+    },
+    {
+      user: demoUser,
+      employee_number: 'DEMO003',
+      position: 'Marketing Specialist',
+      hours_per_week: 32,
+      start_date: new Date('2020-03-15'),
+      emergency_contact: 'Sanne User',
+      emergency_phone: '+31 20 333 7777',
+      emergency_relationship: 'Zus',
+      skills: ['Marketing', 'Social Media', 'Content'],
+      certifications: ['Google Analytics'],
+      education_level: 'HBO',
+      languages: ['Nederlands', 'Engels'],
+      remote_work_allowed: true,
+      work_location: 'Amsterdam / Remote',
+    },
+  ];
+
+  const demoEmployeeDetails = [
+    { email: 'sophie.bakker@demo-company.nl', number: 'DEMO004', position: 'Account Manager', skills: ['Sales', 'CRM', 'Presenteren'], certifications: ['Salesforce Certified'], education_level: 'HBO', start_date: new Date('2018-09-01') },
+    { email: 'lucas.jansen@demo-company.nl', number: 'DEMO005', position: 'Developer', skills: ['JavaScript', 'Python', 'React'], certifications: ['AWS Developer'], education_level: 'HBO', start_date: new Date('2019-02-15') },
+    { email: 'emma.dekker@demo-company.nl', number: 'DEMO006', position: 'HR Specialist', skills: ['HR', 'Recruitment', 'Onboarding'], certifications: ['SHRM-CP'], education_level: 'HBO', start_date: new Date('2021-01-10') },
+  ];
+
+  for (const emp of demoEmployeeRecords) {
+    await prisma.employees.upsert({
+      where: { user_id: emp.user.id },
+      update: {
+        position: emp.position,
+        hours_per_week: emp.hours_per_week,
+        emergency_contact: emp.emergency_contact,
+        emergency_phone: emp.emergency_phone,
+        emergency_relationship: emp.emergency_relationship,
+        skills: emp.skills,
+        certifications: emp.certifications,
+        education_level: emp.education_level,
+        languages: emp.languages,
+        remote_work_allowed: emp.remote_work_allowed,
+        work_location: emp.work_location,
+      },
+      create: {
+        user_id: emp.user.id,
+        tenant_id: demoTenant.id,
+        employee_number: emp.employee_number,
+        position: emp.position,
+        contract_type: emp.hours_per_week === 32 ? 'PARTTIME' : 'FULLTIME',
+        hours_per_week: emp.hours_per_week,
+        start_date: emp.start_date,
+        emergency_contact: emp.emergency_contact,
+        emergency_phone: emp.emergency_phone,
+        emergency_relationship: emp.emergency_relationship,
+        skills: emp.skills,
+        certifications: emp.certifications,
+        education_level: emp.education_level,
+        languages: emp.languages,
+        remote_work_allowed: emp.remote_work_allowed,
+        work_location: emp.work_location,
+      },
+    });
+  }
+
+  for (let i = 0; i < createdDemoEmployees.length; i++) {
+    const user = createdDemoEmployees[i];
+    const details = demoEmployeeDetails[i];
+    await prisma.employees.upsert({
+      where: { user_id: user.id },
+      update: {
+        position: details.position,
+        skills: details.skills,
+        certifications: details.certifications,
+        education_level: details.education_level,
+      },
+      create: {
+        user_id: user.id,
+        tenant_id: demoTenant.id,
+        employee_number: details.number,
+        position: details.position,
+        contract_type: 'FULLTIME',
+        hours_per_week: 40,
+        start_date: details.start_date,
+        emergency_contact: 'Noodcontact ' + user.name?.split(' ')[0],
+        emergency_phone: '+31 20 ' + String(Math.floor(1000000 + Math.random() * 9000000)),
+        emergency_relationship: 'Partner',
+        skills: details.skills,
+        certifications: details.certifications,
+        education_level: details.education_level,
+        languages: ['Nederlands', 'Engels'],
+        remote_work_allowed: Math.random() > 0.3,
+        work_location: 'Amsterdam',
       },
     });
   }
@@ -1058,6 +1319,209 @@ async function main() {
   console.log('  ✅ Historical data created successfully!');
   console.log(`     - ${historicalTimesheets.length} timesheet entries`);
   console.log(`     - ${historicalLeaveRequests.length} leave requests`);
+
+  // ==========================================
+  // 🏖️ VACATIONS AND SICK LEAVES (proper tables)
+  // ==========================================
+  console.log('🏖️ Creating vacations and sick_leaves records...');
+
+  // Get all employee records for creating vacations/sick_leaves
+  const allEmployeeRecords = await prisma.employees.findMany({
+    select: { id: true, user_id: true, tenant_id: true },
+  });
+
+  const ckwEmployeeIds = allEmployeeRecords.filter(e => e.tenant_id === ckwTenant.id);
+  const demoEmployeeIds = allEmployeeRecords.filter(e => e.tenant_id === demoTenant.id);
+
+  // Create vacations for CKW employees
+  for (const emp of ckwEmployeeIds) {
+    // Upcoming approved vacation
+    await prisma.vacations.create({
+      data: {
+        tenant_id: ckwTenant.id,
+        employee_id: emp.id,
+        type: 'VACATION',
+        start_date: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000), // 2 weeks from now
+        end_date: new Date(today.getTime() + 21 * 24 * 60 * 60 * 1000), // 3 weeks from now
+        total_days: 5,
+        description: 'Geplande vakantie',
+        status: Math.random() > 0.3 ? 'APPROVED' : 'PENDING',
+      },
+    });
+
+    // Past approved vacation
+    await prisma.vacations.create({
+      data: {
+        tenant_id: ckwTenant.id,
+        employee_id: emp.id,
+        type: 'VACATION',
+        start_date: new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000), // 2 months ago
+        end_date: new Date(today.getTime() - 53 * 24 * 60 * 60 * 1000), // 2 months ago + 1 week
+        total_days: 5,
+        description: 'Vorige vakantie',
+        status: 'APPROVED',
+      },
+    });
+  }
+
+  // Create vacations for Demo employees
+  for (const emp of demoEmployeeIds) {
+    await prisma.vacations.create({
+      data: {
+        tenant_id: demoTenant.id,
+        employee_id: emp.id,
+        type: 'VACATION',
+        start_date: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
+        end_date: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000),
+        total_days: 5,
+        description: 'Geplande vakantie',
+        status: Math.random() > 0.5 ? 'APPROVED' : 'PENDING',
+      },
+    });
+  }
+
+  // Create sick_leaves for some CKW employees
+  // Active sick leave (one employee currently sick)
+  if (ckwEmployeeIds.length > 2) {
+    await prisma.sick_leaves.create({
+      data: {
+        tenant_id: ckwTenant.id,
+        employee_id: ckwEmployeeIds[2].id, // Third employee
+        start_date: new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000), // Started 3 days ago
+        end_date: null, // Still ongoing
+        reason: 'Griep',
+        status: 'ACTIVE',
+        medical_certificate: false,
+        uwv_reported: false,
+      },
+    });
+  }
+
+  // Past recovered sick leave
+  if (ckwEmployeeIds.length > 0) {
+    await prisma.sick_leaves.create({
+      data: {
+        tenant_id: ckwTenant.id,
+        employee_id: ckwEmployeeIds[0].id,
+        start_date: new Date(today.getTime() - 45 * 24 * 60 * 60 * 1000),
+        end_date: new Date(today.getTime() - 42 * 24 * 60 * 60 * 1000),
+        reason: 'Verkoudheid',
+        status: 'RECOVERED',
+        actual_return_date: new Date(today.getTime() - 41 * 24 * 60 * 60 * 1000),
+      },
+    });
+  }
+
+  // Long-term sick leave approaching UWV deadline
+  if (ckwEmployeeIds.length > 4) {
+    await prisma.sick_leaves.create({
+      data: {
+        tenant_id: ckwTenant.id,
+        employee_id: ckwEmployeeIds[4].id,
+        start_date: new Date(today.getTime() - 38 * 24 * 60 * 60 * 1000), // 38 days ago - approaching 42-day UWV deadline
+        end_date: null,
+        reason: 'Rugklachten',
+        status: 'ACTIVE',
+        medical_certificate: true,
+        uwv_reported: false,
+        uwv_report_deadline: new Date(today.getTime() + 4 * 24 * 60 * 60 * 1000), // 4 days remaining
+        expected_return_date: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000),
+      },
+    });
+  }
+
+  // Create sick_leaves for Demo employees
+  if (demoEmployeeIds.length > 1) {
+    await prisma.sick_leaves.create({
+      data: {
+        tenant_id: demoTenant.id,
+        employee_id: demoEmployeeIds[1].id,
+        start_date: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000),
+        end_date: null,
+        reason: 'Niet lekker',
+        status: 'ACTIVE',
+      },
+    });
+  }
+
+  // ==========================================
+  // 💰 LEAVE BALANCES
+  // ==========================================
+  console.log('💰 Creating leave balances...');
+
+  const currentYear = today.getFullYear();
+  const endOfYear = new Date(currentYear, 11, 31);
+  const midYear = new Date(currentYear, 6, 1);
+
+  for (const emp of ckwEmployeeIds) {
+    const usedStatutory = Math.floor(Math.random() * 10) + 5; // 5-15 days used
+    const usedExtra = Math.floor(Math.random() * 3); // 0-3 days used
+
+    await prisma.leaveBalance.upsert({
+      where: {
+        tenant_id_employee_id_year: {
+          tenant_id: ckwTenant.id,
+          employee_id: emp.id,
+          year: currentYear,
+        },
+      },
+      update: {
+        statutory_used: usedStatutory,
+        extra_used: usedExtra,
+      },
+      create: {
+        tenant_id: ckwTenant.id,
+        employee_id: emp.id,
+        year: currentYear,
+        statutory_days: 20, // Dutch standard
+        statutory_used: usedStatutory,
+        statutory_expiry: midYear, // Statutory days expire mid-year next year typically
+        extra_days: 5,
+        extra_used: usedExtra,
+        extra_expiry: endOfYear,
+        compensation_hours: Math.floor(Math.random() * 20), // 0-20 compensation hours
+        compensation_used: 0,
+        special_leave: 2, // Special leave days
+        special_leave_used: Math.random() > 0.7 ? 1 : 0,
+      },
+    });
+  }
+
+  for (const emp of demoEmployeeIds) {
+    const usedStatutory = Math.floor(Math.random() * 8) + 3;
+    const usedExtra = Math.floor(Math.random() * 2);
+
+    await prisma.leaveBalance.upsert({
+      where: {
+        tenant_id_employee_id_year: {
+          tenant_id: demoTenant.id,
+          employee_id: emp.id,
+          year: currentYear,
+        },
+      },
+      update: {
+        statutory_used: usedStatutory,
+        extra_used: usedExtra,
+      },
+      create: {
+        tenant_id: demoTenant.id,
+        employee_id: emp.id,
+        year: currentYear,
+        statutory_days: 20,
+        statutory_used: usedStatutory,
+        statutory_expiry: midYear,
+        extra_days: 5,
+        extra_used: usedExtra,
+        extra_expiry: endOfYear,
+        compensation_hours: Math.floor(Math.random() * 16),
+        compensation_used: 0,
+        special_leave: 2,
+        special_leave_used: 0,
+      },
+    });
+  }
+
+  console.log('  ✅ Vacations, sick_leaves, and leave balances created!');
 
   console.log('✅ Database seeded successfully!');
   console.log('');

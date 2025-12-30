@@ -1,10 +1,8 @@
 import { auth } from '@/lib/auth/auth';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 import { UserRole } from '@/types';
 import { hasPermission, Permission } from '@/lib/rbac';
 import { headers } from 'next/headers';
-
-const prisma = new PrismaClient();
 
 export interface TenantContext {
   tenantId: string;

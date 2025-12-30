@@ -12,10 +12,8 @@
  */
 
 import PDFDocument from "pdfkit";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import { sendEmail } from "./email-service";
-
-const prisma = new PrismaClient();
 
 // Report configuration interface
 export interface ReportConfig {
@@ -455,8 +453,9 @@ export async function buildAndSendMonthlyReport(config: ReportConfig): Promise<{
         : employees.sort((a, b) => a.name.localeCompare(b.name)),
     };
 
-    // Generate PDF
-    const pdfBuffer = await generatePDFReport(summary, config);
+    // Generate PDF (will be used when email attachment support is added)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _pdfBuffer = await generatePDFReport(summary, config);
 
     // Send emails
     let emailsSent = 0;

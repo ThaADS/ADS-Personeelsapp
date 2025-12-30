@@ -23,16 +23,16 @@ export function StatusFilter({ value, onChange, counts }: StatusFilterProps) {
     if (isActive) {
       switch (color) {
         case "yellow":
-          return "bg-yellow-500 text-white";
+          return "bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg";
         case "green":
-          return "bg-green-500 text-white";
+          return "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg";
         case "red":
-          return "bg-red-500 text-white";
+          return "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg";
         default:
-          return "bg-gray-600 text-white";
+          return "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg";
       }
     }
-    return "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600";
+    return "backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-700 dark:text-gray-300 hover:bg-white/70 dark:hover:bg-white/10";
   };
 
   return (
@@ -56,8 +56,8 @@ export function StatusFilter({ value, onChange, counts }: StatusFilterProps) {
               <span
                 className={`ml-1.5 px-1.5 py-0.5 rounded text-xs ${
                   isActive
-                    ? "bg-white bg-opacity-30"
-                    : "bg-gray-200 dark:bg-gray-600"
+                    ? "bg-white/30"
+                    : "backdrop-blur-sm bg-white/30 dark:bg-white/10"
                 }`}
               >
                 {count}

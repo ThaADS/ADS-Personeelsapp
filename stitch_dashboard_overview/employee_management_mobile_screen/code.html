@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Employee Management</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- FontAwesome for Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<!-- Custom Styles for Specific Tweaks -->
+<style data-purpose="custom-utilities">
+    /* Hide scrollbar for cleaner mobile look while allowing scroll */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    /* Ensure the FAB shadow is soft and prominent */
+    .fab-shadow {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'app-purple': '#6200ea',
+            'app-bg': '#f9f9f9',
+            'status-green': '#4caf50',
+            'status-gray': '#9e9e9e',
+          },
+          fontFamily: {
+            sans: ['Inter', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-gray-800 font-sans h-screen flex flex-col overflow-hidden relative">
+<!-- BEGIN: Top Navigation & Search Area -->
+<!-- This section creates a sticky top area containing the header and search bar on a white background -->
+<div class="bg-white z-20 shadow-sm flex-none">
+<!-- BEGIN: Header -->
+<header class="flex justify-between items-center px-4 py-3">
+<!-- Back Button -->
+<button aria-label="Go back" class="text-gray-600 text-lg p-2">
+<i class="fa-solid fa-chevron-left"></i>
+</button>
+<!-- Title -->
+<h1 class="text-lg font-extrabold text-gray-800">Employee Management</h1>
+<!-- Add Icon (Header) -->
+<button aria-label="Add new" class="text-app-purple text-xl p-2">
+<i class="fa-solid fa-plus"></i>
+</button>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: Search Bar -->
+<div class="px-4 pb-4 flex items-center gap-3">
+<!-- Search Input Container -->
+<div class="flex-1 bg-gray-100 rounded-lg flex items-center px-3 py-2.5">
+<i class="fa-solid fa-search text-gray-400 mr-2 text-sm"></i>
+<input class="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder-gray-500 p-0 focus:ring-0" placeholder="Search employees" type="text"/>
+</div>
+<!-- Filter Icon -->
+<button aria-label="Filter" class="text-gray-500 text-lg p-1">
+<i class="fa-solid fa-filter"></i>
+</button>
+</div>
+<!-- END: Search Bar -->
+</div>
+<!-- END: Top Navigation & Search Area -->
+<!-- BEGIN: Main Content (Employee List) -->
+<!-- The main scrolling area containing the list card -->
+<main class="flex-1 overflow-y-auto no-scrollbar p-4 pt-6" data-purpose="employee-list-container">
+<!-- White Card Container -->
+<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+<ul class="divide-y divide-gray-100">
+<!-- Employee Item 1 -->
+<li class="flex items-center justify-between hover:bg-gray-50 transition-colors px-4 py-5">
+<div class="flex items-center gap-4">
+<img alt="John Doe" class="w-12 h-12 rounded-full object-cover bg-gray-200 w-14 h-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlq0Iwi7c5sf6gRrYaTVnbSm8jLZ3Jr3MT2rVbxm0R10dxu-rRS4XuxvEcj4iwa2vWNlpa8r8B2sM1-35lJ6fWw3tth2JRfPHZ4v38QJXOGrSb7TMwTtKpm0own58dJaHsXOwRhGdFxm71mlt3MWeNedcPK-GXBu1VZt5ZmkScoD1_l2xmC76aJ9_1sKBgA477VvtPS6ZkMmZ_s_ZWN85mf4_nlo5fqb4hR1w7K878ldQnsef48xngscmEVevhsuSqCy0SRFGYv-c"/>
+<div>
+<h3 class="font-bold text-gray-900 text-[15px]">John Doe</h3>
+<p class="text-gray-500 text-xs mt-0.5">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-status-green"></span>
+<span class="text-xs font-medium text-gray-900">Active</span>
+</div>
+<button aria-label="Menu" class="text-gray-400 px-2">
+<i class="fa-solid fa-ellipsis-h"></i>
+</button>
+</div>
+</li>
+<!-- Employee Item 2 -->
+<li class="flex items-center justify-between hover:bg-gray-50 transition-colors px-4 py-5">
+<div class="flex items-center gap-4">
+<img alt="Jenmy Doe" class="w-12 h-12 rounded-full object-cover bg-gray-200 w-14 h-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx3nR2ei7jU0cDuJEsfwAPc5GIg3vxKWJre_qCEtknFDyOisIssHZg6cbgdxmQJ7kDWIsXuzqWZTrYDt84BUhnnTvJi9onfw-5E_F6vQ3BvM8JykXtwjkCu5a_8xpSOyNymPjpAddhKeGgeaPCp4rV8SGhfgMWhyd1Z0OmfGjGysALdYeanjPhvWcKrxaJ5240M9PLpooS1FJVyFNkkJe27FJFUgoMQX7fz0xpVbnoSGntvXkQHZRZcE98r1VatnHicxk-7tAdwaY"/>
+<div>
+<h3 class="font-bold text-gray-900 text-[15px]">Jenmy Doe</h3>
+<p class="text-gray-500 text-xs mt-0.5">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-status-green"></span>
+<span class="text-xs font-medium text-gray-900">Active</span>
+</div>
+<button aria-label="Menu" class="text-gray-400 px-2">
+<i class="fa-solid fa-ellipsis-h"></i>
+</button>
+</div>
+</li>
+<!-- Employee Item 3 -->
+<li class="flex items-center justify-between hover:bg-gray-50 transition-colors px-4 py-5">
+<div class="flex items-center gap-4">
+<img alt="Jody Marbett" class="w-12 h-12 rounded-full object-cover bg-gray-200 w-14 h-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJhBIwN6f65txbQp_G4SiadzWMM-qmg2zqZd1QPwtQU3NhorqWmtPVkh0wTf9ezbMRYeci6w8RqW3kQqAn6Ixl0dQJn4LN44_6l45ADiYwGTbs4MmGHstIg255auWEHnS6AIxozzJLlOtj_WCZ5myxuWR3Fb2r0KmPO-nifC26tzp1syVYYWymKHEDrjgte4v1MDqnJP_bRCLcOPt7RYu2rMRgaBOLwKg5vVghQNglxqN3bi2bbnZBZ0XSENwTF9PEzc-AXDnh3xs"/>
+<div>
+<h3 class="font-bold text-gray-900 text-[15px]">Jody Marbett</h3>
+<p class="text-gray-500 text-xs mt-0.5">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-status-green"></span>
+<span class="text-xs font-medium text-gray-900">Active</span>
+</div>
+<button aria-label="Menu" class="text-gray-400 px-2">
+<i class="fa-solid fa-ellipsis-h"></i>
+</button>
+</div>
+</li>
+<!-- Employee Item 4 (On Leave) -->
+<li class="flex items-center justify-between hover:bg-gray-50 transition-colors px-4 py-5">
+<div class="flex items-center gap-4">
+<img alt="Baby Santa" class="w-12 h-12 rounded-full object-cover bg-gray-200 w-14 h-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjI42HcnFubwZPBC_AdMYWN0ZG2wyAl_FxN0j4glfsXw4HQNRH2dWb2_tO0X95hGPZjrVtMJD_HSD1cjubyyjsSS1hvNdd6lyTVzbalixtCcGWzH00Lu-EAjtzcDVYMZqMN_0HFfrjuscl6NMMx4GwMKraHcdt3YrxeWPkJszk08qCM9O1phWYMd21lOdNYAHkG2xPQ6q9pbU0IYzGLUtfix9Tge0Udno7Uz3jgFWucBaelflp49FEko-meKWxXliraZjWi4qpiLI"/>
+<div>
+<h3 class="font-bold text-gray-900 text-[15px]">Baby Santa</h3>
+<p class="text-gray-500 text-xs mt-0.5">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-status-gray"></span>
+<span class="text-xs font-medium text-status-gray">On Leave</span>
+</div>
+<button aria-label="Menu" class="text-gray-400 px-2">
+<i class="fa-solid fa-ellipsis-h"></i>
+</button>
+</div>
+</li>
+<!-- Employee Item 5 -->
+<li class="flex items-center justify-between hover:bg-gray-50 transition-colors px-4 py-5">
+<div class="flex items-center gap-4">
+<img alt="John Doe" class="w-12 h-12 rounded-full object-cover bg-gray-200 w-14 h-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlq0Iwi7c5sf6gRrYaTVnbSm8jLZ3Jr3MT2rVbxm0R10dxu-rRS4XuxvEcj4iwa2vWNlpa8r8B2sM1-35lJ6fWw3tth2JRfPHZ4v38QJXOGrSb7TMwTtKpm0own58dJaHsXOwRhGdFxm71mlt3MWeNedcPK-GXBu1VZt5ZmkScoD1_l2xmC76aJ9_1sKBgA477VvtPS6ZkMmZ_s_ZWN85mf4_nlo5fqb4hR1w7K878ldQnsef48xngscmEVevhsuSqCy0SRFGYv-c"/>
+<div>
+<h3 class="font-bold text-gray-900 text-[15px]">John Doe</h3>
+<p class="text-gray-500 text-xs mt-0.5">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-status-green"></span>
+<span class="text-xs font-medium text-gray-900">Active</span>
+</div>
+<button aria-label="Menu" class="text-gray-400 px-2">
+<i class="fa-solid fa-ellipsis-h"></i>
+</button>
+</div>
+</li>
+<!-- Employee Item 6 -->
+<li class="flex items-center justify-between hover:bg-gray-50 transition-colors px-4 py-5">
+<div class="flex items-center gap-4">
+<img alt="John Doe" class="w-12 h-12 rounded-full object-cover bg-gray-200 w-14 h-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx3nR2ei7jU0cDuJEsfwAPc5GIg3vxKWJre_qCEtknFDyOisIssHZg6cbgdxmQJ7kDWIsXuzqWZTrYDt84BUhnnTvJi9onfw-5E_F6vQ3BvM8JykXtwjkCu5a_8xpSOyNymPjpAddhKeGgeaPCp4rV8SGhfgMWhyd1Z0OmfGjGysALdYeanjPhvWcKrxaJ5240M9PLpooS1FJVyFNkkJe27FJFUgoMQX7fz0xpVbnoSGntvXkQHZRZcE98r1VatnHicxk-7tAdwaY"/>
+<div>
+<h3 class="font-bold text-gray-900 text-[15px]">John Doe</h3>
+<p class="text-gray-500 text-xs mt-0.5">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-status-green"></span>
+<span class="text-xs font-medium text-gray-900">Active</span>
+</div>
+<button aria-label="Menu" class="text-gray-400 px-2">
+<i class="fa-solid fa-ellipsis-h"></i>
+</button>
+</div>
+</li>
+<!-- Employee Item 7 -->
+<li class="flex items-center justify-between hover:bg-gray-50 transition-colors px-4 py-5">
+<div class="flex items-center gap-4">
+<img alt="John Doe" class="w-12 h-12 rounded-full object-cover bg-gray-200 w-14 h-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJhBIwN6f65txbQp_G4SiadzWMM-qmg2zqZd1QPwtQU3NhorqWmtPVkh0wTf9ezbMRYeci6w8RqW3kQqAn6Ixl0dQJn4LN44_6l45ADiYwGTbs4MmGHstIg255auWEHnS6AIxozzJLlOtj_WCZ5myxuWR3Fb2r0KmPO-nifC26tzp1syVYYWymKHEDrjgte4v1MDqnJP_bRCLcOPt7RYu2rMRgaBOLwKg5vVghQNglxqN3bi2bbnZBZ0XSENwTF9PEzc-AXDnh3xs"/>
+<div>
+<h3 class="font-bold text-gray-900 text-[15px]">John Doe</h3>
+<p class="text-gray-500 text-xs mt-0.5">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-status-green"></span>
+<span class="text-xs font-medium text-gray-900">Active</span>
+</div>
+<button aria-label="Menu" class="text-gray-400 px-2">
+<i class="fa-solid fa-ellipsis-h"></i>
+</button>
+</div>
+</li>
+<!-- Employee Item 8 -->
+<li class="flex items-center justify-between hover:bg-gray-50 transition-colors px-4 py-5">
+<div class="flex items-center gap-4">
+<img alt="Jany Mdoan" class="w-12 h-12 rounded-full object-cover bg-gray-200 w-14 h-14" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjI42HcnFubwZPBC_AdMYWN0ZG2wyAl_FxN0j4glfsXw4HQNRH2dWb2_tO0X95hGPZjrVtMJD_HSD1cjubyyjsSS1hvNdd6lyTVzbalixtCcGWzH00Lu-EAjtzcDVYMZqMN_0HFfrjuscl6NMMx4GwMKraHcdt3YrxeWPkJszk08qCM9O1phWYMd21lOdNYAHkG2xPQ6q9pbU0IYzGLUtfix9Tge0Udno7Uz3jgFWucBaelflp49FEko-meKWxXliraZjWi4qpiLI"/>
+<div>
+<h3 class="font-bold text-gray-900 text-[15px]">Jany Mdoan</h3>
+<p class="text-gray-500 text-xs mt-0.5">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-status-green"></span>
+<span class="text-xs font-medium text-gray-900">Active</span>
+</div>
+<button aria-label="Menu" class="text-gray-400 px-2">
+<i class="fa-solid fa-ellipsis-h"></i>
+</button>
+</div>
+</li>
+</ul>
+</div>
+<!-- Spacer for FAB and Bottom Nav so list content isn't hidden -->
+<div class="h-32 w-full"></div>
+</main>
+<!-- END: Main Content -->
+<!-- BEGIN: Floating Action Button (FAB) -->
+<div class="absolute bottom-24 right-5 z-30">
+<button aria-label="Add Employee" class="w-14 h-14 bg-white rounded-full flex items-center justify-center fab-shadow active:scale-95 transition-transform">
+<i class="fa-solid fa-plus text-app-purple text-xl"></i>
+</button>
+</div>
+<!-- END: Floating Action Button -->
+<!-- BEGIN: Bottom Navigation -->
+<nav class="bg-white border-t border-gray-200 flex justify-between items-center px-6 py-2 pb-5 z-20 flex-none text-[10px] font-medium">
+<!-- Tab 1: Dashboard -->
+<a class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors w-16" href="#">
+<i class="fa-solid fa-th-large text-xl mb-0.5"></i>
+<span>Dashboard</span>
+</a>
+<!-- Tab 2: Employees (Active) -->
+<a class="flex flex-col items-center gap-1 text-app-purple w-16" href="#">
+<i class="fa-solid fa-users text-xl mb-0.5"></i>
+<span>Employees</span>
+</a>
+<!-- Tab 3: Time -->
+<a class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors w-16" href="#">
+<i class="fa-solid fa-clock text-xl mb-0.5"></i>
+<span>Time</span>
+</a>
+<!-- Tab 4: More -->
+<a class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 transition-colors w-16" href="#">
+<i class="fa-solid fa-ellipsis-h text-xl mb-0.5"></i>
+<span>More</span>
+</a>
+</nav>
+<!-- END: Bottom Navigation -->
+</body></html>

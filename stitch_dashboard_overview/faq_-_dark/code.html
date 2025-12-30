@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FAQ - Dark</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b7cee",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101822",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-dark dark group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="flex size-12 shrink-0 items-center justify-center">
+<span class="material-symbols-outlined text-white text-2xl">arrow_back_ios_new</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">FAQ</h2>
+</div>
+<!-- Main Content -->
+<main class="flex-1 px-4 pt-4 pb-8 space-y-6">
+<!-- Search Bar -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">search</span>
+<input class="w-full rounded-xl border-none bg-[#1C242F] py-3 pl-12 pr-4 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-dark" placeholder="Search questions..." type="text"/>
+</div>
+<!-- FAQ Sections -->
+<div class="space-y-6">
+<!-- Getting Started Section -->
+<section class="space-y-3">
+<h3 class="text-primary font-bold text-sm uppercase tracking-wider">Getting Started</h3>
+<div class="space-y-2">
+<!-- FAQ Item 1 (Expanded by default for demo) -->
+<details class="group bg-[#1C242F] rounded-xl overflow-hidden" open="">
+<summary class="flex cursor-pointer list-none items-center justify-between p-4 font-semibold text-white">
+                                How do I create an account?
+                                <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-gray-400 text-sm leading-relaxed">
+                                To create an account, download the AADS Personnel App from the App Store or Google Play. Open the app and tap on the "Sign Up" button. You will be prompted to enter your service number, email address, and a secure password. Follow the on-screen instructions to complete the registration process.
+                            </div>
+</details>
+<!-- FAQ Item 2 -->
+<details class="group bg-[#1C242F] rounded-xl overflow-hidden">
+<summary class="flex cursor-pointer list-none items-center justify-between p-4 font-semibold text-white">
+                                Is the app available for all devices?
+                                <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-gray-400 text-sm leading-relaxed">
+                                Yes, the AADS Personnel App is available for both iOS and Android devices. You can download it from the Apple App Store and the Google Play Store respectively. Ensure your device meets the minimum operating system requirements listed on the store page.
+                            </div>
+</details>
+</div>
+</section>
+<!-- Account & Profile Section -->
+<section class="space-y-3">
+<h3 class="text-primary font-bold text-sm uppercase tracking-wider">Account &amp; Profile</h3>
+<div class="space-y-2">
+<!-- FAQ Item 3 -->
+<details class="group bg-[#1C242F] rounded-xl overflow-hidden">
+<summary class="flex cursor-pointer list-none items-center justify-between p-4 font-semibold text-white">
+                                How do I reset my password?
+                                <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-gray-400 text-sm leading-relaxed">
+                                If you've forgotten your password, tap the "Forgot Password?" link on the login screen. Enter the email address associated with your account, and we will send you a link to reset your password.
+                            </div>
+</details>
+<!-- FAQ Item 4 -->
+<details class="group bg-[#1C242F] rounded-xl overflow-hidden">
+<summary class="flex cursor-pointer list-none items-center justify-between p-4 font-semibold text-white">
+                                Where can I update my contact information?
+                                <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-gray-400 text-sm leading-relaxed">
+                                You can update your contact information by navigating to the 'Profile' section in the app menu. From there, select 'Edit Profile' to change your phone number, address, or other personal details. Remember to save your changes.
+                            </div>
+</details>
+</div>
+</section>
+<!-- Using App Features Section -->
+<section class="space-y-3">
+<h3 class="text-primary font-bold text-sm uppercase tracking-wider">Using App Features</h3>
+<div class="space-y-2">
+<!-- FAQ Item 5 -->
+<details class="group bg-[#1C242F] rounded-xl overflow-hidden">
+<summary class="flex cursor-pointer list-none items-center justify-between p-4 font-semibold text-white">
+                                How do I view my schedule?
+                                <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-gray-400 text-sm leading-relaxed">
+                                Your schedule can be accessed from the main dashboard or by tapping the 'Schedule' icon in the bottom navigation bar. You can view your upcoming shifts, request time off, and see your weekly or monthly calendar.
+                            </div>
+</details>
+<!-- FAQ Item 6 -->
+<details class="group bg-[#1C242F] rounded-xl overflow-hidden">
+<summary class="flex cursor-pointer list-none items-center justify-between p-4 font-semibold text-white">
+                                How can I submit a leave request?
+                                <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-gray-400 text-sm leading-relaxed">
+                                To submit a leave request, go to the 'Schedule' section and tap the 'Request Time Off' button. Select the dates you wish to request off, choose the type of leave (e.g., vacation, sick leave), and add any necessary comments before submitting it for approval.
+                            </div>
+</details>
+</div>
+</section>
+<!-- Troubleshooting Section -->
+<section class="space-y-3">
+<h3 class="text-primary font-bold text-sm uppercase tracking-wider">Troubleshooting</h3>
+<div class="space-y-2">
+<!-- FAQ Item 7 -->
+<details class="group bg-[#1C242F] rounded-xl overflow-hidden">
+<summary class="flex cursor-pointer list-none items-center justify-between p-4 font-semibold text-white">
+                                The app is not loading. What should I do?
+                                <span class="material-symbols-outlined transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 text-gray-400 text-sm leading-relaxed">
+                                First, check your internet connection. If the connection is stable, try closing and reopening the app. If the issue persists, try restarting your device. As a final step, you can try reinstalling the app, but ensure any important data is backed up. If you still face problems, please contact support.
+                            </div>
+</details>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

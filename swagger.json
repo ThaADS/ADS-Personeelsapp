@@ -1,0 +1,675 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ClientWebAPI Documentation",
+    "description": "ClientWebAPI Documentation",
+    "contact": {
+      "name": "Support",
+      "email": "operations@routevision.nl"
+    },
+    "version": "v1",
+    "x-logo": {
+      "url": "https://secure.routevision.com/content/images/map_logo_rv.png",
+      "altText": "Routevision"
+    }
+  },
+  "paths": {
+    "/Login": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Create a token for a user",
+        "description": "This endpoint is used to create a token for a user. The token is used to authenticate the user for other endpoints.",
+        "operationId": "CreateToken",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginPost"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginPost"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginPost"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Not authorized"
+          }
+        }
+      }
+    },
+    "/Login/WhoAmI": {
+      "get": {
+        "tags": [
+          "WhoAmI"
+        ],
+        "summary": "Get information about the user that is logged in",
+        "description": "This endpoint is used to get information about the user that is logged in. ",
+        "operationId": "WhoAmI",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized"
+          }
+        }
+      }
+    },
+    "/User/BucketInfo": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "Bucket info"
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/User/ChangePassword": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed"
+          },
+          "400": {
+            "description": "Old password is incorrect"
+          }
+        }
+      }
+    },
+    "/Vehicle/{vehicleId}": {
+      "get": {
+        "tags": [
+          "Vehicle"
+        ],
+        "summary": "Get vehicle by id",
+        "description": "This endpoint is used to get information about the vehicle with id number.",
+        "operationId": "Vehicle",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleRead"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleRead"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleRead"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/Vehicle/All": {
+      "get": {
+        "tags": [
+          "Vehicle"
+        ],
+        "summary": "Get all vehicles from company",
+        "description": "This endpoint is used to get information about the vehicle with id number. Also shows Archived vehicles when showArchived = false. ",
+        "operationId": "Vehicle",
+        "parameters": [
+          {
+            "name": "showArchived",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VehicleRead"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VehicleRead"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VehicleRead"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized"
+          }
+        }
+      }
+    },
+    "/Vehicle/{vehicleId}/Trips": {
+      "get": {
+        "tags": [
+          "Vehicle"
+        ],
+        "summary": "Get Trips for vehicle",
+        "description": "This endpoint is used to retrieve all Trips for the vehicle with id. Dates needs to be in 'yyyy-MM-dd' form (2022-12-31). The days between dateFrom and dateTo is max 31 days.",
+        "operationId": "Vehicle",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "dateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dateUntil",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TripRead"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TripRead"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TripRead"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized"
+          }
+        }
+      }
+    },
+    "/Vehicle/{vehicleId}/Location": {
+      "get": {
+        "tags": [
+          "Vehicle"
+        ],
+        "summary": "Get vehicle location by VehicleId",
+        "description": "This endpoint is used to retrieve the last known location of the vehicle.\nWhen the vehicle is set to private by the driver, and viewTrips is not allowed, then exception 403 is returned.",
+        "operationId": "Vehicle",
+        "parameters": [
+          {
+            "name": "vehicleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleLocationRead"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleLocationRead"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleLocationRead"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/Vehicle/GetAllVehicleLocations": {
+      "get": {
+        "tags": [
+          "Vehicle"
+        ],
+        "summary": "Get all vehicle locations from the company",
+        "description": "This endpoint is used to retrieve the last known locations of the vehicles.",
+        "operationId": "Vehicle",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VehicleLocationRead"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VehicleLocationRead"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VehicleLocationRead"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized"
+          },
+          "404": {
+            "description": "Not found"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/Version": {
+      "get": {
+        "tags": [
+          "Version"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChangePassword": {
+        "required": [
+          "newPassword",
+          "newPassword2",
+          "oldPassword"
+        ],
+        "type": "object",
+        "properties": {
+          "oldPassword": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "newPassword": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "newPassword2": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LoginPost": {
+        "required": [
+          "emailAddress",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "emailAddress": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string",
+            "format": "password"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TripRead": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isCorrectionTrip": {
+            "type": "boolean"
+          },
+          "registration": {
+            "type": "string",
+            "nullable": true
+          },
+          "driver": {
+            "type": "string",
+            "nullable": true
+          },
+          "departureDateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "departureStreet": {
+            "type": "string",
+            "nullable": true
+          },
+          "departureHouseNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "departurePostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "departureCity": {
+            "type": "string",
+            "nullable": true
+          },
+          "departureCountry": {
+            "type": "string",
+            "nullable": true
+          },
+          "arrivalDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "arrivalStreet": {
+            "type": "string",
+            "nullable": true
+          },
+          "arrivalHouseNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "arrivalPostalCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "arrivalCity": {
+            "type": "string",
+            "nullable": true
+          },
+          "arrivalCountry": {
+            "type": "string",
+            "nullable": true
+          },
+          "distance": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "time": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "isManual": {
+            "type": "boolean"
+          },
+          "isRunning": {
+            "type": "boolean"
+          },
+          "isPrivate": {
+            "type": "boolean"
+          },
+          "isCommute": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserRead": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userName": {
+            "type": "string",
+            "nullable": true
+          },
+          "isDemo": {
+            "type": "boolean"
+          },
+          "organisationId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VehicleLocationRead": {
+        "type": "object",
+        "properties": {
+          "vehicleId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registration": {
+            "type": "string",
+            "nullable": true
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "locationType": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "driverId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "driver": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float"
+          },
+          "speed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "heading": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VehicleRead": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registration": {
+            "type": "string",
+            "nullable": true
+          },
+          "registrationExtra": {
+            "type": "string",
+            "nullable": true
+          },
+          "isVehicle": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "isArchived": {
+            "type": "boolean"
+          },
+          "make": {
+            "type": "string",
+            "nullable": true
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Put JWT Bearer token in textbox below",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}

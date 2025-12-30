@@ -153,21 +153,21 @@ export default function VacationPage() {
   return (
     <div className="space-y-4 md:space-y-6 pb-20 md:pb-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
         <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Vakantie & Verlof</h1>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Beheer je vakantiedagen en verlofaanvragen</p>
       </div>
 
       {/* Error message */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="backdrop-blur-sm bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 rounded-2xl p-4">
           <p className="text-red-800 dark:text-red-300">{error}</p>
         </div>
       )}
 
       {/* Tabs - Mobile Friendly */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-        <div className="flex overflow-x-auto border-b border-gray-200 dark:border-gray-700">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
+        <div className="flex overflow-x-auto border-b border-white/20 dark:border-purple-500/20">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -188,7 +188,7 @@ export default function VacationPage() {
       {selectedTab === 'overview' && (
         <div className="space-y-4">
           {/* Status Filter */}
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+          <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filter op status</h3>
             <StatusFilter
               value={statusFilter}
@@ -197,8 +197,8 @@ export default function VacationPage() {
           </div>
 
           {/* Requests List */}
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700">
+          <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
+            <div className="px-4 py-5 border-b border-white/20 dark:border-purple-500/20">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">Recente Aanvragen</h3>
             </div>
 
@@ -231,29 +231,29 @@ export default function VacationPage() {
 
                 {/* Desktop Table View */}
                 <div className="hidden md:block overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-700">
+                  <table className="min-w-full divide-y divide-white/20 dark:divide-purple-500/20">
+                    <thead className="bg-purple-100/80 dark:bg-white/5">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Type
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Periode
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Dagen
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                        <th className="px-6 py-3 text-left text-xs font-semibold text-purple-800 dark:text-purple-300 uppercase tracking-wider">
                           Ingediend
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody className="bg-white/70 dark:bg-white/5 divide-y divide-purple-200/50 dark:divide-purple-500/20">
                       {requests.map((request) => (
-                        <tr key={request.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <tr key={request.id} className="hover:bg-purple-500/5 dark:hover:bg-purple-500/10 transition-colors">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className="text-xl mr-2">{getTypeIcon(request.type)}</span>
                             <span className="text-sm text-gray-900 dark:text-white">{getTypeText(request.type)}</span>
@@ -312,7 +312,7 @@ export default function VacationPage() {
 
       {/* Request Tab */}
       {selectedTab === 'request' && (
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 md:p-6">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Nieuwe Vakantieaanvraag</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -379,7 +379,7 @@ export default function VacationPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 font-medium min-h-[44px]"
+                className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 font-medium min-h-[44px] transition-all duration-200"
               >
                 {isSubmitting ? 'Bezig met indienen...' : 'Aanvraag Indienen'}
               </button>

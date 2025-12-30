@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTenantContext } from '@/lib/auth/tenant-access';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // Input validation schema matching the actual Prisma model
 const preferencesSchema = z.object({

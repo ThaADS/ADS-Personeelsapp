@@ -1,120 +1,465 @@
 @import "tailwindcss";
 
+/* ============================================
+   GLASSMORPHISM DESIGN SYSTEM
+   ADS Personeelsapp - Modern UI Framework
+   ============================================ */
+
+/* CSS Custom Properties */
 :root {
+  /* Base colors */
   --background: #f8fafc;
   --foreground: #1e293b;
+
+  /* Glassmorphism - Light theme */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-bg-solid: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(148, 163, 184, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --glass-shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+
+  /* Input styling - Light */
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --input-border: rgba(148, 163, 184, 0.3);
+  --input-border-focus: rgba(139, 92, 246, 0.5);
+  --input-text: #1e293b;
+  --input-placeholder: #94a3b8;
+
+  /* Accent colors */
+  --accent-purple: rgba(139, 92, 246, 1);
+  --accent-purple-light: rgba(139, 92, 246, 0.1);
+  --accent-purple-border: rgba(139, 92, 246, 0.3);
 }
 
 .dark {
+  /* Base colors */
   --background: #0f172a;
   --foreground: #f1f5f9;
+
+  /* Glassmorphism - Dark theme */
+  --glass-bg: rgba(30, 41, 59, 0.6);
+  --glass-bg-solid: rgba(30, 41, 59, 0.85);
+  --glass-border: rgba(139, 92, 246, 0.15);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --glass-shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+  /* Input styling - Dark */
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: rgba(139, 92, 246, 0.25);
+  --input-border-focus: rgba(139, 92, 246, 0.6);
+  --input-text: #f1f5f9;
+  --input-placeholder: #64748b;
+
+  /* Accent colors */
+  --accent-purple: rgba(167, 139, 250, 1);
+  --accent-purple-light: rgba(139, 92, 246, 0.15);
+  --accent-purple-border: rgba(139, 92, 246, 0.4);
 }
 
-/* Base body styles */
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@keyframes glareSweep {
-  0% { transform: translateX(-40%) translateY(-20%) rotate(0deg); }
-  50% { transform: translateX(40%) translateY(10%) rotate(0deg); }
-  100% { transform: translateX(120%) translateY(-10%) rotate(0deg); }
+/* Dark mode gradient background */
+.dark body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  background-attachment: fixed;
 }
 
-/* Input and form elements - Light theme */
-input, textarea, select {
-  background-color: #ffffff;
-  color: #1e293b;
-  border-color: #d1d5db;
+/* ============================================
+   GLASSMORPHISM CARD SYSTEM
+   ============================================ */
+
+/* Glass Card - Primary style */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
 }
 
-/* Input and form elements - Dark theme */
-.dark input, .dark textarea, .dark select {
-  background-color: #1e293b;
-  color: #f1f5f9;
-  border-color: #475569;
+.glass-card:hover {
+  box-shadow: var(--glass-shadow-lg);
+  transform: translateY(-2px);
 }
 
-/* Placeholder text colors */
-input::placeholder, textarea::placeholder {
-  color: #9ca3af;
+/* Apply glassmorphism to all cards with bg-white */
+.bg-white {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: var(--glass-border) !important;
+  box-shadow: var(--glass-shadow);
 }
 
-.dark input::placeholder, .dark textarea::placeholder {
-  color: #64748b;
+.dark .bg-white {
+  background: var(--glass-bg) !important;
+  border-color: var(--glass-border) !important;
 }
 
-/* Card styling - Light theme */
+/* Shadow and rounded variations */
+.bg-white.shadow,
+.bg-white.shadow-sm,
+.bg-white.shadow-md,
+.bg-white.shadow-lg {
+  box-shadow: var(--glass-shadow);
+}
+
 .bg-white.rounded-lg,
-.bg-white.shadow.rounded-lg {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow:
-    0 0 0 1px rgba(147,51,234,0.08),
-    0 4px 20px rgba(147,51,234,0.08);
-  transition: transform .15s ease, box-shadow .2s ease, background-color .3s ease;
-}
-
-/* Card styling - Dark theme */
-.dark .bg-white.rounded-lg,
-.dark .bg-white.shadow.rounded-lg {
-  background-color: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  box-shadow:
-    0 0 0 1px rgba(139,92,246,0.15),
-    0 8px 32px rgba(0,0,0,0.3);
+.bg-white.rounded-xl,
+.bg-white.rounded-2xl {
+  border-radius: 16px;
 }
 
 /* Card glow utility */
 .card-glow {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+.card-glow:hover {
+  border-color: var(--accent-purple-border);
+  box-shadow:
+    var(--glass-shadow),
+    0 0 20px rgba(139, 92, 246, 0.15);
+}
+
+/* ============================================
+   INPUT & FORM ELEMENTS
+   ============================================ */
+
+/* Base input styling */
+input, textarea, select {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
   border-radius: 12px;
-  box-shadow:
-    0 0 0 1px rgba(147,51,234,0.08),
-    0 4px 20px rgba(147,51,234,0.08);
-  transition: transform .15s ease, box-shadow .2s ease;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.dark .card-glow {
-  background-color: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  box-shadow:
-    0 0 0 1px rgba(139,92,246,0.15),
-    0 8px 32px rgba(0,0,0,0.3);
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 3px var(--accent-purple-light);
 }
 
-/* Buttons with theme support */
+/* Placeholder colors */
+input::placeholder, textarea::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* Dark theme input enhancements */
+.dark input, .dark textarea, .dark select {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border-color: var(--input-border);
+}
+
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 0 3px var(--accent-purple-light);
+}
+
+/* Date picker styling */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+/* Date picker calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="time"]::-webkit-calendar-picker-indicator,
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.8) sepia(1) hue-rotate(220deg) saturate(5);
+}
+
+/* Select dropdown styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b5cf6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+}
+
+/* Select option styling (limited browser support) */
+select option {
+  background: var(--glass-bg-solid);
+  color: var(--input-text);
+  padding: 0.5rem;
+}
+
+.dark select option {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+/* ============================================
+   TABLE STYLING
+   ============================================ */
+
+/* Table header */
+thead {
+  background: var(--accent-purple-light);
+}
+
+.dark thead {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+th {
+  color: var(--foreground);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+/* Table rows */
+tbody tr {
+  border-bottom: 1px solid var(--glass-border);
+  transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+  background: var(--accent-purple-light);
+}
+
+/* Gray background tables */
+.bg-gray-50 {
+  background: var(--accent-purple-light) !important;
+}
+
+.dark .bg-gray-50 {
+  background: rgba(139, 92, 246, 0.08) !important;
+}
+
+.bg-gray-700 {
+  background: rgba(139, 92, 246, 0.15) !important;
+}
+
+/* ============================================
+   BUTTON STYLING
+   ============================================ */
+
+/* Primary buttons */
 .btn-primary,
 button[type="submit"],
 .bg-blue-500,
 .bg-blue-600,
-.bg-blue-700,
-.bg-blue-800 {
+.bg-blue-700 {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%) !important;
   color: #ffffff !important;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
-/* Tab buttons should respect their text color classes */
+.btn-primary:hover,
+button[type="submit"]:hover,
+.bg-blue-500:hover,
+.bg-blue-600:hover,
+.bg-blue-700:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+}
+
+/* Secondary/outline buttons */
 button:not([type="submit"]):not(.btn-primary):not(.bg-blue-500):not(.bg-blue-600):not(.bg-blue-700):not(.bg-blue-800) {
   color: inherit;
 }
 
-/* Dark theme - only fix text inside cards that doesn't have explicit color classes */
+/* ============================================
+   ALERT & INFO BOXES
+   ============================================ */
+
+/* Blue info boxes */
+.bg-blue-50 {
+  background: rgba(59, 130, 246, 0.1) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+}
+
+.dark .bg-blue-50,
+.dark .bg-blue-900\/20 {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Yellow warning boxes */
+.bg-yellow-50 {
+  background: rgba(234, 179, 8, 0.1) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  border-radius: 12px;
+}
+
+.dark .bg-yellow-50,
+.dark .bg-yellow-900\/20 {
+  background: rgba(234, 179, 8, 0.15) !important;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+/* Red error boxes */
+.bg-red-50 {
+  background: rgba(239, 68, 68, 0.1) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+}
+
+.dark .bg-red-50,
+.dark .bg-red-900\/20 {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* Green success boxes */
+.bg-green-50 {
+  background: rgba(34, 197, 94, 0.1) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 12px;
+}
+
+.dark .bg-green-50,
+.dark .bg-green-900\/20 {
+  background: rgba(34, 197, 94, 0.15) !important;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+/* ============================================
+   DARK THEME SPECIFIC OVERRIDES
+   ============================================ */
+
+/* Gray backgrounds in dark mode */
+.dark .bg-gray-800 {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: var(--glass-border);
+}
+
+.dark .bg-gray-700 {
+  background: rgba(139, 92, 246, 0.1) !important;
+}
+
+.dark .bg-gray-100 {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Dark theme borders */
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-gray-600,
+.dark .border-gray-700 {
+  border-color: var(--glass-border) !important;
+}
+
+/* Text colors in dark mode cards */
 .dark .bg-white h1:not([class*="text-"]),
 .dark .bg-white h2:not([class*="text-"]),
 .dark .bg-white h3:not([class*="text-"]),
 .dark .bg-white p:not([class*="text-"]),
 .dark .bg-white label:not([class*="text-"]),
 .dark .bg-white th:not([class*="text-"]),
-.dark .bg-white td:not([class*="text-"]) {
+.dark .bg-white td:not([class*="text-"]),
+.dark .bg-gray-800 h1:not([class*="text-"]),
+.dark .bg-gray-800 h2:not([class*="text-"]),
+.dark .bg-gray-800 h3:not([class*="text-"]),
+.dark .bg-gray-800 p:not([class*="text-"]),
+.dark .bg-gray-800 label:not([class*="text-"]),
+.dark .bg-gray-800 th:not([class*="text-"]),
+.dark .bg-gray-800 td:not([class*="text-"]) {
   color: #e2e8f0;
 }
 
-/* Blob animation for background elements */
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+
+/* Approved/Success badge */
+.bg-green-100 {
+  background: rgba(34, 197, 94, 0.15) !important;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.dark .bg-green-100,
+.dark .bg-green-900\/30 {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* Pending/Warning badge */
+.bg-yellow-100 {
+  background: rgba(234, 179, 8, 0.15) !important;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.dark .bg-yellow-100,
+.dark .bg-yellow-900\/30 {
+  background: rgba(234, 179, 8, 0.2) !important;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+/* Rejected/Error badge */
+.bg-red-100 {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.dark .bg-red-100,
+.dark .bg-red-900\/30 {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
 @keyframes blob {
   0%, 100% {
     transform: translate(0, 0) scale(1);
@@ -130,8 +475,44 @@ button:not([type="submit"]):not(.btn-primary):not(.bg-blue-500):not(.bg-blue-600
   }
 }
 
+@keyframes glareSweep {
+  0% { transform: translateX(-40%) translateY(-20%) rotate(0deg); }
+  50% { transform: translateX(40%) translateY(10%) rotate(0deg); }
+  100% { transform: translateX(120%) translateY(-10%) rotate(0deg); }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+  }
+}
+
 .animate-blob {
   animation: blob 20s infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
 }
 
 .animation-delay-2000 {
@@ -142,6 +523,105 @@ button:not([type="submit"]):not(.btn-primary):not(.bg-blue-500):not(.bg-blue-600
   animation-delay: 4s;
 }
 
-.animation-delay-1000 {
-  animation-delay: 1s;
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+/* ============================================
+   MODAL & OVERLAY STYLING
+   ============================================ */
+
+/* Modal backdrop */
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Modal content */
+.modal-content {
+  background: var(--glass-bg-solid);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow-lg);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Backdrop blur utilities */
+.backdrop-blur-glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.backdrop-blur-glass-heavy {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Glass backgrounds */
+.bg-glass {
+  background: var(--glass-bg);
+}
+
+.bg-glass-solid {
+  background: var(--glass-bg-solid);
+}
+
+/* Purple accent utilities */
+.border-accent {
+  border-color: var(--accent-purple-border);
+}
+
+.ring-accent {
+  --tw-ring-color: var(--accent-purple);
+}
+
+/* Shadow utilities */
+.shadow-glass {
+  box-shadow: var(--glass-shadow);
+}
+
+.shadow-glass-lg {
+  box-shadow: var(--glass-shadow-lg);
+}
+
+/* Glow effect */
+.glow-purple {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.glow-purple-lg {
+  box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
 }

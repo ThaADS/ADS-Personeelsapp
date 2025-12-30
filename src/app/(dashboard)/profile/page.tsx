@@ -142,13 +142,13 @@ export default function ProfilePage() {
     return (
       <div className="p-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-1/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2 mb-6"></div>
-          <div className="bg-white dark:bg-slate-800 shadow rounded-lg p-6">
+          <div className="h-8 bg-purple-200/50 dark:bg-purple-500/20 rounded-xl w-1/4 mb-4"></div>
+          <div className="h-4 bg-purple-200/50 dark:bg-purple-500/20 rounded-xl w-1/2 mb-6"></div>
+          <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-6">
             <div className="space-y-4">
-              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2"></div>
-              <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-2/3"></div>
+              <div className="h-4 bg-purple-200/50 dark:bg-purple-500/20 rounded-xl w-3/4"></div>
+              <div className="h-4 bg-purple-200/50 dark:bg-purple-500/20 rounded-xl w-1/2"></div>
+              <div className="h-4 bg-purple-200/50 dark:bg-purple-500/20 rounded-xl w-2/3"></div>
             </div>
           </div>
         </div>
@@ -157,65 +157,63 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mijn Profiel</h1>
-        <p className="text-gray-600 dark:text-gray-300 font-medium">Beheer je persoonlijke gegevens en instellingen</p>
+    <div className="space-y-4 md:space-y-6 pb-20 md:pb-6">
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20 p-4 md:p-6">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Mijn Profiel</h1>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Beheer je persoonlijke gegevens en instellingen</p>
       </div>
 
       {/* Success/Error Messages */}
       {successMessage && (
-        <div className="mb-4 p-4 bg-green-100 dark:bg-green-900/30 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-300 rounded">
+        <div className="backdrop-blur-sm bg-green-500/10 dark:bg-green-500/10 border border-green-500/20 text-green-700 dark:text-green-300 rounded-2xl p-4">
           {successMessage}
         </div>
       )}
       {error && (
-        <div className="mb-4 p-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 rounded">
+        <div className="backdrop-blur-sm bg-red-500/10 dark:bg-red-500/10 border border-red-500/20 text-red-700 dark:text-red-300 rounded-2xl p-4">
           {error}
         </div>
       )}
 
       {/* Tabs */}
-      <div className="mb-6">
-        <div className="border-b border-gray-200 dark:border-slate-700">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setSelectedTab('personal')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                selectedTab === 'personal'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                  : 'border-transparent text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300'
-              }`}
-            >
-              Persoonlijke Gegevens
-            </button>
-            <button
-              onClick={() => setSelectedTab('work')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                selectedTab === 'work'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                  : 'border-transparent text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300'
-              }`}
-            >
-              Werkgegevens
-            </button>
-            <button
-              onClick={() => setSelectedTab('settings')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                selectedTab === 'settings'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-                  : 'border-transparent text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300'
-              }`}
-            >
-              Instellingen
-            </button>
-          </nav>
+      <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
+        <div className="flex overflow-x-auto border-b border-white/20 dark:border-purple-500/20">
+          <button
+            onClick={() => setSelectedTab('personal')}
+            className={`flex-1 min-w-0 py-3 px-4 text-sm font-medium text-center whitespace-nowrap min-h-[44px] transition-colors ${
+              selectedTab === 'personal'
+                ? 'border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400'
+                : 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
+            }`}
+          >
+            Persoonlijke Gegevens
+          </button>
+          <button
+            onClick={() => setSelectedTab('work')}
+            className={`flex-1 min-w-0 py-3 px-4 text-sm font-medium text-center whitespace-nowrap min-h-[44px] transition-colors ${
+              selectedTab === 'work'
+                ? 'border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400'
+                : 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
+            }`}
+          >
+            Werkgegevens
+          </button>
+          <button
+            onClick={() => setSelectedTab('settings')}
+            className={`flex-1 min-w-0 py-3 px-4 text-sm font-medium text-center whitespace-nowrap min-h-[44px] transition-colors ${
+              selectedTab === 'settings'
+                ? 'border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 dark:border-purple-400'
+                : 'text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400'
+            }`}
+          >
+            Instellingen
+          </button>
         </div>
       </div>
 
       {/* Personal Tab */}
       {selectedTab === 'personal' && profileData && (
-        <div className="bg-white dark:bg-slate-800 shadow rounded-lg">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
           <div className="px-4 py-5 sm:p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">Persoonlijke Informatie</h3>
@@ -223,7 +221,7 @@ export default function ProfilePage() {
                 {isEditing && (
                   <button
                     onClick={handleCancel}
-                    className="bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="backdrop-blur-sm bg-white/50 dark:bg-white/5 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg border border-gray-200 dark:border-purple-500/30 hover:bg-gray-100 dark:hover:bg-purple-500/10 focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[44px] transition-colors"
                   >
                     Annuleren
                   </button>
@@ -231,7 +229,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleEditToggle}
                   disabled={isSaving}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 min-h-[44px] transition-all duration-200"
                 >
                   {isSaving ? 'Opslaan...' : isEditing ? 'Opslaan' : 'Bewerken'}
                 </button>
@@ -248,8 +246,10 @@ export default function ProfilePage() {
                   onChange={(e) => setEditedData({...editedData, name: e.target.value})}
                   placeholder="Voer uw naam in"
                   title="Naam"
-                  className={`mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400 ${
-                    !isEditing ? 'bg-gray-50 dark:bg-slate-600' : 'bg-white dark:bg-slate-700'
+                  className={`mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
+                    !isEditing
+                      ? 'backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white'
+                      : 'backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
                   }`}
                 />
               </div>
@@ -261,8 +261,10 @@ export default function ProfilePage() {
                   disabled={!isEditing}
                   onChange={(e) => setEditedData({...editedData, email: e.target.value})}
                   aria-label="E-mailadres wijzigen"
-                  className={`mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400 ${
-                    !isEditing ? 'bg-gray-50 dark:bg-slate-600' : 'bg-white dark:bg-slate-700'
+                  className={`mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
+                    !isEditing
+                      ? 'backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white'
+                      : 'backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
                   }`}
                 />
               </div>
@@ -275,8 +277,10 @@ export default function ProfilePage() {
                   onChange={(e) => setEditedData({...editedData, phone: e.target.value})}
                   placeholder="+31 6 12345678"
                   aria-label="Telefoonnummer wijzigen"
-                  className={`mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400 ${
-                    !isEditing ? 'bg-gray-50 dark:bg-slate-600' : 'bg-white dark:bg-slate-700'
+                  className={`mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
+                    !isEditing
+                      ? 'backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white'
+                      : 'backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
                   }`}
                 />
               </div>
@@ -287,7 +291,7 @@ export default function ProfilePage() {
                   value={profileData.tenant?.name || '-'}
                   disabled
                   aria-label="Organisatie (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -299,8 +303,10 @@ export default function ProfilePage() {
                   onChange={(e) => setEditedData({...editedData, address: e.target.value})}
                   placeholder="Voer uw adres in"
                   title="Adres"
-                  className={`mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400 ${
-                    !isEditing ? 'bg-gray-50 dark:bg-slate-600' : 'bg-white dark:bg-slate-700'
+                  className={`mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
+                    !isEditing
+                      ? 'backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white'
+                      : 'backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
                   }`}
                 />
               </div>
@@ -313,8 +319,10 @@ export default function ProfilePage() {
                   onChange={(e) => setEditedData({...editedData, city: e.target.value})}
                   placeholder="Voer uw stad in"
                   title="Stad"
-                  className={`mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400 ${
-                    !isEditing ? 'bg-gray-50 dark:bg-slate-600' : 'bg-white dark:bg-slate-700'
+                  className={`mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
+                    !isEditing
+                      ? 'backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white'
+                      : 'backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
                   }`}
                 />
               </div>
@@ -327,8 +335,10 @@ export default function ProfilePage() {
                   onChange={(e) => setEditedData({...editedData, postalCode: e.target.value})}
                   placeholder="1234 AB"
                   title="Postcode"
-                  className={`mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400 ${
-                    !isEditing ? 'bg-gray-50 dark:bg-slate-600' : 'bg-white dark:bg-slate-700'
+                  className={`mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors ${
+                    !isEditing
+                      ? 'backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white'
+                      : 'backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400'
                   }`}
                 />
               </div>
@@ -339,7 +349,7 @@ export default function ProfilePage() {
 
       {/* Work Tab */}
       {selectedTab === 'work' && profileData && (
-        <div className="bg-white dark:bg-slate-800 shadow rounded-lg">
+        <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-6">Werkgegevens</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Deze gegevens worden beheerd door uw werkgever.</p>
@@ -352,7 +362,7 @@ export default function ProfilePage() {
                   value={profileData.employeeId || '-'}
                   disabled
                   aria-label="Personeelsnummer (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
@@ -362,7 +372,7 @@ export default function ProfilePage() {
                   value={profileData.department || '-'}
                   disabled
                   aria-label="Afdeling (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
@@ -372,7 +382,7 @@ export default function ProfilePage() {
                   value={profileData.position || '-'}
                   disabled
                   aria-label="Functie (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
@@ -382,7 +392,7 @@ export default function ProfilePage() {
                   value={formatDate(profileData.startDate)}
                   disabled
                   aria-label="Startdatum in dienst (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
@@ -392,7 +402,7 @@ export default function ProfilePage() {
                   value={profileData.contractType || '-'}
                   disabled
                   aria-label="Contract type (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
@@ -402,7 +412,7 @@ export default function ProfilePage() {
                   value={profileData.workHoursPerWeek ? `${profileData.workHoursPerWeek} uur` : '-'}
                   disabled
                   aria-label="Werkuren per week (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
@@ -412,7 +422,7 @@ export default function ProfilePage() {
                   value={profileData.tenantRole || '-'}
                   disabled
                   aria-label="Rol (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
@@ -422,7 +432,7 @@ export default function ProfilePage() {
                   value={formatDate(profileData.createdAt)}
                   disabled
                   aria-label="Account aanmaakdatum (alleen lezen)"
-                  className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 bg-gray-50 dark:bg-slate-600 dark:text-white"
+                  className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-gray-100/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/20 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
@@ -433,7 +443,7 @@ export default function ProfilePage() {
       {/* Settings Tab */}
       {selectedTab === 'settings' && profileData && (
         <div className="space-y-6">
-          <div className="bg-white dark:bg-slate-800 shadow rounded-lg">
+          <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
             <div className="px-4 py-5 sm:p-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Wachtwoord Wijzigen</h3>
               <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
@@ -442,7 +452,7 @@ export default function ProfilePage() {
                   <input
                     type="password"
                     aria-label="Huidig wachtwoord"
-                    className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
+                    className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -450,7 +460,7 @@ export default function ProfilePage() {
                   <input
                     type="password"
                     aria-label="Nieuw wachtwoord"
-                    className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
+                    className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -458,13 +468,13 @@ export default function ProfilePage() {
                   <input
                     type="password"
                     aria-label="Bevestig nieuw wachtwoord"
-                    className="mt-1 block w-full border border-gray-300 dark:border-slate-600 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
+                    className="mt-1 block w-full rounded-lg shadow-sm p-3 min-h-[44px] backdrop-blur-sm bg-white/50 dark:bg-white/5 border border-gray-200 dark:border-purple-500/30 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
                   />
                 </div>
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[44px] transition-all duration-200"
                   >
                     Wachtwoord Wijzigen
                   </button>
@@ -473,11 +483,11 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 shadow rounded-lg">
+          <div className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 shadow-lg rounded-2xl border border-white/20 dark:border-purple-500/20">
             <div className="px-4 py-5 sm:p-6">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Notificatie Instellingen</h3>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-3 rounded-lg backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10">
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 dark:text-white">E-mail notificaties</h4>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Ontvang updates via e-mail</p>
@@ -486,10 +496,10 @@ export default function ProfilePage() {
                     type="checkbox"
                     defaultChecked={profileData.notifications?.emailEnabled ?? true}
                     aria-label="E-mail notificaties ontvangen"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded dark:bg-slate-700"
+                    className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-purple-500/30 rounded dark:bg-white/5"
                   />
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-3 rounded-lg backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10">
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 dark:text-white">Vakantie herinneringen</h4>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Herinneringen voor vakantieaanvragen</p>
@@ -498,10 +508,10 @@ export default function ProfilePage() {
                     type="checkbox"
                     defaultChecked
                     aria-label="Vakantie herinneringen ontvangen"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded dark:bg-slate-700"
+                    className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-purple-500/30 rounded dark:bg-white/5"
                   />
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-3 rounded-lg backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10">
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 dark:text-white">Tijdregistratie meldingen</h4>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Dagelijkse herinneringen voor tijdregistratie</p>
@@ -509,7 +519,7 @@ export default function ProfilePage() {
                   <input
                     type="checkbox"
                     aria-label="Tijdregistratie meldingen ontvangen"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 rounded dark:bg-slate-700"
+                    className="h-5 w-5 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-purple-500/30 rounded dark:bg-white/5"
                   />
                 </div>
               </div>

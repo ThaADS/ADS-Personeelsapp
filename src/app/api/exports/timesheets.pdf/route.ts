@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requirePermission } from "@/lib/auth/tenant-access";
+import { prisma } from "@/lib/db/prisma";
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_request: NextRequest) {
   try {
     const context = await requirePermission('timesheet:approve');
-    const prisma = new (await import('@prisma/client')).PrismaClient();
     const PDFDocument = (await import('pdfkit')).default;
 
     const rows = await prisma.timesheet.findMany({
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
         'Content-Disposition': 'attachment; filename="timesheets.pdf"',
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Export failed' }, { status: 500 });
   }
 }

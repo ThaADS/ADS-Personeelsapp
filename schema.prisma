@@ -41,6 +41,7 @@ model Tenant {
   timesheets           Timesheet[]
   vacations            vacations[]
   work_schedules       work_schedules[]
+  routeVisionConfig    RouteVisionConfig?
 
   @@index([domain], map: "idx_tenants_domain")
   @@index([slug], map: "idx_tenants_slug")
@@ -70,6 +71,16 @@ model User {
   startDate                                DateTime?               @map("start_date") @db.Timestamptz(6)
   contractType                             String?                 @map("contract_type") @db.VarChar(50)
   workHoursPerWeek                         Float?                  @map("work_hours_per_week")
+  // Additional personal details
+  dateOfBirth                              DateTime?               @map("date_of_birth") @db.Date
+  gender                                   String?                 @db.VarChar(20)
+  nationality                              String?                 @db.VarChar(50)
+  maritalStatus                            String?                 @map("marital_status") @db.VarChar(30)
+  // Bank details for payroll
+  bankAccountNumber                        String?                 @map("bank_account_number") @db.VarChar(50)
+  bankAccountName                          String?                 @map("bank_account_name") @db.VarChar(100)
+  // BSN for Dutch employees
+  bsnNumber                                String?                 @map("bsn_number") @db.VarChar(20)
   auditLogs                                AuditLog[]
   departments                              departments[]
   documents                                documents[]
@@ -139,6 +150,8 @@ model Subscription {
   plan                 Plan                @relation(fields: [planId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tenant               Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
+  @@index([tenantId], map: "idx_subscriptions_tenant_id")
+  @@index([status], map: "idx_subscriptions_status")
   @@map("subscriptions")
 }
 
@@ -290,6 +303,10 @@ model LeaveRequest {
   tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
+  @@index([tenantId], map: "idx_leave_requests_tenant_id")
+  @@index([userId], map: "idx_leave_requests_user_id")
+  @@index([status], map: "idx_leave_requests_status")
+  @@index([startDate, endDate], map: "idx_leave_requests_dates")
   @@map("leave_requests")
 }
 
@@ -334,22 +351,37 @@ model documents {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model employees {
-  id                String           @id @default(uuid()) @db.Uuid
-  user_id           String           @unique @db.Uuid
-  tenant_id         String           @db.Uuid
-  department_id     String?          @db.Uuid
-  employee_number   String?
-  position          String?
-  contract_type     contract_type?   @default(FULLTIME)
-  hours_per_week    Decimal?         @default("40")
-  start_date        DateTime         @db.Date
-  end_date          DateTime?        @db.Date
-  phone_number      String?
-  emergency_contact String?
-  emergency_phone   String?
-  hourly_rate       Decimal?         @db.Decimal(10, 2)
-  created_at        DateTime?        @default(now()) @db.Timestamptz(6)
-  updated_at        DateTime?        @default(now()) @db.Timestamptz(6)
+  id                      String           @id @default(uuid()) @db.Uuid
+  user_id                 String           @unique @db.Uuid
+  tenant_id               String           @db.Uuid
+  department_id           String?          @db.Uuid
+  employee_number         String?
+  position                String?
+  contract_type           contract_type?   @default(FULLTIME)
+  hours_per_week          Decimal?         @default("40")
+  start_date              DateTime         @db.Date
+  end_date                DateTime?        @db.Date
+  phone_number            String?
+  // Emergency contact details
+  emergency_contact       String?
+  emergency_phone         String?
+  emergency_relationship  String?          @db.VarChar(50)
+  // Employment details
+  hourly_rate             Decimal?         @db.Decimal(10, 2)
+  manager_id              String?          @db.Uuid
+  cost_center             String?          @db.VarChar(50)
+  // Skills and qualifications
+  skills                  String[]         @default([])
+  certifications          String[]         @default([])
+  education_level         String?          @db.VarChar(100)
+  languages               String[]         @default([])
+  // Work preferences
+  remote_work_allowed     Boolean?         @default(false)
+  work_location           String?          @db.VarChar(100)
+  // Notes
+  notes                   String?
+  created_at              DateTime?        @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime?        @default(now()) @db.Timestamptz(6)
   documents         documents[]
   departments       departments?     @relation(fields: [department_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tenants           Tenant           @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -358,6 +390,7 @@ model employees {
   sick_leaves       sick_leaves[]
   vacations         vacations[]
   work_schedules    work_schedules[]
+  vehicleMappings   VehicleMapping[]
 
   @@unique([tenant_id, employee_number])
   @@index([department_id], map: "idx_employees_department_id")
@@ -549,4 +582,163 @@ enum vacation_type {
   COMPENSATION
   SPECIAL
   UNPAID
+}
+
+// Password Reset Tokens - secure database storage for reset tokens
+model PasswordResetToken {
+  id          String    @id @default(uuid()) @db.Uuid
+  email       String
+  token       String    @unique // hashed token
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  usedAt      DateTime? @map("used_at") @db.Timestamptz(6)
+
+  @@index([email], map: "idx_password_reset_tokens_email")
+  @@index([expiresAt], map: "idx_password_reset_tokens_expires_at")
+  @@map("password_reset_tokens")
+}
+
+// Rate Limiting - database storage for rate limit tracking
+model RateLimitEntry {
+  id            String   @id @default(uuid()) @db.Uuid
+  identifier    String   // email or IP address
+  type          String   // 'password_reset', 'login', etc.
+  count         Int      @default(1)
+  firstRequest  DateTime @map("first_request") @db.Timestamptz(6)
+  windowExpires DateTime @map("window_expires") @db.Timestamptz(6)
+
+  @@unique([identifier, type])
+  @@index([windowExpires], map: "idx_rate_limit_entries_window_expires")
+  @@map("rate_limit_entries")
+}
+
+// RouteVision Integration - Per-tenant configuration for RouteVision API
+// LEGACY: Kept for backwards compatibility, new integrations use FleetProviderConfig
+model RouteVisionConfig {
+  id            String    @id @default(uuid()) @db.Uuid
+  tenant_id     String    @unique @db.Uuid
+  api_email     String    // Encrypted email for RouteVision API
+  api_password  String    // Encrypted password for RouteVision API
+  sync_enabled  Boolean   @default(false)
+  last_sync     DateTime? @db.Timestamptz(6)
+  sync_interval Int       @default(60) // Minutes between syncs
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  tenant        Tenant    @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([sync_enabled], map: "idx_routevision_config_sync_enabled")
+  @@map("routevision_configs")
+}
+
+// Fleet Provider Configuration - Generic config for all fleet tracking providers
+model FleetProviderConfig {
+  id              String    @id @default(uuid()) @db.Uuid
+  tenant_id       String    @db.Uuid
+  provider_type   String    // routevision, fleetgo, samsara, webfleet, trackjack, verizon
+  display_name    String?   // Custom name for this integration
+
+  // Credentials (encrypted)
+  credentials     Json      // { email?, password?, apiKey?, apiSecret?, customFields? }
+
+  // Sync settings
+  sync_enabled    Boolean   @default(false)
+  sync_interval   Int       @default(60) // Minutes between syncs
+  last_sync       DateTime? @db.Timestamptz(6)
+  last_sync_error String?
+
+  // Status
+  is_active       Boolean   @default(true)
+  connection_status String  @default("unconfigured") // unconfigured, connected, error
+
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@unique([tenant_id, provider_type])
+  @@index([tenant_id], map: "idx_fleet_provider_config_tenant_id")
+  @@index([provider_type], map: "idx_fleet_provider_config_provider_type")
+  @@index([sync_enabled], map: "idx_fleet_provider_config_sync_enabled")
+  @@map("fleet_provider_configs")
+}
+
+// Vehicle Mapping - Links fleet provider vehicles to employees
+model VehicleMapping {
+  id              String     @id @default(uuid()) @db.Uuid
+  tenant_id       String     @db.Uuid
+  provider_type   String     @default("routevision") // Provider type for this vehicle
+  provider_vehicle_id String // Vehicle ID from the provider (was routevision_id)
+  registration    String     // License plate (kenteken)
+  vehicle_name    String?    // Optional friendly name
+  employee_id     String?    @db.Uuid
+  is_active       Boolean    @default(true)
+  created_at      DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime   @default(now()) @updatedAt @db.Timestamptz(6)
+  employee        employees? @relation(fields: [employee_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  // Keep routevision_id as computed/alias for backwards compatibility
+  routevision_id  String?    // DEPRECATED: Use provider_vehicle_id instead
+
+  @@unique([tenant_id, provider_type, provider_vehicle_id])
+  @@index([tenant_id], map: "idx_vehicle_mapping_tenant_id")
+  @@index([employee_id], map: "idx_vehicle_mapping_employee_id")
+  @@index([provider_type], map: "idx_vehicle_mapping_provider_type")
+  @@map("vehicle_mappings")
+}
+
+// Trip Record - Synchronized trips from fleet providers
+model TripRecord {
+  id                  String    @id @default(uuid()) @db.Uuid
+  tenant_id           String    @db.Uuid
+  provider_type       String    @default("routevision") // Provider that synced this trip
+  provider_trip_id    String    // External ID from provider
+  vehicle_id          String    // Provider vehicle ID
+  registration        String    // License plate
+  driver_name         String?   // Driver name from provider
+  employee_id         String?   @db.Uuid
+
+  departure_time      DateTime  @db.Timestamptz(6)
+  arrival_time        DateTime  @db.Timestamptz(6)
+  distance_km         Decimal   @db.Decimal(10, 2)
+  duration_minutes    Int
+
+  // Departure location
+  departure_street    String?
+  departure_house_nr  String?
+  departure_postal    String?
+  departure_city      String?
+  departure_address   String    // Full formatted address
+  departure_lat       Float?    // GPS latitude
+  departure_lng       Float?    // GPS longitude
+
+  // Arrival location
+  arrival_street      String?
+  arrival_house_nr    String?
+  arrival_postal      String?
+  arrival_city        String?
+  arrival_address     String    // Full formatted address
+  arrival_lat         Float?    // GPS latitude
+  arrival_lng         Float?    // GPS longitude
+
+  // Trip flags
+  is_private          Boolean   @default(false)
+  is_commute          Boolean   @default(false)
+  is_manual           Boolean   @default(false)
+  is_correction       Boolean   @default(false)
+
+  // Link to timesheet (auto-matched)
+  timesheet_id        String?   @db.Uuid
+
+  // Legacy field for backwards compatibility
+  routevision_trip_id String?   @unique // DEPRECATED: Use provider_trip_id
+
+  synced_at           DateTime  @default(now()) @db.Timestamptz(6)
+  created_at          DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@unique([tenant_id, provider_type, provider_trip_id])
+  @@index([tenant_id, departure_time], map: "idx_trip_records_tenant_departure")
+  @@index([employee_id], map: "idx_trip_records_employee_id")
+  @@index([timesheet_id], map: "idx_trip_records_timesheet_id")
+  @@index([vehicle_id], map: "idx_trip_records_vehicle_id")
+  @@index([provider_type], map: "idx_trip_records_provider_type")
+  @@map("trip_records")
 }

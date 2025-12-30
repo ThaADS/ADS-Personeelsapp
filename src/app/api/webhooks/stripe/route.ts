@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/config";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import { SubscriptionStatus, PlanType } from "@/types";
 import Stripe from "stripe";
-
-const prisma = new PrismaClient();
 
 // Extended type for Stripe subscription with billing period fields
 interface StripeSubscriptionWithPeriod extends Stripe.Subscription {

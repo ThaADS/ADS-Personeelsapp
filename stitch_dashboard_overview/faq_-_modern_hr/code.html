@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FAQ - Modern HR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b7cee",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101822",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-dark dark group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="flex items-center bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
+<div class="text-white flex size-12 shrink-0 items-center justify-start">
+<span class="material-symbols-outlined text-2xl">arrow_back_ios_new</span>
+</div>
+<h1 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">FAQ</h1>
+<div class="flex size-12 shrink-0 items-center"></div>
+</div>
+<!-- Search Bar -->
+<div class="px-4 py-3">
+<label class="flex flex-col min-w-40 h-12 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#92a9c9] flex border-none bg-[#1E293B] items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined text-2xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border-none bg-[#1E293B] focus:border-none h-full placeholder:text-[#92a9c9] px-4 pl-2 text-base font-normal leading-normal" placeholder="Search questions..." value=""/>
+</div>
+</label>
+</div>
+<!-- Chips -->
+<div class="flex gap-3 px-4 py-3 overflow-x-auto whitespace-nowrap scrollbar-hide">
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary pl-4 pr-4 cursor-pointer"><p class="text-white text-sm font-medium leading-normal">All</p></div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#1E293B] pl-4 pr-4 cursor-pointer">
+<p class="text-white text-sm font-medium leading-normal">Payroll</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#1E293B] pl-4 pr-4 cursor-pointer">
+<p class="text-white text-sm font-medium leading-normal">Benefits</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#1E293B] pl-4 pr-4 cursor-pointer">
+<p class="text-white text-sm font-medium leading-normal">Leave Policy</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#1E293B] pl-4 pr-4 cursor-pointer">
+<p class="text-white text-sm font-medium leading-normal">Onboarding</p>
+</div>
+<div class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-[#1E293B] pl-4 pr-4 cursor-pointer">
+<p class="text-white text-sm font-medium leading-normal">Technical</p>
+</div>
+</div>
+<!-- Accordions -->
+<div class="flex flex-col p-4 gap-3">
+<details class="flex flex-col rounded-lg bg-[#1E293B] px-4 py-2 group" open="">
+<summary class="flex cursor-pointer items-center justify-between gap-6 py-2 list-none">
+<p class="text-white text-sm font-semibold leading-normal">How do I submit an expense report?</p>
+<div class="text-white group-open:rotate-180 transition-transform">
+<span class="material-symbols-outlined text-xl">expand_more</span>
+</div>
+</summary>
+<p class="text-[#92a9c9] text-sm font-normal leading-normal pb-2">
+                    To submit an expense report, navigate to the 'Expenses' section in the main menu, tap on 'New Report', fill in the required details, attach your receipts, and then tap 'Submit'.
+                </p>
+</details>
+<details class="flex flex-col rounded-lg bg-[#1E293B] px-4 py-2 group">
+<summary class="flex cursor-pointer items-center justify-between gap-6 py-2 list-none">
+<p class="text-white text-sm font-semibold leading-normal">What is the company policy on remote work?</p>
+<div class="text-white group-open:rotate-180 transition-transform">
+<span class="material-symbols-outlined text-xl">expand_more</span>
+</div>
+</summary>
+<p class="text-[#92a9c9] text-sm font-normal leading-normal pb-2">
+                    Our company supports a flexible remote work policy. Specific arrangements can be discussed with your direct manager and are subject to departmental needs and individual performance.
+                </p>
+</details>
+<details class="flex flex-col rounded-lg bg-[#1E293B] px-4 py-2 group">
+<summary class="flex cursor-pointer items-center justify-between gap-6 py-2 list-none">
+<p class="text-white text-sm font-semibold leading-normal">Where can I find my payslips?</p>
+<div class="text-white group-open:rotate-180 transition-transform">
+<span class="material-symbols-outlined text-xl">expand_more</span>
+</div>
+</summary>
+<p class="text-[#92a9c9] text-sm font-normal leading-normal pb-2">
+                    You can access all your payslips directly through the 'Payroll' section of this app. They are available in PDF format for download or viewing at any time.
+                </p>
+</details>
+<details class="flex flex-col rounded-lg bg-[#1E293B] px-4 py-2 group">
+<summary class="flex cursor-pointer items-center justify-between gap-6 py-2 list-none">
+<p class="text-white text-sm font-semibold leading-normal">How are vacation days calculated?</p>
+<div class="text-white group-open:rotate-180 transition-transform">
+<span class="material-symbols-outlined text-xl">expand_more</span>
+</div>
+</summary>
+<p class="text-[#92a9c9] text-sm font-normal leading-normal pb-2">
+                    Vacation days are accrued based on your length of service with the company. Please refer to the 'Leave Policy' document available in the 'Documents' section for a detailed breakdown of accrual rates.
+                </p>
+</details>
+<details class="flex flex-col rounded-lg bg-[#1E293B] px-4 py-2 group">
+<summary class="flex cursor-pointer items-center justify-between gap-6 py-2 list-none">
+<p class="text-white text-sm font-semibold leading-normal">How do I update my personal information?</p>
+<div class="text-white group-open:rotate-180 transition-transform">
+<span class="material-symbols-outlined text-xl">expand_more</span>
+</div>
+</summary>
+<p class="text-[#92a9c9] text-sm font-normal leading-normal pb-2">
+                    You can update your personal information, such as address or contact details, by navigating to 'My Profile' and selecting the 'Edit' option.
+                </p>
+</details>
+</div>
+</div>
+</body></html>

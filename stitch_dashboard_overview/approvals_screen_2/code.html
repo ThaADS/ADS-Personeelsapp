@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Approvals Mobile Screen</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter for a clean sans-serif look similar to iOS system font -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration for Specific Colors -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            ios: {
+              black: '#000000',
+              card: '#1C1C1E', // Dark Grey Card Background
+              divider: '#38383A', // Subtle divider
+              textSecondary: '#8E8E93', // Standard iOS grey text
+              purple: '#5D5CE6', // Active tab color
+              orange: '#FF9F0A', // Status pending
+              green: '#30D158', // Success/Approve
+              greenBg: 'rgba(48, 209, 88, 0.15)', // Very dark transparent green
+              red: '#FF453A', // Destructive/Reject
+              redBg: 'rgba(255, 69, 58, 0.15)', // Very dark transparent red
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-utilities">
+    /* Custom scrollbar hiding for a cleaner mobile app feel */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Safe area spacing simulation for notch devices */
+    .safe-top {
+      padding-top: max(1rem, env(safe-area-inset-top));
+    }
+    .safe-bottom {
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+  </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-ios-black text-white antialiased h-screen flex flex-col overflow-hidden relative">
+<!-- BEGIN: Header Section -->
+<!-- Includes top navigation icons and the main page title -->
+<header class="flex-none px-4 pt-12 pb-4 space-y-4 z-10 bg-ios-black">
+<!-- Navigation Controls Row -->
+<div class="flex justify-between items-center">
+<button class="text-white focus:outline-none opacity-80 hover:opacity-100 transition-opacity">
+<i class="fas fa-chevron-left text-white text-[20px]"></i>
+</button>
+<button class="text-white focus:outline-none opacity-80 hover:opacity-100 transition-opacity">
+<i class="fas fa-filter text-white text-[22px]"></i>
+</button>
+</div>
+<!-- Page Title -->
+<h1 class="text-3xl font-bold tracking-tight" style="font-size: 30px; font-weight: 800;">Approvals</h1>
+</header>
+<!-- END: Header Section -->
+<!-- BEGIN: Main Content -->
+<!-- Scrollable list of approval cards -->
+<main class="flex-1 overflow-y-auto no-scrollbar px-4 pb-24 space-y-4">
+<!-- BEGIN: Card 1 (John Smith - Actionable) -->
+<article class="bg-ios-card overflow-hidden rounded-xl mb-4" data-purpose="approval-card-vacation">
+<!-- Card Header: User Info -->
+<div class="px-4 py-3 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<img alt="John Smith" class="w-10 h-10 rounded-full object-cover bg-gray-700 w-[48px] h-[48px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe4f1c0k6EPamCy3cBWZO5aL_UEFzyMf271Y2pf1joUsTBD2yCYdCTKXlpdOn114pR7BupzUHj1bdad73_foZuhb7bZgaBwRT9KpSxZUvzvmX-TAq8aN-ECwexn5x1R3wUxtxNS-XnTNBRzsZoR-v_AHLvct05nDkXfQIO0HnUl1ACCwEoKoUj6_1ukaRwMWbpplO99Znrb1WfxqjvHsZINqjSO0ub0CIzcXba27oRFIA0vgmbwMctgVGxDPObU8rI04D458jxX_c"/>
+<span class="font-semibold text-lg">John Smith</span>
+</div>
+<span class="text-ios-textSecondary text-sm">Today</span>
+</div>
+<!-- Divider -->
+<div class="h-px mx-4 bg-[#2C2C2E]"></div>
+<!-- Card Body: Details -->
+<div class="p-4 space-y-1">
+<!-- Title & Status Row -->
+<div class="flex justify-between items-start">
+<h3 class="text-lg font-semibold">Vacation Leave</h3>
+<div class="flex items-center space-x-1.5" style="align-items: center;">
+<div class="w-2 h-2 rounded-full bg-ios-orange"></div>
+<span class="text-ios-orange text-sm font-medium">Pending</span>
+</div>
+</div>
+<!-- Date Subtitle -->
+<p class="text-ios-textSecondary text-sm">Aug 15 - Aug 22, 2024 (8 days)</p>
+<!-- Action Buttons -->
+<div class="pt-4 flex space-x-3 mt-4">
+<!-- Approve Button -->
+<button class="flex-1 py-2.5 rounded-lg border border-ios-green text-ios-green bg-ios-greenBg font-medium text-center hover:bg-opacity-25 transition-colors">
+            Approve
+          </button>
+<!-- Reject Button -->
+<button class="flex-1 py-2.5 rounded-lg border border-ios-red text-ios-red bg-ios-redBg font-medium text-center hover:bg-opacity-25 transition-colors">
+            Reject
+          </button>
+</div>
+</div>
+</article>
+<!-- END: Card 1 -->
+<!-- BEGIN: Card 2 (Sarah Lee - Expense) -->
+<article class="bg-ios-card overflow-hidden rounded-xl mb-4" data-purpose="approval-card-expense">
+<!-- Card Header -->
+<div class="px-4 py-3 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<img alt="Sarah Lee" class="w-10 h-10 rounded-full object-cover bg-gray-700 w-[48px] h-[48px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwGVurUNPaA_s7BD7EDvQBq1udn0rn53zRTw_6TZWPMPvvWwbA9-tpnUU9OpUMWkI143oeaRBTcBakYmvHVO-k7VP7PhMdrNqoL1EnYPfqYrRKdhjT1MVDdMe-0h2R69Yef9chfiKpIz8EbDvYCdOlPXJckgEpfWYOpwXzYDZMVsB5_CsfEKoogqcvex5r0zzcTaARyCo-AIJWA8OMe3brGaHn489HBcFmApZNX8n8hl5GIk78stADmGM_AcUR4TRU49iVVGGBhwY"/>
+<span class="font-semibold text-lg">Sarah Lee</span>
+</div>
+<!-- No date in header for this card based on design -->
+</div>
+<!-- Divider -->
+<div class="h-px mx-4 bg-[#2C2C2E]"></div>
+<!-- Card Body -->
+<div class="p-4 space-y-1">
+<!-- Title & Status -->
+<div class="flex justify-between items-start">
+<h3 class="text-lg font-semibold">Expense Report</h3>
+<div class="flex items-center space-x-1.5" style="align-items: center;">
+<div class="w-2 h-2 rounded-full bg-ios-orange"></div>
+<span class="text-ios-orange text-sm font-medium">Pending</span>
+</div>
+</div>
+<!-- Description Subtitle -->
+<p class="text-ios-textSecondary text-sm">Client Dinner (Aug 10)</p>
+<!-- Amount -->
+<p class="text-white font-medium pt-1">$125.50</p>
+</div>
+</article>
+<!-- END: Card 2 -->
+<!-- BEGIN: Card 3 (Michael Chen - Sick Leave) -->
+<article class="bg-ios-card overflow-hidden rounded-xl mb-4" data-purpose="approval-card-sick-leave">
+<!-- Card Header -->
+<div class="px-4 py-3 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<img alt="Michael Chen" class="w-10 h-10 rounded-full object-cover bg-gray-700 w-[48px] h-[48px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6NOoh6wJTLdpVQZMthUd5LKUN0RlatL3Xf3pibaotGvb4WW3xqE7yfpUxJ9eKftQDFGlslRO8XR9Rl41WmPng4F7D1uSRsg1A-ppAtfnBUICC23l-slZ4ptNNy1TVo7O1CaCQpUmlpVeVYpLgdUz2jHR-yQN_sktUxqeo6-hBOVXWA2QQvkNZEHtMg5mVcsjyUMBjFgv0S3UeN5PfI2CWfBAKk5C2zEgh-2M66MORhGxB_0P5Wi0lppRgykkSFAFdXWo8kkdtX8c"/>
+<span class="font-semibold text-lg">Michael Chen</span>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-px mx-4 bg-[#2C2C2E]"></div>
+<!-- Card Body -->
+<div class="p-4 space-y-1">
+<!-- Title -->
+<h3 class="text-lg font-semibold">Sick Leave</h3>
+<!-- Date Subtitle -->
+<p class="text-ios-textSecondary text-sm">Aug 12, 2024 (1 day)</p>
+</div>
+</article>
+<!-- END: Card 3 -->
+</main>
+<!-- END: Main Content -->
+<!-- BEGIN: Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full border-t border-gray-800 safe-bottom" style="background-color: #161616; border-top: 0.5px solid #333;">
+<div class="flex justify-between items-center px-2 pt-2 pb-1">
+<!-- Dashboard Item -->
+<button class="flex flex-col items-center justify-center w-1/5 space-y-1 group">
+<i class="fas fa-home text-xl"></i>
+<span class="text-[10px] text-ios-textSecondary group-hover:text-white">Dashboard</span>
+</button>
+<!-- Approvals Item (Active) -->
+<button class="flex flex-col items-center justify-center w-1/5 space-y-1 relative"><div style="width: 24px; height: 24px; background-color: #5E5CE6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 4px;"><i class="fas fa-check" style="color: white; font-size: 14px;"></i></div><span class="text-[10px] text-ios-purple font-medium">Approvals</span></button>
+<!-- Time Item -->
+<button class="flex flex-col items-center justify-center w-1/5 space-y-1 group">
+<i class="far fa-clock text-xl"></i>
+<span class="text-[10px] text-ios-textSecondary group-hover:text-white">Time</span>
+</button>
+<!-- Leave Item -->
+<button class="flex flex-col items-center justify-center w-1/5 space-y-1 group">
+<i class="far fa-calendar-alt text-xl"></i>
+<span class="text-[10px] text-ios-textSecondary group-hover:text-white">Leave</span>
+</button>
+<!-- More Item -->
+<button class="flex flex-col items-center justify-center w-1/5 space-y-1 group">
+<i class="fas fa-bars text-xl"></i>
+<span class="text-[10px] text-ios-textSecondary group-hover:text-white">More</span>
+</button>
+</div>
+</nav>
+<!-- END: Bottom Navigation Bar -->
+</body></html>

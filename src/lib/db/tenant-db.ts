@@ -1,14 +1,13 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 import { getTenantContext, TenantContext } from '@/lib/auth/tenant-access';
 
 /**
  * Tenant-aware database client that automatically applies tenant filtering
  */
 export class TenantDB {
-  private prisma: PrismaClient;
-  
   constructor() {
-    this.prisma = new PrismaClient();
+    // Uses singleton prisma instance
   }
 
   /**
@@ -29,7 +28,7 @@ export class TenantDB {
     return {
       findMany: async (args?: Prisma.TimesheetFindManyArgs) => {
         const context = await this.getContext();
-        return this.prisma.timesheet.findMany({
+        return prisma.timesheet.findMany({
           ...args,
           where: {
             ...args?.where,
@@ -42,7 +41,7 @@ export class TenantDB {
 
       findUnique: async (args: Prisma.TimesheetFindUniqueArgs) => {
         const context = await this.getContext();
-        const timesheet = await this.prisma.timesheet.findUnique(args);
+        const timesheet = await prisma.timesheet.findUnique(args);
         
         if (!timesheet) return null;
         
@@ -61,9 +60,10 @@ export class TenantDB {
 
       create: async (args: Prisma.TimesheetCreateArgs) => {
         const context = await this.getContext();
-        // Extract relation fields to avoid type conflicts
-        const { tenant, user, ...restData } = args.data as Record<string, unknown>;
-        return this.prisma.timesheet.create({
+        // Extract relation fields to avoid type conflicts (tenant/user are relations, not direct data)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { tenant: _tenant, user: _user, ...restData } = args.data as Record<string, unknown>;
+        return prisma.timesheet.create({
           ...args,
           data: {
             ...restData,
@@ -75,38 +75,34 @@ export class TenantDB {
       },
 
       update: async (args: Prisma.TimesheetUpdateArgs) => {
-        const context = await this.getContext();
-        
         // First verify access to the timesheet
         const existing = await this.timesheet.findUnique({
           where: args.where,
         });
-        
+
         if (!existing) {
           throw new Error('Timesheet not found');
         }
-        
-        return this.prisma.timesheet.update(args);
+
+        return prisma.timesheet.update(args);
       },
 
       delete: async (args: Prisma.TimesheetDeleteArgs) => {
-        const context = await this.getContext();
-        
         // First verify access to the timesheet
         const existing = await this.timesheet.findUnique({
           where: args.where,
         });
-        
+
         if (!existing) {
           throw new Error('Timesheet not found');
         }
-        
-        return this.prisma.timesheet.delete(args);
+
+        return prisma.timesheet.delete(args);
       },
 
       count: async (args?: Prisma.TimesheetCountArgs) => {
         const context = await this.getContext();
-        return this.prisma.timesheet.count({
+        return prisma.timesheet.count({
           ...args,
           where: {
             ...args?.where,
@@ -125,14 +121,14 @@ export class TenantDB {
     return {
       findMany: async (args?: Prisma.UserFindManyArgs) => {
         const context = await this.getContext();
-        
+
         if (context.isSuperuser) {
           // Superusers can see all users
-          return this.prisma.user.findMany(args);
+          return prisma.user.findMany(args);
         }
-        
+
         // Regular users can only see users in their tenant
-        return this.prisma.user.findMany({
+        return prisma.user.findMany({
           ...args,
           where: {
             ...args?.where,
@@ -148,16 +144,16 @@ export class TenantDB {
 
       findUnique: async (args: Prisma.UserFindUniqueArgs) => {
         const context = await this.getContext();
-        const user = await this.prisma.user.findUnique(args);
-        
+        const user = await prisma.user.findUnique(args);
+
         if (!user) return null;
-        
+
         if (context.isSuperuser) {
           return user;
         }
-        
+
         // Check if user is in the same tenant
-        const tenantUser = await this.prisma.tenantUser.findUnique({
+        const tenantUser = await prisma.tenantUser.findUnique({
           where: {
             tenantId_userId: {
               tenantId: context.tenantId,
@@ -165,22 +161,22 @@ export class TenantDB {
             },
           },
         });
-        
+
         if (!tenantUser?.isActive) {
           throw new Error('Access denied to this user');
         }
-        
+
         return user;
       },
 
       count: async (args?: Prisma.UserCountArgs) => {
         const context = await this.getContext();
-        
+
         if (context.isSuperuser) {
-          return this.prisma.user.count(args);
+          return prisma.user.count(args);
         }
-        
-        return this.prisma.user.count({
+
+        return prisma.user.count({
           ...args,
           where: {
             ...args?.where,
@@ -203,12 +199,12 @@ export class TenantDB {
     return {
       findMany: async (args?: Prisma.TenantUserFindManyArgs) => {
         const context = await this.getContext();
-        
+
         if (context.isSuperuser) {
-          return this.prisma.tenantUser.findMany(args);
+          return prisma.tenantUser.findMany(args);
         }
-        
-        return this.prisma.tenantUser.findMany({
+
+        return prisma.tenantUser.findMany({
           ...args,
           where: {
             ...args?.where,
@@ -219,70 +215,66 @@ export class TenantDB {
 
       findUnique: async (args: Prisma.TenantUserFindUniqueArgs) => {
         const context = await this.getContext();
-        const tenantUser = await this.prisma.tenantUser.findUnique(args);
-        
+        const tenantUser = await prisma.tenantUser.findUnique(args);
+
         if (!tenantUser) return null;
-        
+
         if (context.isSuperuser) {
           return tenantUser;
         }
-        
+
         if (tenantUser.tenantId !== context.tenantId) {
           throw new Error('Access denied to this tenant user');
         }
-        
+
         return tenantUser;
       },
 
       create: async (args: Prisma.TenantUserCreateArgs) => {
         const context = await this.getContext();
-        
+
         if (!context.isSuperuser) {
           // Regular users can only create in their own tenant
           args.data.tenantId = context.tenantId;
         }
-        
-        return this.prisma.tenantUser.create(args);
+
+        return prisma.tenantUser.create(args);
       },
 
       update: async (args: Prisma.TenantUserUpdateArgs) => {
-        const context = await this.getContext();
-        
         // First verify access
         const existing = await this.tenantUser.findUnique({
           where: args.where,
         });
-        
+
         if (!existing) {
           throw new Error('Tenant user not found');
         }
-        
-        return this.prisma.tenantUser.update(args);
+
+        return prisma.tenantUser.update(args);
       },
 
       delete: async (args: Prisma.TenantUserDeleteArgs) => {
-        const context = await this.getContext();
-        
         // First verify access
         const existing = await this.tenantUser.findUnique({
           where: args.where,
         });
-        
+
         if (!existing) {
           throw new Error('Tenant user not found');
         }
-        
-        return this.prisma.tenantUser.delete(args);
+
+        return prisma.tenantUser.delete(args);
       },
 
       count: async (args?: Prisma.TenantUserCountArgs) => {
         const context = await this.getContext();
-        
+
         if (context.isSuperuser) {
-          return this.prisma.tenantUser.count(args);
+          return prisma.tenantUser.count(args);
         }
-        
-        return this.prisma.tenantUser.count({
+
+        return prisma.tenantUser.count({
           ...args,
           where: {
             ...args?.where,
@@ -300,10 +292,10 @@ export class TenantDB {
     return {
       findMany: async (args?: Prisma.TenantFindManyArgs) => {
         const context = await this.getContext();
-        
+
         if (!context.isSuperuser) {
           // Regular users can only see their own tenant
-          return this.prisma.tenant.findMany({
+          return prisma.tenant.findMany({
             ...args,
             where: {
               ...args?.where,
@@ -311,42 +303,42 @@ export class TenantDB {
             },
           });
         }
-        
-        return this.prisma.tenant.findMany(args);
+
+        return prisma.tenant.findMany(args);
       },
 
       findUnique: async (args: Prisma.TenantFindUniqueArgs) => {
         const context = await this.getContext();
-        const tenant = await this.prisma.tenant.findUnique(args);
-        
+        const tenant = await prisma.tenant.findUnique(args);
+
         if (!tenant) return null;
-        
+
         if (context.isSuperuser) {
           return tenant;
         }
-        
+
         if (tenant.id !== context.tenantId) {
           throw new Error('Access denied to this tenant');
         }
-        
+
         return tenant;
       },
 
       update: async (args: Prisma.TenantUpdateArgs) => {
         const context = await this.getContext();
-        
+
         if (!context.isSuperuser) {
           // Regular users can only update their own tenant
           const tenant = await this.tenant.findUnique({
             where: args.where,
           });
-          
+
           if (!tenant) {
             throw new Error('Tenant not found');
           }
         }
-        
-        return this.prisma.tenant.update(args);
+
+        return prisma.tenant.update(args);
       },
     };
   }
@@ -355,7 +347,7 @@ export class TenantDB {
    * Raw Prisma client for operations that need custom logic
    */
   get raw() {
-    return this.prisma;
+    return prisma;
   }
 
   /**
@@ -364,7 +356,7 @@ export class TenantDB {
   async transaction<T>(fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
     await this.getContext(); // Verify context exists
 
-    return this.prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx) => {
       // Pass the transaction client to the function
       return fn(tx);
     });
@@ -374,7 +366,7 @@ export class TenantDB {
    * Disconnect the client
    */
   async disconnect() {
-    await this.prisma.$disconnect();
+    await prisma.$disconnect();
   }
 }
 

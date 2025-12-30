@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Profile &amp; Settings - iOS Mockup</title>
+<!-- Load Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Load FontAwesome for icons matching the mockup style -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<!-- BEGIN: Custom Configuration -->
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ios: {
+                            bg: '#F2F2F7',      // Standard iOS Grouped Background
+                            blue: '#007AFF',    // iOS System Blue
+                            red: '#FF3B30',     // iOS System Red
+                            separator: '#C6C6C8', // iOS Separator Color
+                            green: '#34C759',   // iOS System Green (Success)
+                            text: '#000000',
+                            subtext: '#8E8E93',
+                            surface: '#FFFFFF'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+<!-- END: Custom Configuration -->
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="toggle-switch">
+        /* Custom styles for the iOS-style toggle switches to match exact appearance */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #34C759;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #34C759;
+        }
+        
+        /* The sliding circle */
+        .toggle-checkbox {
+            appearance: none;
+            display: none;
+        }
+        
+        .toggle-label {
+            width: 51px;
+            height: 31px;
+            background-color: #E9E9EA; /* iOS Grey Off state */
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 27px;
+            height: 27px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .toggle-checkbox:checked + .toggle-label::after {
+            transform: translateX(20px);
+        }
+    </style>
+<style data-purpose="layout-tweaks">
+        /* Hiding scrollbar for cleaner mobile preview if content overflows */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        /* Ensuring the last item in a list group doesn't have a border */
+        .list-group-item:last-child .inner-content {
+            border-bottom: none;
+        }
+    
+        /* Remove border from the content div of the last item in the list group */
+        .list-group-item:last-child > div:last-child {
+            border-bottom: none;
+        }
+    </style>
+<!-- END: Custom Styles -->
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-ios-bg font-sans text-ios-text antialiased min-h-screen">
+<!-- BEGIN: NavigationBar -->
+<!-- Fixed top navigation bar typical of iOS apps -->
+<header class="sticky top-0 z-50 bg-ios-surface/95 backdrop-blur border-b border-gray-300 px-4 h-[44px] flex items-center justify-between">
+<!-- Back Button -->
+<button aria-label="Go back" class="flex items-center text-ios-blue text-lg">
+<i class="fa-solid fa-chevron-left mr-1 text-xl"></i>
+</button>
+<!-- Page Title -->
+<h1 class="text-[17px] text-black absolute left-1/2 transform -translate-x-1/2 font-bold">
+            Profile &amp; Settings
+        </h1>
+<!-- Done Button -->
+<button class="text-[17px] font-semibold text-ios-blue">
+            Done
+        </button>
+</header>
+<!-- END: NavigationBar -->
+<main class="pb-10">
+<!-- BEGIN: ProfileHeader -->
+<!-- Top section with user avatar and basic details -->
+<section class="bg-ios-surface mb-6 px-4 py-4 flex items-center gap-4 border-b border-gray-300">
+<!-- Avatar -->
+<div class="flex-shrink-0">
+<img alt="Jane Doe Profile" class="w-[60px] h-[60px] rounded-full object-cover border border-gray-100 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoa20EN46Q8ZfcwvwsAQvMBjER8QGZb3t5-g_ZMj7h4Ql3EoXtWlbdQCzV2TrJt0RXCKTY6EXHePJDyeY1GsLl00knapeMufLo-A_m0its_4sunYrfQd1UjvnlZexC7sgtMCv59bCIlYQAJTT7TJr4zWhFiIe-tAfr3kfESs_twE8vYikZaL17vxk_uNFfEmNYo3CEgmkokmLKr5LyalOeW_iGXq3Xg1BVRFWNCJ7UzFWEG5pv-EFln4PEa5c1REVcLvgPx2M__mA"/>
+</div>
+<!-- User Details -->
+<div class="flex flex-col">
+<h2 class="text-[22px] font-bold leading-tight">Jane Doe</h2>
+<p class="text-[15px] text-gray-500 mt-0.5">Senior Analyst, ID: 12345</p>
+</div>
+</section>
+<!-- END: ProfileHeader -->
+<!-- BEGIN: PersonalInformationSection -->
+<section class="mb-8 px-4">
+<h3 class="text-[13px] text-gray-500 uppercase px-4 mb-2 font-normal tracking-wide">Personal Information</h3>
+<div class="bg-ios-surface rounded-xl overflow-hidden shadow-sm"><!-- Email Row -->
+<div class="list-group-item pl-4 active:bg-gray-100 transition-colors flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-regular fa-envelope"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">Email</span>
+<div class="flex items-center gap-2">
+<span class="text-[17px] text-gray-500">jane.doe@aads.com</span>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+</div>
+<!-- Phone Row -->
+<div class="list-group-item pl-4 active:bg-gray-100 transition-colors flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-solid fa-phone"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">Phone</span>
+<div class="flex items-center gap-2">
+<span class="text-[17px] text-gray-500">(555) 123-4567</span>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+</div>
+<!-- Location Row -->
+<div class="list-group-item pl-4 active:bg-gray-100 transition-colors flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-solid fa-location-arrow"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">Work Location</span>
+<div class="flex items-center gap-2">
+<span class="text-[17px] text-gray-500">Headquarters, NY</span>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+</div></div>
+</section>
+<!-- END: PersonalInformationSection -->
+<!-- BEGIN: PreferencesSection -->
+<section class="mb-8 px-4">
+<h3 class="text-[13px] text-gray-500 uppercase px-4 mb-2 font-normal tracking-wide">Preferences</h3>
+<div class="bg-ios-surface rounded-xl overflow-hidden shadow-sm"><!-- Dark Mode Row (Toggle OFF) -->
+<div class="list-group-item pl-4 flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-regular fa-moon"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">Dark Mode</span>
+<div>
+<input class="toggle-checkbox" id="darkModeToggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden cursor-pointer" for="darkModeToggle"></label>
+</div>
+</div>
+</div>
+<!-- Push Notifications Row (Toggle ON) -->
+<div class="list-group-item pl-4 flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-regular fa-bell"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">Push Notifications</span>
+<div>
+<input checked="" class="toggle-checkbox" id="pushToggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden cursor-pointer" for="pushToggle"></label>
+</div>
+</div>
+</div>
+<!-- Language Row -->
+<div class="list-group-item pl-4 active:bg-gray-100 transition-colors flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-solid fa-globe"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">Language</span>
+<div class="flex items-center gap-2">
+<span class="text-[17px] text-gray-500">English (US)</span>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+</div></div>
+</section>
+<!-- END: PreferencesSection -->
+<!-- BEGIN: AppSettingsSection -->
+<section class="mb-8 px-4">
+<h3 class="text-[13px] text-gray-500 uppercase px-4 mb-2 font-normal tracking-wide">App Settings</h3>
+<div class="bg-ios-surface rounded-xl overflow-hidden shadow-sm"><!-- Change Password -->
+<div class="list-group-item pl-4 active:bg-gray-100 transition-colors flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-solid fa-key"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">Change Password</span>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+<!-- Privacy & Security -->
+<div class="list-group-item pl-4 active:bg-gray-100 transition-colors flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-solid fa-lock"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">Privacy &amp; Security</span>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+<!-- About AADS -->
+<div class="list-group-item pl-4 active:bg-gray-100 transition-colors flex items-center">
+<div class="w-8 flex justify-start text-black text-lg flex-shrink-0">
+<i class="fa-regular fa-circle-info"></i>
+</div>
+<div class="flex-grow flex items-center py-3 pr-4 border-b border-gray-200">
+<span class="text-[17px] flex-grow">About AADS</span>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div></div>
+</section>
+<!-- END: AppSettingsSection -->
+<!-- BEGIN: FooterAction -->
+<section class="px-4 mt-8">
+<div class="bg-ios-surface rounded-xl overflow-hidden shadow-sm h-12 flex items-center justify-center">
+<button class="w-full h-full text-[17px] font-normal text-ios-red active:bg-gray-100 transition-colors">
+            Log Out
+        </button>
+</div>
+</section>
+<!-- END: FooterAction -->
+</main>
+</body></html>

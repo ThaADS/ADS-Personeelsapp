@@ -50,7 +50,7 @@ export const ensureStripeProducts = async () => {
     if (STRIPE_CONFIG.products.standard) {
       try {
         standardProduct = await stripe.products.retrieve(STRIPE_CONFIG.products.standard);
-      } catch (error) {
+      } catch {
         // Product doesn't exist, create it
         standardProduct = await createStandardProduct();
       }
@@ -94,7 +94,7 @@ const ensureStandardPrices = async (productId: string) => {
   if (STRIPE_CONFIG.prices.standardMonthly) {
     try {
       prices.monthly = await stripe.prices.retrieve(STRIPE_CONFIG.prices.standardMonthly);
-    } catch (error) {
+    } catch {
       console.log('Monthly price not found, creating...');
     }
   }
@@ -121,7 +121,7 @@ const ensureStandardPrices = async (productId: string) => {
   if (STRIPE_CONFIG.prices.standardYearly) {
     try {
       prices.yearly = await stripe.prices.retrieve(STRIPE_CONFIG.prices.standardYearly);
-    } catch (error) {
+    } catch {
       console.log('Yearly price not found, creating...');
     }
   }
@@ -149,7 +149,7 @@ const ensureStandardPrices = async (productId: string) => {
   if (STRIPE_CONFIG.prices.extraUserMonthly) {
     try {
       prices.extraUser = await stripe.prices.retrieve(STRIPE_CONFIG.prices.extraUserMonthly);
-    } catch (error) {
+    } catch {
       console.log('Extra user price not found, creating...');
     }
   }

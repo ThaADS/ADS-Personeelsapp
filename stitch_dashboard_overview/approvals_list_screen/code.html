@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="nl"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Goedkeuringen - Mobile View</title>
+<!-- Tailwind CSS v3 with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration for custom colors -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'app-purple': '#6A1B9A',
+            'app-red': '#D32F2F',
+            'app-green': '#388E3C',
+            'app-bg': '#F5F5F5',
+            'app-badge': '#E0E0E0',
+            'app-text-muted': '#757575',
+          },
+          fontFamily: {
+            sans: ['Helvetica', 'Arial', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for specific adjustments not covered by utilities -->
+<style data-purpose="layout-adjustments">
+    /* Ensure the body takes full height and allows scrolling for main content */
+    body {
+      background-color: #F5F5F5; /* app-bg */
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden; /* Prevent body scroll, scroll main instead */
+    }
+    
+    /* Main scrollable area */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      /* Add padding for top header and bottom nav */
+      padding-top: 60px; 
+      padding-bottom: 80px;
+    }
+
+    /* Fixed Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background-color: white;
+      height: 60px;
+    }
+
+    /* Fixed Bottom Nav */
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background-color: white;
+      height: 70px; /* Slightly taller for icons + text */
+      box-shadow: 0 -1px 4px rgba(0,0,0,0.05);
+    }
+  </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-sans antialiased text-gray-900">
+<!-- BEGIN: Header -->
+<!-- Top navigation bar with Back link, Title, and Filter icon -->
+<header class="flex items-center justify-between px-4 border-b border-gray-200">
+<!-- Left: Back Button -->
+<button class="flex items-center text-app-purple font-medium text-lg">
+<!-- Icon Placeholder: Chevron Left -->
+<i class="fa-solid fa-chevron-left mr-1"></i>
+      Back
+    </button>
+<!-- Center: Page Title -->
+<h1 class="text-lg font-bold text-black absolute left-1/2 transform -translate-x-1/2 font-bold text-lg">
+      Goedkeuringen
+    </h1>
+<!-- Right: Filter Icon -->
+<button class="text-app-purple">
+<!-- Icon Placeholder: Funnel/Filter -->
+<i class="fa-solid fa-filter"></i>
+</button>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: Main Content -->
+<!-- Scrollable list of approval cards -->
+<main class="px-3 py-4 space-y-4">
+<!-- Card 1: Verlofaanvraag -->
+<article class="bg-white rounded-xl shadow-card p-4 flex flex-col gap-3">
+<!-- Header: Type & Status -->
+<div class="flex justify-between items-start">
+<h2 class="font-bold text-lg text-black">Verlofaanvraag</h2>
+<span class="bg-gray-100 text-gray-600 text-xs font-normal px-2 py-1 rounded-full" style="background-color: #F3F4F6;">
+          In afwachting
+        </span>
+</div>
+<!-- Subheader: Name & Date -->
+<div class="flex justify-between items-center text-sm">
+<span class="text-black font-medium">Jan Jansen</span>
+<span class="text-gray-500">12 Okt 2023</span>
+</div>
+<!-- Description -->
+<div class="text-sm text-black leading-snug">
+<p>Verlofaanvraag sich tonden hij ongendag vam 01.02. 2023 - 13:00</p>
+</div>
+<!-- Action Buttons -->
+<div class="flex mt-2 gap-4">
+<button class="flex-1 bg-app-red text-white font-medium py-3 rounded-lg shadow-sm active:opacity-90 transition-opacity" style="border-radius: 8px;">
+          Afwijzen
+        </button>
+<button class="flex-1 bg-app-green text-white font-medium py-3 rounded-lg shadow-sm active:opacity-90 transition-opacity" style="border-radius: 8px;">
+          Goedkeuren
+        </button>
+</div>
+</article>
+<!-- Card 2: Onkostendeclaratie -->
+<article class="bg-white rounded-xl shadow-card p-4 flex flex-col gap-3">
+<!-- Header: Type & Status -->
+<div class="flex justify-between items-start">
+<h2 class="font-bold text-lg text-black">Onkostendeclaratie</h2>
+<span class="bg-gray-100 text-gray-600 text-xs font-normal px-2 py-1 rounded-full" style="background-color: #F3F4F6;">
+          In afwachting
+        </span>
+</div>
+<!-- Subheader: Name & Date -->
+<div class="flex justify-between items-center text-sm">
+<span class="text-black font-medium">Jan Jansen</span>
+<span class="text-gray-500">12 Okt 2023</span>
+</div>
+<!-- Description -->
+<div class="text-sm text-black leading-snug space-y-3">
+<p>Onkostendeclaratie van her egestring net onkostendeclaratie.</p>
+<p class="font-medium">Kincipe: 2,70 €</p>
+</div>
+<!-- Action Buttons -->
+<div class="flex mt-2 gap-4">
+<button class="flex-1 bg-app-red text-white font-medium py-3 rounded-lg shadow-sm active:opacity-90 transition-opacity" style="border-radius: 8px;">
+          Afwijzen
+        </button>
+<button class="flex-1 bg-app-green text-white font-medium py-3 rounded-lg shadow-sm active:opacity-90 transition-opacity" style="border-radius: 8px;">
+          Goedkeuren
+        </button>
+</div>
+</article>
+<!-- Card 3: Tijdregistratie -->
+<article class="bg-white rounded-xl shadow-card p-4 flex flex-col gap-3">
+<!-- Header: Type & Status -->
+<div class="flex justify-between items-start">
+<h2 class="font-bold text-lg text-black">Tijdregistratie</h2>
+<span class="bg-gray-100 text-gray-600 text-xs font-normal px-2 py-1 rounded-full" style="background-color: #F3F4F6;">
+          In afwachting
+        </span>
+</div>
+<!-- Subheader: Name & Date -->
+<div class="flex justify-between items-center text-sm">
+<span class="text-black font-medium">Jan Jansen</span>
+<span class="text-gray-500">12 Okt 2023</span>
+</div>
+<!-- Description -->
+<div class="text-sm text-black leading-snug">
+<p>Tijdregistratie wort: 1kij 6 daze er is noor u verlwanden.</p>
+</div>
+<!-- Action Buttons -->
+<div class="flex mt-2 gap-4">
+<button class="flex-1 bg-app-red text-white font-medium py-3 rounded-lg shadow-sm active:opacity-90 transition-opacity" style="border-radius: 8px;">
+          Afwijzen
+        </button>
+<button class="flex-1 bg-app-green text-white font-medium py-3 rounded-lg shadow-sm active:opacity-90 transition-opacity" style="border-radius: 8px;">
+          Goedkeuren
+        </button>
+</div>
+</article>
+</main>
+<!-- END: Main Content -->
+<!-- BEGIN: Bottom Navigation -->
+<nav class="bottom-nav flex justify-between items-center px-2 text-[10px] text-gray-400 border-t border-gray-200">
+<!-- Item 1: Dashboard -->
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 pt-1 flex-1 text-gray-400" href="#">
+<!-- Icon: Table Columns -->
+<i class="fa-solid fa-table-columns text-xl mb-1"></i>
+<span>Dashboard</span>
+</a>
+<!-- Item 2: Medewerkers -->
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 pt-1 flex-1 text-gray-400" href="#">
+<!-- Icon: User Group -->
+<i class="fa-solid fa-user-group text-xl mb-1"></i>
+<span>Medewerkers</span>
+</a>
+<!-- Item 3: Goedkeuringen (ACTIVE) -->
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 pt-1 text-app-purple flex-1" href="#">
+<!-- Icon: Clipboard Check -->
+<i class="fa-solid fa-clipboard-check text-xl mb-1"></i>
+<span class="font-medium">Goedkeuringen</span>
+</a>
+<!-- Item 4: Tijdregistratie -->
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 pt-1 flex-1 text-gray-400" href="#">
+<!-- Icon: Clock -->
+<i class="fa-solid fa-clock text-xl mb-1"></i>
+<span>Tijdregistratie</span>
+</a>
+<!-- Item 5: Meer -->
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 pt-1 flex-1 text-gray-400" href="#">
+<!-- Icon: Ellipsis -->
+<i class="fa-solid fa-ellipsis text-xl mb-1"></i>
+<span>Meer</span>
+</a>
+</nav>
+<!-- END: Bottom Navigation -->
+</body></html>

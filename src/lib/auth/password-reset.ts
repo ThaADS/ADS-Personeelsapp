@@ -7,8 +7,8 @@
  * Security features:
  * - Cryptographically secure token generation
  * - Token hashing (tokens stored hashed, not plain)
- * - Rate limiting (3 requests per hour per email)
- * - Token expiration (1 hour)
+ * - Rate limiting (3 requests per hour per email) - stored in database
+ * - Token expiration (1 hour) - stored in database
  * - Audit logging for all attempts
  */
 
@@ -16,24 +16,6 @@ import { prisma } from '@/lib/db/prisma';
 import { hash } from 'bcryptjs';
 import crypto from 'crypto';
 import { sendPasswordResetEmail, sendPasswordChangedEmail } from '@/lib/services/email-service';
-
-// In-memory token storage (for production, use Redis or database)
-interface TokenData {
-  hashedToken: string;
-  email: string;
-  userId: string;
-  expiresAt: Date;
-  createdAt: Date;
-}
-
-interface RateLimitData {
-  count: number;
-  firstRequestAt: Date;
-}
-
-// Token storage - in production, use Redis or a dedicated table
-const tokenStore = new Map<string, TokenData>();
-const rateLimitStore = new Map<string, RateLimitData>();
 
 // Constants
 const TOKEN_EXPIRY_HOURS = 1;
@@ -56,26 +38,36 @@ function hashToken(token: string): string {
 }
 
 /**
- * Check rate limiting for an email
+ * Check rate limiting for an email using database storage
  */
-function checkRateLimit(email: string): { allowed: boolean; remainingAttempts: number } {
+async function checkRateLimit(email: string): Promise<{ allowed: boolean; remainingAttempts: number }> {
   const normalizedEmail = email.toLowerCase();
   const now = new Date();
-  const rateData = rateLimitStore.get(normalizedEmail);
 
-  if (!rateData) {
+  // Find existing rate limit entry
+  const rateEntry = await prisma.rateLimitEntry.findUnique({
+    where: {
+      identifier_type: {
+        identifier: normalizedEmail,
+        type: 'password_reset'
+      }
+    }
+  });
+
+  if (!rateEntry) {
     return { allowed: true, remainingAttempts: MAX_REQUESTS_PER_WINDOW - 1 };
   }
 
-  const windowStart = new Date(now.getTime() - RATE_LIMIT_WINDOW_HOURS * 60 * 60 * 1000);
-
-  // Reset if outside window
-  if (rateData.firstRequestAt < windowStart) {
-    rateLimitStore.delete(normalizedEmail);
+  // Check if window has expired
+  if (rateEntry.windowExpires < now) {
+    // Delete expired entry
+    await prisma.rateLimitEntry.delete({
+      where: { id: rateEntry.id }
+    });
     return { allowed: true, remainingAttempts: MAX_REQUESTS_PER_WINDOW - 1 };
   }
 
-  const remaining = MAX_REQUESTS_PER_WINDOW - rateData.count;
+  const remaining = MAX_REQUESTS_PER_WINDOW - rateEntry.count;
   return {
     allowed: remaining > 0,
     remainingAttempts: Math.max(0, remaining - 1)
@@ -83,33 +75,55 @@ function checkRateLimit(email: string): { allowed: boolean; remainingAttempts: n
 }
 
 /**
- * Record a rate limit attempt
+ * Record a rate limit attempt in database
  */
-function recordRateLimitAttempt(email: string): void {
+async function recordRateLimitAttempt(email: string): Promise<void> {
   const normalizedEmail = email.toLowerCase();
   const now = new Date();
-  const existing = rateLimitStore.get(normalizedEmail);
+  const windowExpires = new Date(now.getTime() + RATE_LIMIT_WINDOW_HOURS * 60 * 60 * 1000);
 
-  if (existing) {
-    existing.count += 1;
-  } else {
-    rateLimitStore.set(normalizedEmail, {
+  await prisma.rateLimitEntry.upsert({
+    where: {
+      identifier_type: {
+        identifier: normalizedEmail,
+        type: 'password_reset'
+      }
+    },
+    update: {
+      count: { increment: 1 }
+    },
+    create: {
+      identifier: normalizedEmail,
+      type: 'password_reset',
       count: 1,
-      firstRequestAt: now
-    });
-  }
+      firstRequest: now,
+      windowExpires
+    }
+  });
 }
 
 /**
- * Clean up expired tokens (run periodically)
+ * Clean up expired tokens from database (run periodically)
  */
-function cleanupExpiredTokens(): void {
+async function cleanupExpiredTokens(): Promise<void> {
   const now = new Date();
-  for (const [key, data] of tokenStore.entries()) {
-    if (data.expiresAt < now) {
-      tokenStore.delete(key);
+
+  // Delete expired tokens
+  await prisma.passwordResetToken.deleteMany({
+    where: {
+      OR: [
+        { expiresAt: { lt: now } },
+        { usedAt: { not: null } }
+      ]
     }
-  }
+  });
+
+  // Delete expired rate limit entries
+  await prisma.rateLimitEntry.deleteMany({
+    where: {
+      windowExpires: { lt: now }
+    }
+  });
 }
 
 /**
@@ -150,11 +164,11 @@ export async function requestPasswordReset(
 ): Promise<{ success: boolean; message: string }> {
   const normalizedEmail = email.toLowerCase().trim();
 
-  // Clean up expired tokens periodically
-  cleanupExpiredTokens();
+  // Clean up expired tokens periodically (async, don't await)
+  cleanupExpiredTokens().catch(err => console.error('Token cleanup error:', err));
 
   // Check rate limiting
-  const { allowed, remainingAttempts } = checkRateLimit(normalizedEmail);
+  const { allowed } = await checkRateLimit(normalizedEmail);
 
   if (!allowed) {
     await createAuditLog('PASSWORD_RESET_RATE_LIMITED', null, {
@@ -171,7 +185,7 @@ export async function requestPasswordReset(
   }
 
   // Record the attempt
-  recordRateLimitAttempt(normalizedEmail);
+  await recordRateLimitAttempt(normalizedEmail);
 
   try {
     // Find user by email
@@ -205,20 +219,18 @@ export async function requestPasswordReset(
     const hashedToken = hashToken(token);
     const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
 
-    // Invalidate any existing tokens for this user
-    for (const [key, data] of tokenStore.entries()) {
-      if (data.userId === user.id) {
-        tokenStore.delete(key);
-      }
-    }
+    // Invalidate any existing tokens for this email
+    await prisma.passwordResetToken.deleteMany({
+      where: { email: normalizedEmail }
+    });
 
-    // Store the new token
-    tokenStore.set(hashedToken, {
-      hashedToken,
-      email: normalizedEmail,
-      userId: user.id,
-      expiresAt,
-      createdAt: new Date()
+    // Store the new token in database
+    await prisma.passwordResetToken.create({
+      data: {
+        email: normalizedEmail,
+        token: hashedToken,
+        expiresAt
+      }
     });
 
     // Build reset URL
@@ -283,12 +295,16 @@ export async function resetPassword(
   const normalizedEmail = email.toLowerCase().trim();
 
   // Clean up expired tokens
-  cleanupExpiredTokens();
+  await cleanupExpiredTokens();
 
   try {
     // Hash the provided token to look up
     const hashedToken = hashToken(token);
-    const tokenData = tokenStore.get(hashedToken);
+
+    // Find token in database
+    const tokenData = await prisma.passwordResetToken.findUnique({
+      where: { token: hashedToken }
+    });
 
     // Verify token exists
     if (!tokenData) {
@@ -307,7 +323,9 @@ export async function resetPassword(
 
     // Verify token hasn't expired
     if (tokenData.expiresAt < new Date()) {
-      tokenStore.delete(hashedToken);
+      await prisma.passwordResetToken.delete({
+        where: { id: tokenData.id }
+      });
 
       await createAuditLog('PASSWORD_RESET_EXPIRED_TOKEN', null, {
         email: normalizedEmail,
@@ -320,6 +338,15 @@ export async function resetPassword(
         success: false,
         message: 'De reset link is verlopen. Vraag een nieuwe aan.',
         error: 'TOKEN_EXPIRED'
+      };
+    }
+
+    // Verify token hasn't been used
+    if (tokenData.usedAt) {
+      return {
+        success: false,
+        message: 'De reset link is al gebruikt. Vraag een nieuwe aan.',
+        error: 'TOKEN_USED'
       };
     }
 
@@ -340,10 +367,7 @@ export async function resetPassword(
 
     // Find and verify user
     const user = await prisma.user.findUnique({
-      where: {
-        id: tokenData.userId,
-        email: normalizedEmail
-      },
+      where: { email: normalizedEmail },
       select: {
         id: true,
         email: true,
@@ -352,11 +376,12 @@ export async function resetPassword(
     });
 
     if (!user) {
-      tokenStore.delete(hashedToken);
+      await prisma.passwordResetToken.delete({
+        where: { id: tokenData.id }
+      });
 
       await createAuditLog('PASSWORD_RESET_USER_NOT_FOUND', null, {
         email: normalizedEmail,
-        userId: tokenData.userId,
         ipAddress
       }, ipAddress);
 
@@ -379,15 +404,10 @@ export async function resetPassword(
       }
     });
 
-    // Delete the used token
-    tokenStore.delete(hashedToken);
-
-    // Clear all tokens for this user (invalidate any other reset links)
-    for (const [key, data] of tokenStore.entries()) {
-      if (data.userId === user.id) {
-        tokenStore.delete(key);
-      }
-    }
+    // Mark token as used and delete all tokens for this user
+    await prisma.passwordResetToken.deleteMany({
+      where: { email: normalizedEmail }
+    });
 
     // Send confirmation email
     const emailSent = await sendPasswordChangedEmail(normalizedEmail, {
@@ -441,18 +461,27 @@ export async function verifyResetToken(
 ): Promise<{ valid: boolean; error?: string }> {
   const normalizedEmail = email.toLowerCase().trim();
 
-  cleanupExpiredTokens();
+  // Clean up expired tokens
+  await cleanupExpiredTokens();
 
   const hashedToken = hashToken(token);
-  const tokenData = tokenStore.get(hashedToken);
+  const tokenData = await prisma.passwordResetToken.findUnique({
+    where: { token: hashedToken }
+  });
 
   if (!tokenData) {
     return { valid: false, error: 'INVALID_TOKEN' };
   }
 
   if (tokenData.expiresAt < new Date()) {
-    tokenStore.delete(hashedToken);
+    await prisma.passwordResetToken.delete({
+      where: { id: tokenData.id }
+    });
     return { valid: false, error: 'TOKEN_EXPIRED' };
+  }
+
+  if (tokenData.usedAt) {
+    return { valid: false, error: 'TOKEN_USED' };
   }
 
   if (tokenData.email !== normalizedEmail) {

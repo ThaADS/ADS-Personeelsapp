@@ -8,7 +8,7 @@ interface GPSIndicatorProps {
 export function GPSIndicator({ hasData, showLabel = true }: GPSIndicatorProps) {
   if (hasData) {
     return (
-      <span className="flex items-center text-green-600 dark:text-green-400">
+      <span className="flex items-center px-2 py-1 rounded-lg backdrop-blur-sm bg-green-500/10 dark:bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400">
         <svg
           className="h-4 w-4 mr-1"
           xmlns="http://www.w3.org/2000/svg"
@@ -27,7 +27,7 @@ export function GPSIndicator({ hasData, showLabel = true }: GPSIndicatorProps) {
   }
 
   return (
-    <span className="flex items-center text-gray-400 dark:text-gray-500">
+    <span className="flex items-center px-2 py-1 rounded-lg backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/10 text-gray-400 dark:text-gray-500">
       <svg
         className="h-4 w-4 mr-1"
         xmlns="http://www.w3.org/2000/svg"

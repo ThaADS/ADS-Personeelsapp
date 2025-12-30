@@ -1,25 +1,15 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 // Mock E2E test scenarios for critical user paths
 describe('E2E Critical Path Tests (Mocked)', () => {
   describe('Authentication Flow', () => {
     it('should complete login to dashboard flow', async () => {
-      // Mock E2E test scenario
-      const e2eScenario = {
-        step1: 'Navigate to /login',
-        step2: 'Enter credentials: admin@ckw.nl / Admin123!',
-        step3: 'Click login button',
-        step4: 'Verify redirect to /dashboard',
-        step5: 'Verify user menu shows admin name',
-        step6: 'Verify dashboard widgets load'
-      };
-
       // Simulate successful login flow
       const loginFlow = {
         navigateToLogin: () => ({ success: true, url: '/login' }),
-        enterCredentials: (email: string, password: string) => ({ 
+        enterCredentials: (email: string, password: string) => ({
           success: email === 'admin@ckw.nl' && password === 'Admin123!',
-          inputsValid: true 
+          inputsValid: true
         }),
         submitLogin: () => ({ success: true, redirected: true }),
         verifyDashboard: () => ({ 
@@ -47,7 +37,8 @@ describe('E2E Critical Path Tests (Mocked)', () => {
 
     it('should handle invalid login gracefully', async () => {
       const invalidLoginFlow = {
-        enterCredentials: (email: string, password: string) => ({ 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        enterCredentials: (_email: string, _password: string) => ({
           success: false,
           error: 'Invalid credentials'
         }),

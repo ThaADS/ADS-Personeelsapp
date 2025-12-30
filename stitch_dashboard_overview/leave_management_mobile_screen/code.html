@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Leave Management</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- FontAwesome for Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            app: {
+              bg: '#EAF6FB',
+              primary: '#3B82F6', // Blue
+              success: '#22C55E', // Green
+              warning: '#F59E0B', // Orange
+              danger: '#EF4444', // Red
+              text: '#1F2937', // Dark Gray/Black
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for specific layout needs -->
+<style data-purpose="chart-styles">
+    /* Utility to create the donut chart effect using conic-gradient */
+    .donut-chart {
+      position: relative;
+      border-radius: 50%;
+    }
+    
+    /* The white center to make it a donut */
+    .donut-chart::after {
+      content: "";
+      position: absolute;
+      inset: 8px; /* Thinner ring */
+      background-color: white;
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    /* Text needs to sit on top of the mask */
+    .donut-content {
+      position: absolute;
+      z-index: 10;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#EAF6FB] font-sans text-app-text antialiased">
+<!-- BEGIN: Main App Container -->
+<!-- Constrained width to simulate mobile view on larger screens -->
+<div class="mx-auto max-w-md min-h-screen shadow-2xl relative flex flex-col pb-24 bg-[#EAF6FB]">
+<!-- BEGIN: Header -->
+<header class="flex items-center justify-between px-5 pt-12 pb-4 sticky top-0 z-50 bg-[#EAF6FB]">
+<button aria-label="Go Back" class="text-2xl text-gray-800 focus:outline-none">
+<i class="fa-solid fa-chevron-left"></i>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-gray-900">Leave Management</h1>
+<button aria-label="User Profile" class="text-3xl text-gray-900 focus:outline-none">
+<i class="fa-solid fa-circle-user"></i>
+</button>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: Scrollable Content -->
+<main class="flex-1 px-5 space-y-6 overflow-y-auto">
+<!-- BEGIN: Balances Section -->
+<section class="bg-white rounded-2xl p-6 shadow-sm" data-purpose="balances-card">
+<h2 class="text-xl font-bold mb-6 pl-1">Your Balances</h2>
+<div class="grid grid-cols-3 gap-2">
+<!-- Balance Item 1: Annual Leave -->
+<div class="flex flex-col items-center text-center">
+<!-- 75% Green Chart -->
+<div class="donut-chart w-20 h-20 mb-2" style="background: conic-gradient(#22C55E 75%, #F3F4F6 0);">
+<div class="donut-content">
+<span class="text-lg font-bold text-gray-900 leading-none">15 / 20</span>
+<span class="text-[10px] text-gray-500 font-medium mt-0.5">Days</span>
+</div>
+</div>
+<p class="text-xs font-semibold text-gray-900 leading-tight">Annual Leave:</p>
+<p class="text-[10px] text-gray-500">Days Remaining</p>
+</div>
+<!-- Balance Item 2: Sick Leave -->
+<div class="flex flex-col items-center text-center">
+<!-- 80% Blue Chart -->
+<div class="donut-chart w-20 h-20 mb-2" style="background: conic-gradient(#3B82F6 80%, #F3F4F6 0);">
+<div class="donut-content">
+<span class="text-lg font-bold text-gray-900 leading-none">8 / 10</span>
+<span class="text-[10px] text-gray-500 font-medium mt-0.5">Days</span>
+</div>
+</div>
+<p class="text-xs font-semibold text-gray-900 leading-tight">Sick Leave:</p>
+<p class="text-[10px] text-gray-500">Days Remaining</p>
+</div>
+<!-- Balance Item 3: Personal Leave -->
+<div class="flex flex-col items-center text-center">
+<!-- 60% Orange Chart -->
+<div class="donut-chart w-20 h-20 mb-2" style="background: conic-gradient(#F59E0B 60%, #F3F4F6 0);">
+<div class="donut-content">
+<span class="text-lg font-bold text-gray-900 leading-none">3 / 5</span>
+<span class="text-[10px] text-gray-500 font-medium mt-0.5">Days</span>
+</div>
+</div>
+<p class="text-xs font-semibold text-gray-900 leading-tight">Personal Leave:</p>
+<p class="text-[10px] text-gray-500">Days Remaining</p>
+</div>
+</div>
+</section>
+<!-- END: Balances Section -->
+<!-- BEGIN: New Request Action -->
+<button class="w-full bg-[#4DA8D6] active:bg-[#3d8cb3] text-white font-medium py-3.5 rounded-xl shadow-sm flex items-center justify-center gap-2 transition-colors">
+<i class="fa-solid fa-circle-plus"></i>
+<span>New Request</span>
+</button>
+<!-- END: New Request Action -->
+<!-- BEGIN: Recent Requests Section -->
+<section data-purpose="recent-requests-list">
+<h2 class="text-xl font-bold mb-4 pl-1">Recent Requests</h2>
+<!-- List Container -->
+<div class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col">
+<!-- Request Item 1 -->
+<div class="flex border-b border-gray-100 last:border-0 relative">
+<!-- Status Color Bar -->
+<div class="w-2 bg-orange-400 shrink-0"></div>
+<div class="flex-1 p-4 pr-3 flex items-center justify-between">
+<!-- Text Content -->
+<div class="flex flex-col gap-1">
+<h3 class="font-bold text-gray-900 text-sm">Vacation:</h3>
+<p class="text-xs text-gray-500">
+          Dec 24 - Jan 2 | 8 Days | <span class="text-gray-500">Pending (Manager)</span>
+</p>
+</div>
+<!-- Icons -->
+<div class="flex items-center gap-3 pl-2">
+<i class="fa-solid fa-circle-exclamation text-orange-400 text-lg"></i>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+</div>
+<!-- Request Item 2 -->
+<div class="flex border-b border-gray-100 last:border-0 relative">
+<!-- Status Color Bar -->
+<div class="w-2 bg-green-500 shrink-0"></div>
+<div class="flex-1 p-4 pr-3 flex items-center justify-between">
+<!-- Text Content -->
+<div class="flex flex-col gap-1">
+<h3 class="font-bold text-gray-900 text-sm">Sick Leave:</h3>
+<p class="text-xs text-gray-500">
+          Nov 15 | 1 Day | <span class="text-gray-500">Approved</span>
+</p>
+</div>
+<!-- Icons -->
+<div class="flex items-center gap-3 pl-2">
+<i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+</div>
+<!-- Request Item 3 -->
+<div class="flex border-b border-gray-100 last:border-0 relative">
+<!-- Status Color Bar -->
+<div class="w-2 bg-green-500 shrink-0"></div>
+<div class="flex-1 p-4 pr-3 flex items-center justify-between">
+<!-- Text Content -->
+<div class="flex flex-col gap-1">
+<h3 class="font-bold text-gray-900 text-sm">Personal Leave:</h3>
+<p class="text-xs text-gray-500">
+          Oct 5 | 1 Day | <span class="text-gray-500">Approved</span>
+</p>
+</div>
+<!-- Icons -->
+<div class="flex items-center gap-3 pl-2">
+<i class="fa-solid fa-circle-check text-green-500 text-lg"></i>
+<i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Recent Requests Section -->
+<!-- BEGIN: View All Button -->
+<button class="w-full bg-[#DFF1FA] border border-[#BDE0F2] font-medium py-3.5 rounded-xl transition-colors mb-6 text-gray-900">
+        View All Requests
+      </button>
+<!-- END: View All Button -->
+</main>
+<!-- END: Scrollable Content -->
+<!-- BEGIN: Bottom Navigation -->
+<nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 z-50">
+<ul class="grid grid-cols-5 text-center">
+<!-- Home -->
+<li>
+<a class="flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-600" href="#">
+<i class="fa-solid fa-house text-xl"></i>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+</li>
+<!-- Leave (Active) -->
+<li>
+<a class="flex flex-col items-center justify-center gap-1 text-[#4DA8D6] text-blue-500" href="#">
+<i class="fa-solid fa-clock text-xl"></i>
+<span class="text-[10px] font-medium">Leave</span>
+</a>
+</li>
+<!-- Timesheet -->
+<li>
+<a class="flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-600" href="#">
+<i class="fa-solid fa-calendar-days text-xl"></i>
+<span class="text-[10px] font-medium">Timesheet</span>
+</a>
+</li>
+<!-- Profile -->
+<li>
+<a class="flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-600" href="#">
+<i class="fa-regular fa-circle-user text-xl"></i>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</li>
+<!-- Settings -->
+<li>
+<a class="flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-600" href="#">
+<i class="fa-solid fa-gear text-xl"></i>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- END: Bottom Navigation -->
+</div>
+<!-- END: Main App Container -->
+</body></html>

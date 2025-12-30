@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext, createAuditLog, addTenantFilter } from "@/lib/auth/tenant-access";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
 
 // Validation schema for creating/updating timesheets
 const timesheetSchema = z.object({

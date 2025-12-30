@@ -48,7 +48,7 @@ export default function LoginPage() {
       setError(t('auth.loginError', 'Login mislukt'));
       setIsLoading(false);
 
-    } catch (error) {
+    } catch {
       setError(t('common.error', 'Er ging iets mis'));
       setIsLoading(false);
     }
@@ -93,8 +93,8 @@ export default function LoginPage() {
                   E-mailadres
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <UserIcon className="h-5 w-5 text-gray-400" />
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <UserIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="email"
@@ -102,7 +102,7 @@ export default function LoginPage() {
                     type="email"
                     autoComplete="email"
                     required
-                    className="block w-full pl-10 pr-3 py-3 border border-white/20 rounded-xl bg-white/5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="block w-full pl-14 pr-4 py-3.5 border border-white/30 rounded-xl bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-base"
                     placeholder="naam@bedrijf.nl"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -125,8 +125,8 @@ export default function LoginPage() {
                   </a>
                 </div>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <LockClosedIcon className="h-5 w-5 text-gray-400" />
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <LockClosedIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="password"
@@ -134,7 +134,7 @@ export default function LoginPage() {
                     type="password"
                     autoComplete="current-password"
                     required
-                    className="block w-full pl-10 pr-3 py-3 border border-white/20 rounded-xl bg-white/5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="block w-full pl-14 pr-4 py-3.5 border border-white/30 rounded-xl bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-base"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

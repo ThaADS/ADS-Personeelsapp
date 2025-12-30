@@ -10,25 +10,25 @@ export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
     switch (status) {
       case "APPROVED":
         return {
-          bg: "bg-green-100 dark:bg-green-900/30",
+          bg: "backdrop-blur-sm bg-green-500/20 dark:bg-green-500/20 border border-green-500/30",
           text: "text-green-800 dark:text-green-300",
           label: "Goedgekeurd",
         };
       case "PENDING":
         return {
-          bg: "bg-yellow-100 dark:bg-yellow-900/30",
+          bg: "backdrop-blur-sm bg-yellow-500/20 dark:bg-yellow-500/20 border border-yellow-500/30",
           text: "text-yellow-800 dark:text-yellow-300",
           label: "In behandeling",
         };
       case "REJECTED":
         return {
-          bg: "bg-red-100 dark:bg-red-900/30",
+          bg: "backdrop-blur-sm bg-red-500/20 dark:bg-red-500/20 border border-red-500/30",
           text: "text-red-800 dark:text-red-300",
           label: "Afgekeurd",
         };
       default:
         return {
-          bg: "bg-gray-100 dark:bg-gray-700",
+          bg: "backdrop-blur-sm bg-white/30 dark:bg-white/5 border border-white/20 dark:border-purple-500/20",
           text: "text-gray-800 dark:text-gray-300",
           label: status,
         };

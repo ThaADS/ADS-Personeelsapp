@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db/prisma';
 import { SubscriptionStatus } from '@/types';
-
-const prisma = new PrismaClient();
 
 // GET /api/admin/stats - Get platform statistics (superuser only)
 export async function GET(request: NextRequest) {

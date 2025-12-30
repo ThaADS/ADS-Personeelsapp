@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTenantContext } from '@/lib/auth/tenant-access';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/db/prisma';
 
 export async function GET() {
   const context = await getTenantContext();

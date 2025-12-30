@@ -282,7 +282,12 @@ export async function GET() {
       stats.uwvAlertCount = uwvAlerts;
     }
 
-    return NextResponse.json(stats);
+    // Add cache headers for performance (cache for 30 seconds, stale-while-revalidate for 60s)
+    return NextResponse.json(stats, {
+      headers: {
+        'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+      },
+    });
 
   } catch (error) {
     console.error('[Dashboard Stats] Error:', error);

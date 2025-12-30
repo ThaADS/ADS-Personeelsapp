@@ -42,7 +42,7 @@ export default function NewTenantPage() {
         const data = await res.json().catch(() => ({}));
         throw new Error(data?.error || `Fout ${res.status}`);
       }
-      const data = await res.json();
+      await res.json();
       setSuccess("Tenant aangemaakt.");
       setTimeout(() => router.push("/admin/tenants"), 800);
     } catch (err) {

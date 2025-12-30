@@ -128,6 +128,7 @@ async function findUsersWithIncompleteTimesheets(
 /**
  * Check user notification preferences
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function shouldSendReminder(userId: string, _tenantId: string): Promise<boolean> {
   const preferences = await prisma.notificationPreference.findFirst({
     where: {

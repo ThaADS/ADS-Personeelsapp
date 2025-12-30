@@ -7,8 +7,7 @@
 
 import { VacationRequest, SickLeave } from "@/types";
 import { Timesheet } from "@prisma/client";
-import { differenceInMinutes, differenceInDays, isWeekend, addBusinessDays } from "date-fns";
-import { nl } from "date-fns/locale";
+import { differenceInMinutes, differenceInDays, isWeekend } from "date-fns";
 
 // Interface voor validatieresultaten
 export interface ValidationResult {

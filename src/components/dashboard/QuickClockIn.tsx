@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 
 interface ActiveTimesheet {
   id: string;
@@ -9,9 +9,11 @@ interface ActiveTimesheet {
   startLng?: number;
 }
 
-export function QuickClockIn() {
+// Memoized component to prevent unnecessary re-renders
+export const QuickClockIn = memo(function QuickClockIn() {
   const [isWorking, setIsWorking] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const [timesheetId, setTimesheetId] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
   const [isLoading, setIsLoading] = useState(false);
   const [gpsStatus, setGpsStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -22,8 +24,15 @@ export function QuickClockIn() {
     if (stored) {
       try {
         const data: ActiveTimesheet = JSON.parse(stored);
-        setIsWorking(true);
-        setStartTime(new Date(data.startTime));
+        // Validate that ID exists before restoring state
+        if (data.id && typeof data.id === 'string' && data.id.length > 0) {
+          setIsWorking(true);
+          setStartTime(new Date(data.startTime));
+          setTimesheetId(data.id);
+        } else {
+          // Invalid data, remove from localStorage
+          localStorage.removeItem("activeTimesheet");
+        }
       } catch {
         localStorage.removeItem("activeTimesheet");
       }
@@ -96,6 +105,11 @@ export function QuickClockIn() {
 
       const data = await response.json();
 
+      // Validate that we got a valid ID from the API
+      if (!data.id || typeof data.id !== 'string' || data.id.length === 0) {
+        throw new Error("Server response bevat geen geldige ID");
+      }
+
       const activeData: ActiveTimesheet = {
         id: data.id,
         startTime: now,
@@ -106,6 +120,7 @@ export function QuickClockIn() {
       localStorage.setItem("activeTimesheet", JSON.stringify(activeData));
       setIsWorking(true);
       setStartTime(now);
+      setTimesheetId(data.id);
     } catch (error) {
       console.error("Clock in error:", error);
       alert("Kon niet inklokken. Probeer opnieuw.");
@@ -117,14 +132,30 @@ export function QuickClockIn() {
   const handleClockOut = async () => {
     setIsLoading(true);
     try {
-      const stored = localStorage.getItem("activeTimesheet");
-      if (!stored) throw new Error("Geen actieve registratie gevonden");
+      // First try to get ID from state, fallback to localStorage
+      let currentTimesheetId = timesheetId;
 
-      const activeData: ActiveTimesheet = JSON.parse(stored);
+      if (!currentTimesheetId) {
+        const stored = localStorage.getItem("activeTimesheet");
+        if (!stored) throw new Error("Geen actieve registratie gevonden");
+
+        const activeData: ActiveTimesheet = JSON.parse(stored);
+        if (!activeData.id || typeof activeData.id !== 'string' || activeData.id.length === 0) {
+          // Clear invalid data and reset state
+          localStorage.removeItem("activeTimesheet");
+          setIsWorking(false);
+          setStartTime(null);
+          setTimesheetId(null);
+          setElapsedTime("00:00:00");
+          throw new Error("Ongeldige registratie data. Start een nieuwe registratie.");
+        }
+        currentTimesheetId = activeData.id;
+      }
+
       const location = await captureLocation();
       const now = new Date();
 
-      const response = await fetch(`/api/timesheets/${activeData.id}`, {
+      const response = await fetch(`/api/timesheets/${currentTimesheetId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -140,6 +171,7 @@ export function QuickClockIn() {
       localStorage.removeItem("activeTimesheet");
       setIsWorking(false);
       setStartTime(null);
+      setTimesheetId(null);
       setElapsedTime("00:00:00");
 
       // Show success message
@@ -153,7 +185,7 @@ export function QuickClockIn() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-500 to-cyan-600 dark:from-blue-600 dark:to-cyan-700 rounded-2xl p-6 text-white shadow-lg">
+    <div className="bg-gradient-to-br from-purple-600 to-pink-600 dark:from-purple-700 dark:to-pink-700 rounded-2xl p-6 text-white shadow-lg backdrop-blur-xl border border-white/20">
       <h3 className="text-lg font-semibold mb-4 flex items-center">
         <svg
           className="w-5 h-5 mr-2"
@@ -175,7 +207,7 @@ export function QuickClockIn() {
         <>
           <div className="text-center mb-4">
             <div className="text-4xl font-bold mb-2 font-mono">{elapsedTime}</div>
-            <div className="text-sm text-blue-100">
+            <div className="text-sm text-purple-100">
               Gestart om{" "}
               {startTime?.toLocaleTimeString("nl-NL", {
                 hour: "2-digit",
@@ -186,7 +218,7 @@ export function QuickClockIn() {
           <button
             onClick={handleClockOut}
             disabled={isLoading}
-            className="w-full bg-white text-red-600 font-semibold py-4 rounded-xl hover:bg-red-50 transition-colors flex items-center justify-center min-h-[56px] disabled:opacity-50"
+            className="w-full backdrop-blur-sm bg-white/90 dark:bg-white/10 text-red-600 dark:text-red-400 font-semibold py-4 rounded-xl hover:bg-white dark:hover:bg-white/20 transition-colors flex items-center justify-center min-h-[56px] disabled:opacity-50 border border-white/50 dark:border-red-500/30 shadow-lg"
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600" />
@@ -220,10 +252,10 @@ export function QuickClockIn() {
         <button
           onClick={handleClockIn}
           disabled={isLoading}
-          className="w-full bg-white text-blue-600 font-semibold py-4 rounded-xl hover:bg-blue-50 transition-colors flex items-center justify-center min-h-[56px] disabled:opacity-50"
+          className="w-full backdrop-blur-sm bg-white/90 dark:bg-white/10 text-purple-600 dark:text-purple-300 font-semibold py-4 rounded-xl hover:bg-white dark:hover:bg-white/20 transition-colors flex items-center justify-center min-h-[56px] disabled:opacity-50 border border-white/50 dark:border-purple-500/30 shadow-lg"
         >
           {isLoading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600 dark:border-purple-400" />
           ) : (
             <>
               <svg
@@ -251,7 +283,7 @@ export function QuickClockIn() {
         </button>
       )}
 
-      <div className="mt-3 text-xs text-blue-100 text-center flex items-center justify-center">
+      <div className="mt-3 text-xs text-purple-100 text-center flex items-center justify-center">
         {gpsStatus === "loading" && (
           <>
             <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1" />
@@ -286,4 +318,6 @@ export function QuickClockIn() {
       </div>
     </div>
   );
-}
+});
+
+QuickClockIn.displayName = "QuickClockIn";
