@@ -9,31 +9,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { processMonthlyReports, buildAndSendMonthlyReport, ReportConfig } from "@/lib/services/report-builder";
-
-// Verify the request is from Vercel Cron
-function verifyCronRequest(request: NextRequest): boolean {
-  const authHeader = request.headers.get("authorization");
-
-  // In development, allow requests without auth
-  if (process.env.NODE_ENV === "development") {
-    return true;
-  }
-
-  // In production, verify the cron secret
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) {
-    console.warn("CRON_SECRET not configured");
-    return false;
-  }
-
-  return authHeader === `Bearer ${cronSecret}`;
-}
+import { verifyCronAuth } from "@/lib/security/cron-auth";
 
 // GET - Automatic monthly report generation
 export async function GET(request: NextRequest) {
-  // Verify authorization
-  if (!verifyCronRequest(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Verify authorization - CRON_SECRET is required in production
+  const auth = verifyCronAuth(request);
+  if (!auth.authorized) {
+    return auth.error!;
   }
 
   try {
@@ -62,9 +45,10 @@ export async function GET(request: NextRequest) {
 
 // POST - Manual report generation for specific tenant
 export async function POST(request: NextRequest) {
-  // Verify authorization
-  if (!verifyCronRequest(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Verify authorization - CRON_SECRET is required in production
+  const auth = verifyCronAuth(request);
+  if (!auth.authorized) {
+    return auth.error!;
   }
 
   try {

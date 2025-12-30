@@ -5,6 +5,13 @@
  * API Documentation: https://rest.routevision.com/docs/
  */
 
+import {
+  encrypt as aesEncrypt,
+  decrypt as aesDecrypt,
+  migrateFromXor,
+  isEncrypted as isAesEncrypted,
+} from '@/lib/security/encryption';
+
 const ROUTEVISION_BASE_URL = 'https://rest.routevision.com';
 
 // Cache for JWT tokens (per tenant)
@@ -413,36 +420,50 @@ export async function syncTripsForTenant(
 
 // ============== Encryption Helpers ==============
 
+// Legacy XOR key for migration
+const LEGACY_XOR_KEY = process.env.ROUTEVISION_ENCRYPTION_KEY || 'default-key-change-in-production';
+
 /**
- * Simple XOR encryption for API credentials
- * Note: In production, use a proper encryption library like crypto-js
+ * Encrypt API credentials using AES-256-GCM
  */
-const ENCRYPTION_KEY = process.env.ROUTEVISION_ENCRYPTION_KEY || 'default-key-change-in-production';
-
 export function encryptCredential(text: string): string {
-  if (!text) return '';
-
-  let result = '';
-  for (let i = 0; i < text.length; i++) {
-    const charCode = text.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length);
-    result += String.fromCharCode(charCode);
-  }
-
-  return Buffer.from(result).toString('base64');
+  return aesEncrypt(text);
 }
 
+/**
+ * Decrypt API credentials
+ * Automatically handles migration from legacy XOR encryption to AES-256
+ */
 export function decryptCredential(encrypted: string): string {
   if (!encrypted) return '';
 
+  // Check if it's already AES encrypted
+  if (isAesEncrypted(encrypted)) {
+    try {
+      return aesDecrypt(encrypted);
+    } catch {
+      // Fall through to legacy decryption
+    }
+  }
+
+  // Try legacy XOR decryption
   try {
     const decoded = Buffer.from(encrypted, 'base64').toString();
     let result = '';
     for (let i = 0; i < decoded.length; i++) {
-      const charCode = decoded.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length);
+      const charCode = decoded.charCodeAt(i) ^ LEGACY_XOR_KEY.charCodeAt(i % LEGACY_XOR_KEY.length);
       result += String.fromCharCode(charCode);
     }
     return result;
   } catch {
     return '';
   }
+}
+
+/**
+ * Migrate credentials from XOR to AES-256
+ * Call this when updating credentials to ensure they use the new encryption
+ */
+export function migrateCredential(oldEncrypted: string): string {
+  return migrateFromXor(oldEncrypted, LEGACY_XOR_KEY);
 }

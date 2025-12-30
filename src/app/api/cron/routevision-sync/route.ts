@@ -8,6 +8,7 @@ import {
   convertTripToDbFormat,
 } from "@/lib/services/routevision-service";
 import { matchTripsToTimesheets } from "@/lib/services/trip-timesheet-matcher";
+import { verifyCronAuth } from "@/lib/security/cron-auth";
 
 /**
  * GET /api/cron/routevision-sync
@@ -25,12 +26,10 @@ import { matchTripsToTimesheets } from "@/lib/services/trip-timesheet-matcher";
  */
 export async function GET(request: NextRequest) {
   try {
-    // Verify cron secret for security
-    const authHeader = request.headers.get("authorization");
-    const cronSecret = process.env.CRON_SECRET;
-
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Verify authorization - CRON_SECRET is required in production
+    const auth = verifyCronAuth(request);
+    if (!auth.authorized) {
+      return auth.error!;
     }
 
     // Get all tenants with RouteVision sync enabled

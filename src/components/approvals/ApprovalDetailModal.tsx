@@ -61,21 +61,18 @@ export default function ApprovalDetailModal({
   const hasErrors = approval.validationErrors && approval.validationErrors.length > 0;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      {/* Backdrop - separate layer */}
+    <div className="fixed inset-0 z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      {/* Backdrop - covers entire screen with blur */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
         aria-hidden="true"
         onClick={onClose}
       />
 
-      {/* Modal container - needs relative to sit above backdrop */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-        {/* Centering helper for sm+ screens */}
-        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-        {/* Modal panel - solid background, no blur inheritance */}
-        <div className="relative inline-block align-bottom bg-white dark:bg-slate-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-purple-500/20">
+      {/* Modal container - fixed centered on screen */}
+      <div className="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+        {/* Modal panel - solid background, captures pointer events */}
+        <div className="pointer-events-auto w-full max-w-lg bg-white dark:bg-slate-800 rounded-2xl text-left overflow-hidden shadow-2xl border border-purple-500/20 max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
             <div className="flex items-center justify-between">

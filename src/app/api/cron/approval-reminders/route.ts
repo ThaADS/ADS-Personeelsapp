@@ -9,21 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { processApprovalReminders } from '@/lib/services/approval-reminder-service';
-
-/**
- * Verify cron secret for security
- */
-function verifyCronSecret(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    console.warn('CRON_SECRET not configured - allowing request in development');
-    return process.env.NODE_ENV === 'development';
-  }
-
-  return authHeader === `Bearer ${cronSecret}`;
-}
+import { verifyCronAuth } from '@/lib/security/cron-auth';
 
 /**
  * GET handler for Vercel Cron
@@ -32,13 +18,11 @@ function verifyCronSecret(request: NextRequest): boolean {
 export async function GET(request: NextRequest) {
   console.log('[Approval Reminders Cron] Starting execution...');
 
-  // Verify cron secret
-  if (!verifyCronSecret(request)) {
+  // Verify authorization - CRON_SECRET is required in production
+  const auth = verifyCronAuth(request);
+  if (!auth.authorized) {
     console.error('[Approval Reminders Cron] Unauthorized request');
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    );
+    return auth.error!;
   }
 
   try {

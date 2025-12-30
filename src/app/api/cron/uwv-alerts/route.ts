@@ -22,39 +22,13 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { processUwvAlerts } from '@/lib/services/uwv-alert-service';
-
-// Verify cron secret for security
-function verifyCronSecret(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  // If no secret is configured, allow in development
-  if (!cronSecret && process.env.NODE_ENV === 'development') {
-    return true;
-  }
-
-  // Check for Vercel Cron authorization
-  if (authHeader === `Bearer ${cronSecret}`) {
-    return true;
-  }
-
-  // Also check query parameter for manual testing
-  const url = new URL(request.url);
-  const querySecret = url.searchParams.get('secret');
-  if (querySecret === cronSecret) {
-    return true;
-  }
-
-  return false;
-}
+import { verifyCronAuth } from '@/lib/security/cron-auth';
 
 export async function GET(request: NextRequest) {
-  // Verify authorization
-  if (!verifyCronSecret(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    );
+  // Verify authorization - CRON_SECRET is required in production
+  const auth = verifyCronAuth(request);
+  if (!auth.authorized) {
+    return auth.error!;
   }
 
   try {

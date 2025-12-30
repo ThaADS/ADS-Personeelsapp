@@ -4,11 +4,12 @@
  * Automatically matches RouteVision trips to employee timesheets based on:
  * 1. Same employee (via vehicle mapping)
  * 2. Overlapping time periods
- * 3. Optional GPS location proximity
+ * 3. GPS location proximity (using professional geocoding service)
  */
 
 import { prisma } from "@/lib/db/prisma";
 import { Prisma } from "@prisma/client";
+import { geocodePostalCode } from "@/lib/services/geocoding-service";
 
 // Types
 interface MatchResult {
@@ -29,6 +30,9 @@ interface GPSLocation {
   lat: number;
   lng: number;
 }
+
+// Cache for geocoded postal codes during batch matching
+const postalCodeCache = new Map<string, GPSLocation | null>();
 
 // Configuration
 const MATCH_CONFIG = {
@@ -128,7 +132,7 @@ function parseTimesheetLocation(
 /**
  * Calculate match confidence between a trip and timesheet
  */
-function calculateMatchConfidence(
+async function calculateMatchConfidence(
   trip: {
     employee_id: string | null;
     departure_time: Date;
@@ -144,7 +148,7 @@ function calculateMatchConfidence(
     location_end: Prisma.JsonValue | null;
   },
   employeeUserId: string | null
-): { confidence: number; reasons: string[] } {
+): Promise<{ confidence: number; reasons: string[] }> {
   let confidence = 0;
   const reasons: string[] = [];
 
@@ -174,13 +178,9 @@ function calculateMatchConfidence(
     reasons.push(`${Math.round(overlapMinutes)} min overlap`);
   }
 
-  // 3. GPS location match (if available)
-  const tripStartLocation = parsePostalCodeToApproxLocation(
-    trip.departure_postal
-  );
-  const timesheetStartLocation = parseTimesheetLocation(
-    timesheet.location_start
-  );
+  // 3. GPS location match (using professional geocoding service)
+  const tripStartLocation = await getLocationFromPostalCode(trip.departure_postal);
+  const timesheetStartLocation = parseTimesheetLocation(timesheet.location_start);
 
   if (tripStartLocation && timesheetStartLocation) {
     const distance = calculateDistance(tripStartLocation, timesheetStartLocation);
@@ -195,33 +195,39 @@ function calculateMatchConfidence(
 }
 
 /**
- * Approximate GPS coordinates from Dutch postal code
- * This is a simplified lookup - in production, use a geocoding service
+ * Get GPS coordinates from Dutch postal code using professional geocoding
+ * Uses PDOK (Dutch government geocoding service) with caching for efficiency
  */
-function parsePostalCodeToApproxLocation(
+async function getLocationFromPostalCode(
   postalCode: string | null
-): GPSLocation | null {
+): Promise<GPSLocation | null> {
   if (!postalCode) return null;
 
-  // Dutch postal codes are 4 digits + 2 letters
-  // This is a simplified approximation based on major areas
-  const numericPart = parseInt(postalCode.replace(/\D/g, "").slice(0, 4), 10);
+  // Check session cache first
+  const cached = postalCodeCache.get(postalCode);
+  if (cached !== undefined) {
+    return cached;
+  }
 
-  if (isNaN(numericPart)) return null;
+  // Use the professional geocoding service
+  const geoResult = await geocodePostalCode(postalCode);
 
-  // Very rough approximation of Dutch postal code regions
-  // In production, use a proper geocoding API
-  // Netherlands roughly spans lat 50.75-53.5, lng 3.3-7.2
-  const latBase = 50.75;
-  const lngBase = 3.3;
+  if (geoResult) {
+    const location: GPSLocation = { lat: geoResult.lat, lng: geoResult.lng };
+    postalCodeCache.set(postalCode, location);
+    return location;
+  }
 
-  // Postal codes range from ~1000 (Amsterdam) to ~9999 (Groningen area)
-  const normalized = (numericPart - 1000) / 9000;
+  // Cache null result to avoid repeated lookups
+  postalCodeCache.set(postalCode, null);
+  return null;
+}
 
-  return {
-    lat: latBase + normalized * 2.75,
-    lng: lngBase + normalized * 3.9,
-  };
+/**
+ * Clear the postal code cache (useful for testing or memory management)
+ */
+export function clearPostalCodeCache(): void {
+  postalCodeCache.clear();
 }
 
 /**
@@ -294,7 +300,7 @@ async function findBestTimesheetMatch(
   let bestMatch: { timesheet: (typeof potentialTimesheets)[0]; confidence: number; reasons: string[] } | null = null;
 
   for (const timesheet of potentialTimesheets) {
-    const { confidence, reasons } = calculateMatchConfidence(
+    const { confidence, reasons } = await calculateMatchConfidence(
       trip,
       timesheet,
       employeeUserId
