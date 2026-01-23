@@ -15,6 +15,7 @@
 | 4 | Performance Optimalisatie | 🟢 MEDIUM | 6 taken |
 | 5 | Schaalbaarheid & Infrastructuur | 🟢 MEDIUM | 5 taken |
 | 6 | Feature Completering | 🔵 LAAG | 4 taken |
+| 7 | UI/UX Dashboard Verbeteringen | 🟡 HOOG | 10 taken |
 
 ---
 
@@ -258,6 +259,112 @@
 
 ---
 
+## Fase 7: UI/UX Dashboard Verbeteringen 🟡
+
+**Doel:** Dashboard visueel verbeteren met behoud van dark/light/system thema's
+
+### Huidige Staat
+- **Thema Systeem:** next-themes met light/dark/system support ✅
+- **Design:** Glassmorphism met backdrop-blur effecten
+- **Kleuren:** Purple (#8b5cf6) + Pink (#ec4899) accent palette
+- **Responsive:** Mobile-first met bottom nav bar
+- **Animaties:** Blob animations, hover effects, smooth transitions
+
+### 7.1 Visuele Hiërarchie Verbeteren
+- **Probleem:** Meerdere stat cards concurreren om aandacht, onduidelijke prioriteit
+- **Locaties:** `src/app/(dashboard)/dashboard/page.tsx`
+- **Actie:**
+  - Primary/secondary/tertiary card levels introduceren
+  - Belangrijkste metrics groter en prominenter maken
+  - Minder belangrijke stats collapsible of smaller
+- **Acceptatiecriteria:** Duidelijke visuele focus op kritieke informatie
+
+### 7.2 Loading States Verbeteren
+- **Probleem:** Generieke skeletons matchen niet met final layout
+- **Locaties:** Dashboard widgets en data components
+- **Actie:**
+  - Content-aware skeleton loaders die finale layout spiegelen
+  - Shimmer animatie voor betere perceived performance
+  - Progressive loading met prioriteit voor above-the-fold content
+- **Acceptatiecriteria:** Skeletons matchen exact met geladen content shape
+
+### 7.3 Form Input Styling
+- **Probleem:** Input velden missen duidelijke focus states en error styling
+- **Locaties:** `src/app/globals.css`, form components
+- **Actie:**
+  - Enhanced focus ring met thema-aware kleuren
+  - Animated error messages met shake effect
+  - Inline validation feedback met icons
+  - Consistent input styling across all forms
+- **Acceptatiecriteria:** Alle forms hebben duidelijke focus/error/success states
+
+### 7.4 Toast Notification Systeem
+- **Probleem:** Success/error feedback via alerts, geen subtiele feedback
+- **Actie:**
+  - Toast notification component implementeren (sonner of react-hot-toast)
+  - Success, error, warning, info variants
+  - Thema-aware styling matching glassmorphism design
+  - Auto-dismiss met progress indicator
+- **Acceptatiecriteria:** Alle acties geven feedback via toast notifications
+
+### 7.5 Empty States met Illustraties
+- **Probleem:** Generieke "geen data" berichten zonder context
+- **Locaties:** Timesheets, approvals, employees lists
+- **Actie:**
+  - Contextuele empty states per pagina
+  - Minimalistische illustraties of icons
+  - Actionable guidance (bijv. "Registreer je eerste uren")
+  - Consistent empty state component
+- **Acceptatiecriteria:** Elke lege lijst heeft helpende empty state
+
+### 7.6 Dashboard Personalisatie
+- **Probleem:** Dashboard toont alle widgets, kan overweldigend zijn
+- **Actie:**
+  - Smart card prioritering op basis van user role
+  - Collapsible secties voor minder gebruikte widgets
+  - "Customize dashboard" optie voor widget aan/uit
+  - Onthoud preferences in localStorage
+- **Acceptatiecriteria:** Users kunnen dashboard layout aanpassen
+
+### 7.7 Microinteracties Toevoegen
+- **Probleem:** Beperkte feedback op button states en interacties
+- **Actie:**
+  - Loading spinner op buttons tijdens requests
+  - Success checkmark animatie na completion
+  - Haptic-style visual feedback op touch
+  - Subtle scale/color transitions op hover
+- **Acceptatiecriteria:** Elke interactie heeft visuele feedback
+
+### 7.8 Navigation Improvements
+- **Probleem:** Multiple nav levels (top, bottom, hamburger) kunnen verwarren
+- **Actie:**
+  - Active state indicator verbeteren (underline/highlight)
+  - Breadcrumb trail voor deep pages
+  - Consistent icon usage across nav items
+  - Mobile: duidelijker hamburger menu content
+- **Acceptatiecriteria:** Gebruiker weet altijd waar ze zijn
+
+### 7.9 Accessibility Verbeteringen
+- **Probleem:** Glassmorphic elements kunnen contrast issues hebben
+- **Actie:**
+  - WCAG AAA contrast ratio voor alle tekst
+  - High-contrast mode optie toevoegen
+  - Focus visible states voor keyboard navigation
+  - Screen reader friendly labels
+  - Reduced motion preference respecteren
+- **Acceptatiecriteria:** WCAG 2.1 AA compliance minimum
+
+### 7.10 Card & Modal Consistentie
+- **Probleem:** Modals lijken te veel op cards, onduidelijke hiërarchie
+- **Actie:**
+  - Prominentere modal backdrops met blur
+  - Duidelijke modal header/footer styling
+  - Consistent card border-radius en shadows
+  - Z-index hiërarchie documenteren
+- **Acceptatiecriteria:** Duidelijk onderscheid tussen cards en modals
+
+---
+
 ## Implementatie Volgorde
 
 ```
@@ -270,6 +377,8 @@ Week 7:    Fase 4.1-4.3 (Performance)
 Week 8:    Fase 4.4-4.6 + Fase 5.1-5.2 (Performance + infra)
 Week 9:    Fase 5.3-5.5 (Infra completion)
 Week 10:   Fase 6.1-6.4 (Features)
+Week 11-12: Fase 7.1-7.5 (UI/UX basis - met frontend dev review)
+Week 13:   Fase 7.6-7.10 (UI/UX polish)
 ```
 
 ---
@@ -283,6 +392,10 @@ Week 10:   Fase 6.1-6.4 (Features)
 | Type Safety | 10+ unsafe casts | 0 |
 | API Response Time | Onbekend | <200ms p95 |
 | Console Logs | 25+ | 0 in productie |
+| WCAG Compliance | Onbekend | AA minimum |
+| Empty States | Generiek | Contextueel |
+| Toast Notifications | Geen | Alle acties |
+| Theme Support | light/dark/system | Behouden + verbeterd |
 
 *Geschat op basis van coverage gaps analyse
 
