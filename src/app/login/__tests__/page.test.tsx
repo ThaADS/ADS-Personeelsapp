@@ -20,9 +20,9 @@ describe('LoginPage', () => {
   it('renders the login form', () => {
     render(<LoginPage />);
 
-    // Find inputs by placeholder since labels are sr-only
-    expect(screen.getByPlaceholderText(/e-mailadres/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/wachtwoord/i)).toBeInTheDocument();
+    // Find inputs by placeholder (actual placeholders from login page)
+    expect(screen.getByPlaceholderText('naam@bedrijf.nl')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /inloggen/i })).toBeInTheDocument();
   });
 });
