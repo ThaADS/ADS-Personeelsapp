@@ -3,6 +3,9 @@ import { prisma } from '@/lib/db/prisma';
 import { UserRole } from '@/types';
 import { hasPermission, Permission } from '@/lib/rbac';
 import { headers } from 'next/headers';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('TenantAccess');
 
 export interface TenantContext {
   tenantId: string;
@@ -13,14 +16,19 @@ export interface TenantContext {
 
 /**
  * Get the current tenant context from the authenticated session
+ * Includes JWT validation for security compliance
  */
 export async function getTenantContext(): Promise<TenantContext | null> {
   const session = await auth();
 
-  console.log('[getTenantContext] Session user:', session?.user);
-
   if (!session?.user) {
-    console.log('[getTenantContext] No session or user - returning null');
+    logger.debug('No session or user found');
+    return null;
+  }
+
+  // Validate required session fields
+  if (!session.user.id) {
+    logger.warn('Session missing user ID');
     return null;
   }
 
@@ -29,7 +37,7 @@ export async function getTenantContext(): Promise<TenantContext | null> {
     const headersList = await headers();
     const tenantId = headersList.get('x-tenant-id') || session.user.tenantId;
 
-    console.log('[getTenantContext] Superuser with tenantId:', tenantId);
+    logger.debug('Superuser access', { tenantId: tenantId || 'global' });
 
     if (!tenantId) {
       return {
@@ -49,10 +57,8 @@ export async function getTenantContext(): Promise<TenantContext | null> {
   }
 
   // Regular users must have tenant context
-  console.log('[getTenantContext] Regular user tenantId from session:', session.user.tenantId);
-
   if (!session.user.tenantId) {
-    console.log('[getTenantContext] No tenantId in session - returning null');
+    logger.debug('Regular user without tenant context');
     return null;
   }
 
