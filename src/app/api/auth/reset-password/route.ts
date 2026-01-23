@@ -13,10 +13,17 @@
  * - Audit logging for all attempts
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { resetPassword } from '@/lib/auth/password-reset';
 import { z } from 'zod';
 import { checkRateLimit, rateLimitedResponse } from '@/lib/security/rate-limiter';
+import {
+  successResponse,
+  errorResponse,
+  validationErrorResponse,
+  internalErrorResponse,
+  ErrorCodes,
+} from '@/lib/api/response';
 
 // Validation schema
 const resetPasswordSchema = z.object({
@@ -47,15 +54,11 @@ export async function POST(request: NextRequest) {
     // Validate input
     const validation = resetPasswordSchema.safeParse(body);
     if (!validation.success) {
-      const errors = validation.error.issues.map(e => e.message);
-      return NextResponse.json(
-        {
-          success: false,
-          message: errors[0],
-          errors,
-        },
-        { status: 400 }
-      );
+      const errors: Record<string, string> = {};
+      validation.error.issues.forEach((issue) => {
+        errors[issue.path.join('.')] = issue.message;
+      });
+      return validationErrorResponse(errors, validation.error.issues[0].message);
     }
 
     const { token, email, password } = validation.data;
@@ -69,29 +72,16 @@ export async function POST(request: NextRequest) {
     const result = await resetPassword(token, email, password, ipAddress);
 
     if (!result.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: result.message,
-          error: result.error,
-        },
-        { status: 400 }
+      return errorResponse(
+        ErrorCodes.INVALID_TOKEN,
+        result.message,
+        result.error ? { error: result.error } : undefined
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: result.message,
-    });
+    return successResponse({ reset: true }, { message: result.message });
   } catch (error) {
     console.error('Reset password error:', error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Er is een fout opgetreden. Probeer het opnieuw.',
-      },
-      { status: 500 }
-    );
+    return internalErrorResponse('Er is een fout opgetreden. Probeer het opnieuw.');
   }
 }

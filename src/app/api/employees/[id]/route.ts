@@ -1,7 +1,7 @@
 /**
  * API route voor individuele werknemer beheer
  */
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import { maskApiResponse, getAllowedFieldsForRole } from "@/lib/security/data-masking";
@@ -11,6 +11,15 @@ import {
   createValidationErrorResponse,
   type UpdateEmployeeInput,
 } from "@/lib/validation/employee-schemas";
+import {
+  successResponse,
+  errorResponse,
+  internalErrorResponse,
+  unauthorizedResponse,
+  forbiddenResponse,
+  notFoundResponse,
+  ErrorCodes,
+} from "@/lib/api/response";
 
 /**
  * GET /api/employees/[id]
@@ -23,7 +32,7 @@ export async function GET(
   try {
     const context = await getTenantContext();
     if (!context) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     const { id } = await params;
@@ -90,7 +99,7 @@ export async function GET(
     });
 
     if (!tenantUser) {
-      return NextResponse.json({ error: "Werknemer niet gevonden" }, { status: 404 });
+      return notFoundResponse("Werknemer");
     }
 
     // Haal voertuig koppelingen op voor deze employee
@@ -200,16 +209,17 @@ export async function GET(
       unmaskedFields,
     }).catch(() => {/* Silent fail for audit logging */});
 
-    return NextResponse.json({
+    return successResponse({
       employee: maskedEmployee,
-      _meta: {
+    }, {
+      meta: {
         dataMasked: masked,
         allowedSensitiveFields: getAllowedFieldsForRole(context.userRole),
       }
     });
   } catch (error) {
     console.error("Error in employee GET:", error);
-    return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
+    return internalErrorResponse();
   }
 }
 
@@ -224,12 +234,12 @@ export async function PUT(
   try {
     const context = await getTenantContext();
     if (!context) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     // Controleer of gebruiker rechten heeft
     if (context.userRole !== "TENANT_ADMIN" && context.userRole !== "MANAGER") {
-      return NextResponse.json({ error: "Onvoldoende rechten" }, { status: 403 });
+      return forbiddenResponse();
     }
 
     const { id } = await params;
@@ -238,9 +248,10 @@ export async function PUT(
     // Valideer input met Zod schema
     const validationResult = validateUpdateEmployee(body);
     if (!validationResult.success) {
-      return NextResponse.json(
-        createValidationErrorResponse(validationResult.error),
-        { status: 400 }
+      return errorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        "Validatie gefaald",
+        { fields: createValidationErrorResponse(validationResult.error) }
       );
     }
 
@@ -262,7 +273,7 @@ export async function PUT(
     });
 
     if (!tenantUser) {
-      return NextResponse.json({ error: "Werknemer niet gevonden" }, { status: 404 });
+      return notFoundResponse("Werknemer");
     }
 
     // Update User gegevens
@@ -393,9 +404,9 @@ export async function PUT(
       }
     }
 
-    return NextResponse.json({ success: true });
+    return successResponse({ updated: true }, { message: "Werknemer succesvol bijgewerkt" });
   } catch (error) {
     console.error("Error in employee PUT:", error);
-    return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
+    return internalErrorResponse();
   }
 }

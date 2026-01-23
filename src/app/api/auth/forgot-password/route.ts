@@ -12,10 +12,11 @@
  * - Audit logging for all attempts
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { requestPasswordReset } from '@/lib/auth/password-reset';
 import { z } from 'zod';
 import { checkRateLimit, rateLimitedResponse } from '@/lib/security/rate-limiter';
+import { successResponse, validationErrorResponse } from '@/lib/api/response';
 
 // Validation schema
 const forgotPasswordSchema = z.object({
@@ -35,13 +36,7 @@ export async function POST(request: NextRequest) {
     // Validate input
     const validation = forgotPasswordSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Vul een geldig emailadres in.',
-        },
-        { status: 400 }
-      );
+      return validationErrorResponse({ email: 'Vul een geldig emailadres in.' });
     }
 
     const { email } = validation.data;
@@ -56,20 +51,14 @@ export async function POST(request: NextRequest) {
     const result = await requestPasswordReset(email, ipAddress, userAgent);
 
     // Always return 200 to prevent email enumeration
-    return NextResponse.json({
-      success: result.success,
-      message: result.message,
-    });
+    return successResponse({ sent: result.success }, { message: result.message });
   } catch (error) {
     console.error('Forgot password error:', error);
 
-    // Generic error to prevent information leakage
-    return NextResponse.json(
-      {
-        success: true,
-        message: 'Als dit emailadres bij ons bekend is, ontvang je binnen enkele minuten een email met instructies.',
-      },
-      { status: 200 }
+    // Generic success to prevent information leakage
+    return successResponse(
+      { sent: true },
+      { message: 'Als dit emailadres bij ons bekend is, ontvang je binnen enkele minuten een email met instructies.' }
     );
   }
 }

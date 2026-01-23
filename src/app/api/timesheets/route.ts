@@ -1,7 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getTenantContext, createAuditLog, addTenantFilter } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
+import {
+  successResponse,
+  errorResponse,
+  internalErrorResponse,
+  unauthorizedResponse,
+  validationErrorResponse,
+  ErrorCodes,
+} from "@/lib/api/response";
 
 // Validation schema for creating/updating timesheets
 const timesheetSchema = z.object({
@@ -22,7 +30,7 @@ export async function GET(request: NextRequest) {
     const context = await getTenantContext();
 
     if (!context) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     const url = new URL(request.url);
@@ -91,7 +99,7 @@ export async function GET(request: NextRequest) {
       updatedAt: t.updatedAt?.toISOString() || new Date().toISOString(),
     }));
 
-    return NextResponse.json({
+    return successResponse({
       items,
       pagination: {
         page,
@@ -102,7 +110,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching timesheets:", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return internalErrorResponse();
   }
 }
 
@@ -112,11 +120,11 @@ export async function POST(request: NextRequest) {
     const context = await getTenantContext();
 
     if (!context) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     if (!context.tenantId) {
-      return NextResponse.json({ error: "Geen tenant context" }, { status: 400 });
+      return errorResponse(ErrorCodes.VALIDATION_ERROR, "Geen tenant context");
     }
 
     const body = await request.json();
@@ -179,8 +187,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       id: timesheet.id, // Top-level id for QuickClockIn component
       timesheet: {
         id: timesheet.id,
@@ -193,16 +200,17 @@ export async function POST(request: NextRequest) {
         userName: timesheet.user?.name || timesheet.user?.email || 'Onbekend',
         createdAt: timesheet.createdAt?.toISOString() || new Date().toISOString(),
       },
-    }, { status: 201 });
+    }, { message: "Urenregistratie succesvol aangemaakt", status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Validatiefout", details: error.issues },
-        { status: 400 }
-      );
+      const errors: Record<string, string> = {};
+      error.issues.forEach((issue) => {
+        errors[issue.path.join('.')] = issue.message;
+      });
+      return validationErrorResponse(errors);
     }
 
     console.error("Error creating timesheet:", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return internalErrorResponse();
   }
 }

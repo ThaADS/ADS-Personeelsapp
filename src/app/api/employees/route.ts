@@ -1,7 +1,7 @@
 /**
  * API route voor werknemers beheer
  */
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import bcrypt from "bcryptjs";
@@ -13,6 +13,14 @@ import {
   createValidationErrorResponse,
   type CreateEmployeeInput,
 } from "@/lib/validation/employee-schemas";
+import {
+  successResponse,
+  errorResponse,
+  internalErrorResponse,
+  unauthorizedResponse,
+  forbiddenResponse,
+  ErrorCodes,
+} from "@/lib/api/response";
 
 /**
  * GET /api/employees
@@ -29,11 +37,11 @@ export async function GET(request: NextRequest) {
     const context = await getTenantContext();
 
     if (!context) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     if (!context.tenantId) {
-      return NextResponse.json({ error: "Geen tenant geselecteerd" }, { status: 400 });
+      return errorResponse(ErrorCodes.VALIDATION_ERROR, "Geen tenant geselecteerd");
     }
 
     // Parse query parameters
@@ -239,7 +247,7 @@ export async function GET(request: NextRequest) {
       }).catch(() => {/* Silent fail for audit logging */});
     }
 
-    return NextResponse.json({
+    return successResponse({
       employees: maskedEmployees,
       pagination: {
         total: totalCount,
@@ -251,14 +259,15 @@ export async function GET(request: NextRequest) {
         departments,
         roles: ['USER', 'MANAGER', 'TENANT_ADMIN'],
       },
-      _meta: {
+    }, {
+      meta: {
         dataMasked: true,
         allowedSensitiveFields: allowedFields,
       },
     });
   } catch (error) {
     console.error("Error in employees GET:", error);
-    return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
+    return internalErrorResponse();
   }
 }
 
@@ -270,12 +279,12 @@ export async function POST(request: NextRequest) {
   try {
     const context = await getTenantContext();
     if (!context) {
-      return NextResponse.json({ error: "Niet geautoriseerd" }, { status: 401 });
+      return unauthorizedResponse();
     }
 
     // Controleer of gebruiker rechten heeft
     if (context.userRole !== "TENANT_ADMIN" && context.userRole !== "MANAGER") {
-      return NextResponse.json({ error: "Onvoldoende rechten" }, { status: 403 });
+      return forbiddenResponse();
     }
 
     const body = await request.json();
@@ -283,9 +292,10 @@ export async function POST(request: NextRequest) {
     // Valideer input met Zod schema
     const validationResult = validateCreateEmployee(body);
     if (!validationResult.success) {
-      return NextResponse.json(
-        createValidationErrorResponse(validationResult.error),
-        { status: 400 }
+      return errorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        "Validatie gefaald",
+        { fields: createValidationErrorResponse(validationResult.error) }
       );
     }
 
@@ -297,9 +307,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: "Er bestaat al een account met dit e-mailadres" },
-        { status: 400 }
+      return errorResponse(
+        ErrorCodes.ALREADY_EXISTS,
+        "Er bestaat al een account met dit e-mailadres"
       );
     }
 
@@ -381,13 +391,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
-      success: true,
+    return successResponse({
       userId: user.id,
       employeeId: employeeRecord.id,
-    });
+    }, { message: "Werknemer succesvol aangemaakt", status: 201 });
   } catch (error) {
     console.error("Error in employees POST:", error);
-    return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
+    return internalErrorResponse();
   }
 }
