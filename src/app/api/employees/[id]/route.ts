@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import { maskApiResponse, getAllowedFieldsForRole } from "@/lib/security/data-masking";
+import { logSensitiveDataAccess } from "@/lib/security/sensitive-data-audit";
 
 /**
  * GET /api/employees/[id]
@@ -176,11 +177,23 @@ export async function GET(
     const requestUnmasked = request.nextUrl.searchParams.get('unmasked') === 'true';
 
     // Pas data masking toe op basis van user role
-    const { data: maskedEmployee, masked } = maskApiResponse(
+    const { data: maskedEmployee, masked, unmaskedFields } = maskApiResponse(
       employee,
       context.userRole,
       { requestUnmasked }
     );
+
+    // Log sensitive data access (async, non-blocking)
+    logSensitiveDataAccess({
+      userId: context.userId,
+      tenantId: context.tenantId,
+      userRole: context.userRole,
+      action: 'VIEW',
+      resourceType: 'Employee',
+      resourceId: id,
+      dataAccessed: employee,
+      unmaskedFields,
+    }).catch(() => {/* Silent fail for audit logging */});
 
     return NextResponse.json({
       employee: maskedEmployee,

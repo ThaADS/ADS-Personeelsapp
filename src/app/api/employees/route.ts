@@ -6,6 +6,7 @@ import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import bcrypt from "bcryptjs";
 import { maskSensitiveData, getAllowedFieldsForRole } from "@/lib/security/data-masking";
+import { logSensitiveDataAccess } from "@/lib/security/sensitive-data-audit";
 
 /**
  * GET /api/employees
@@ -210,6 +211,21 @@ export async function GET(request: NextRequest) {
     const maskedEmployees = formattedEmployees.map(emp =>
       maskSensitiveData(emp, { allowedFields })
     );
+
+    // Log sensitive data access voor elke employee (async, non-blocking)
+    // We loggen alleen als er daadwerkelijk sensitive data is opgehaald
+    if (formattedEmployees.length > 0) {
+      logSensitiveDataAccess({
+        userId: context.userId,
+        tenantId: context.tenantId,
+        userRole: context.userRole,
+        action: 'VIEW',
+        resourceType: 'EmployeeList',
+        resourceId: `bulk_${formattedEmployees.length}_records`,
+        dataAccessed: { employees: formattedEmployees.slice(0, 1) }, // Log sample voor detectie
+        unmaskedFields: allowedFields,
+      }).catch(() => {/* Silent fail for audit logging */});
+    }
 
     return NextResponse.json({
       employees: maskedEmployees,
