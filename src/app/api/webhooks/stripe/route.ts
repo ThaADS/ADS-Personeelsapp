@@ -4,21 +4,10 @@ import { prisma } from "@/lib/db/prisma";
 import { SubscriptionStatus, PlanType } from "@/types";
 import Stripe from "stripe";
 
-// Extended type for Stripe subscription with billing period fields
-interface StripeSubscriptionWithPeriod extends Stripe.Subscription {
-  current_period_start: number;
-  current_period_end: number;
-}
-
-// Extended type for Stripe invoice with subscription field
-interface StripeInvoiceWithSubscription extends Stripe.Invoice {
-  subscription: string | Stripe.Subscription | null;
-}
-
 // Disable body parsing, we need raw body for webhook signature verification
 export const dynamic = "force-dynamic";
 
-async function handleSubscriptionCreated(subscription: StripeSubscriptionWithPeriod) {
+async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
   const tenantId = subscription.metadata?.tenantId;
 
   if (!tenantId) {
@@ -95,7 +84,7 @@ async function handleSubscriptionCreated(subscription: StripeSubscriptionWithPer
   console.log(`Subscription created/updated for tenant ${tenantId}: ${status}`);
 }
 
-async function handleSubscriptionUpdated(subscription: StripeSubscriptionWithPeriod) {
+async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const tenantId = subscription.metadata?.tenantId;
 
   if (!tenantId) {
@@ -117,7 +106,7 @@ async function handleSubscriptionUpdated(subscription: StripeSubscriptionWithPer
 
 async function updateSubscriptionFromStripe(
   tenantId: string,
-  subscription: StripeSubscriptionWithPeriod
+  subscription: Stripe.Subscription
 ) {
   // Determine status
   let status: SubscriptionStatus = SubscriptionStatus.ACTIVE;
@@ -164,7 +153,7 @@ async function updateSubscriptionFromStripe(
   console.log(`Subscription updated for tenant ${tenantId}: ${status}`);
 }
 
-async function handleSubscriptionDeleted(subscription: StripeSubscriptionWithPeriod) {
+async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   // Find the subscription in our database
   const dbSubscription = await prisma.subscription.findUnique({
     where: { stripeSubscriptionId: subscription.id },
@@ -198,7 +187,7 @@ async function handleSubscriptionDeleted(subscription: StripeSubscriptionWithPer
   );
 }
 
-async function handleInvoicePaymentSucceeded(invoice: StripeInvoiceWithSubscription) {
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
   if (!invoice.subscription) return;
 
   const subscriptionId =
@@ -234,7 +223,7 @@ async function handleInvoicePaymentSucceeded(invoice: StripeInvoiceWithSubscript
   }
 }
 
-async function handleInvoicePaymentFailed(invoice: StripeInvoiceWithSubscription) {
+async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   if (!invoice.subscription) return;
 
   const subscriptionId =
@@ -282,7 +271,7 @@ async function handleCheckoutSessionCompleted(
     typeof subscriptionId === "string" ? subscriptionId : subscriptionId.id;
 
   // Fetch the full subscription from Stripe
-  const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId) as unknown as StripeSubscriptionWithPeriod;
+  const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
 
   // Handle as subscription created
   await handleSubscriptionCreated(subscription);
@@ -329,28 +318,28 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case "customer.subscription.created":
         await handleSubscriptionCreated(
-          event.data.object as StripeSubscriptionWithPeriod
+          event.data.object as Stripe.Subscription
         );
         break;
 
       case "customer.subscription.updated":
         await handleSubscriptionUpdated(
-          event.data.object as StripeSubscriptionWithPeriod
+          event.data.object as Stripe.Subscription
         );
         break;
 
       case "customer.subscription.deleted":
         await handleSubscriptionDeleted(
-          event.data.object as StripeSubscriptionWithPeriod
+          event.data.object as Stripe.Subscription
         );
         break;
 
       case "invoice.payment_succeeded":
-        await handleInvoicePaymentSucceeded(event.data.object as StripeInvoiceWithSubscription);
+        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
         break;
 
       case "invoice.payment_failed":
-        await handleInvoicePaymentFailed(event.data.object as StripeInvoiceWithSubscription);
+        await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
         break;
 
       case "checkout.session.completed":

@@ -7,6 +7,12 @@ import { prisma } from "@/lib/db/prisma";
 import bcrypt from "bcryptjs";
 import { maskSensitiveData, getAllowedFieldsForRole } from "@/lib/security/data-masking";
 import { logSensitiveDataAccess } from "@/lib/security/sensitive-data-audit";
+import { checkRateLimit, rateLimitedResponse } from "@/lib/security/rate-limiter";
+import {
+  validateCreateEmployee,
+  createValidationErrorResponse,
+  type CreateEmployeeInput,
+} from "@/lib/validation/employee-schemas";
 
 /**
  * GET /api/employees
@@ -14,6 +20,12 @@ import { logSensitiveDataAccess } from "@/lib/security/sensitive-data-audit";
  */
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting check - sensitive type: 30 req/min
+    const rateLimitResult = await checkRateLimit(request, 'sensitive');
+    if (!rateLimitResult.success) {
+      return rateLimitedResponse(rateLimitResult);
+    }
+
     const context = await getTenantContext();
 
     if (!context) {
@@ -268,17 +280,20 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    // Validatie
-    if (!body.email || !body.name || !body.password) {
+    // Valideer input met Zod schema
+    const validationResult = validateCreateEmployee(body);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "E-mail, naam en wachtwoord zijn verplicht" },
+        createValidationErrorResponse(validationResult.error),
         { status: 400 }
       );
     }
 
+    const validatedData: CreateEmployeeInput = validationResult.data;
+
     // Check of email al bestaat
     const existingUser = await prisma.user.findUnique({
-      where: { email: body.email },
+      where: { email: validatedData.email },
     });
 
     if (existingUser) {
@@ -289,32 +304,32 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash het wachtwoord
-    const hashedPassword = await bcrypt.hash(body.password, 12);
+    const hashedPassword = await bcrypt.hash(validatedData.password, 12);
 
-    // Maak user aan
+    // Maak user aan met gevalideerde data
     const user = await prisma.user.create({
       data: {
-        email: body.email,
-        name: body.name,
+        email: validatedData.email,
+        name: validatedData.name,
         password: hashedPassword,
-        phone: body.phone || null,
-        department: body.department || null,
-        position: body.position || null,
-        employeeId: body.employeeId || null,
-        startDate: body.startDate ? new Date(body.startDate) : null,
-        contractType: body.contractType || null,
-        workHoursPerWeek: body.hoursPerWeek ? parseFloat(body.hoursPerWeek) : null,
-        dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
-        gender: body.gender || null,
-        nationality: body.nationality || null,
-        maritalStatus: body.maritalStatus || null,
-        address: body.address || null,
-        city: body.city || null,
-        postalCode: body.postalCode || null,
-        bankAccountNumber: body.bankAccountNumber || null,
-        bankAccountName: body.bankAccountName || null,
-        bsnNumber: body.bsnNumber || null,
-        role: body.role || "USER",
+        phone: validatedData.phone || null,
+        department: validatedData.department || null,
+        position: validatedData.position || null,
+        employeeId: validatedData.employeeId || null,
+        startDate: validatedData.startDate ? new Date(validatedData.startDate) : null,
+        contractType: validatedData.contractType || null,
+        workHoursPerWeek: validatedData.hoursPerWeek ? Number(validatedData.hoursPerWeek) : null,
+        dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
+        gender: validatedData.gender || null,
+        nationality: validatedData.nationality || null,
+        maritalStatus: validatedData.maritalStatus || null,
+        address: validatedData.address || null,
+        city: validatedData.city || null,
+        postalCode: validatedData.postalCode || null,
+        bankAccountNumber: validatedData.bankAccountNumber || null,
+        bankAccountName: validatedData.bankAccountName || null,
+        bsnNumber: validatedData.bsnNumber || null,
+        role: validatedData.role || "USER",
       },
     });
 
@@ -323,42 +338,42 @@ export async function POST(request: NextRequest) {
       data: {
         tenantId: context.tenantId,
         userId: user.id,
-        role: body.role || "USER",
+        role: validatedData.role || "USER",
         isActive: true,
       },
     });
 
-    // Maak employees record voor extra velden
+    // Maak employees record voor extra velden met gevalideerde data
     const employeeRecord = await prisma.employees.create({
       data: {
         user_id: user.id,
         tenant_id: context.tenantId,
-        employee_number: body.employeeId || null,
-        position: body.position || null,
-        contract_type: (body.contractType as 'FULLTIME' | 'PARTTIME' | 'FLEX' | 'TEMPORARY' | 'INTERN') || 'FULLTIME',
-        hours_per_week: body.hoursPerWeek ? parseFloat(body.hoursPerWeek) : 40,
-        start_date: body.startDate ? new Date(body.startDate) : new Date(),
-        phone_number: body.phone || null,
-        emergency_contact: body.emergencyContact || null,
-        emergency_phone: body.emergencyPhone || null,
-        emergency_relationship: body.emergencyRelationship || null,
-        hourly_rate: body.hourlyRate ? parseFloat(body.hourlyRate) : null,
-        cost_center: body.costCenter || null,
-        skills: body.skills || [],
-        certifications: body.certifications || [],
-        education_level: body.educationLevel || null,
-        languages: body.languages || [],
-        remote_work_allowed: body.remoteWorkAllowed ?? false,
-        work_location: body.workLocation || null,
+        employee_number: validatedData.employeeId || null,
+        position: validatedData.position || null,
+        contract_type: validatedData.contractType || 'FULLTIME',
+        hours_per_week: validatedData.hoursPerWeek ? Number(validatedData.hoursPerWeek) : 40,
+        start_date: validatedData.startDate ? new Date(validatedData.startDate) : new Date(),
+        phone_number: validatedData.phone || null,
+        emergency_contact: validatedData.emergencyContact || null,
+        emergency_phone: validatedData.emergencyPhone || null,
+        emergency_relationship: validatedData.emergencyRelationship || null,
+        hourly_rate: validatedData.hourlyRate ? Number(validatedData.hourlyRate) : null,
+        cost_center: validatedData.costCenter || null,
+        skills: validatedData.skills || [],
+        certifications: validatedData.certifications || [],
+        education_level: validatedData.educationLevel || null,
+        languages: validatedData.languages || [],
+        remote_work_allowed: validatedData.remoteWorkAllowed ?? false,
+        work_location: validatedData.workLocation || null,
       },
     });
 
     // Koppel voertuigen als meegegeven
-    if (body.vehicleIds && body.vehicleIds.length > 0) {
+    if (validatedData.vehicleIds && validatedData.vehicleIds.length > 0) {
       await prisma.vehicleMapping.updateMany({
         where: {
           tenant_id: context.tenantId,
-          id: { in: body.vehicleIds },
+          id: { in: validatedData.vehicleIds },
         },
         data: {
           employee_id: employeeRecord.id,

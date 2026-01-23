@@ -39,8 +39,7 @@ export async function POST(request: NextRequest) {
       .join('\n\n');
 
     // User info from session or provided data
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const user = session?.user as any;
+    const user = session?.user;
     const finalUserName = userName || user?.name || 'Onbekend';
     const finalUserEmail = userEmail || user?.email || 'Niet opgegeven';
     const userRole = user?.role || 'Onbekend';

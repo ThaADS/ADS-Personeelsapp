@@ -4,6 +4,30 @@ import { tenantDb } from "@/lib/db/tenant-db";
 import { z } from "zod";
 import { timesheet_status } from "@prisma/client";
 
+// Type-safe helper for parsing audit log JSON values
+interface AuditLogNewValues {
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+  totalDays?: number;
+  reason?: string;
+}
+
+function parseAuditLogNewValues(newValues: unknown): AuditLogNewValues {
+  if (typeof newValues === 'string') {
+    try {
+      return JSON.parse(newValues) as AuditLogNewValues;
+    } catch {
+      return {};
+    }
+  }
+  if (newValues && typeof newValues === 'object') {
+    return newValues as AuditLogNewValues;
+  }
+  return {};
+}
+
 const approvalActionSchema = z.object({
   ids: z.array(z.string()),
   action: z.enum(['approve', 'reject']),
@@ -108,21 +132,21 @@ export async function GET(request: NextRequest) {
         skip: type === 'vacation' ? (page - 1) * limit : 0,
         take: type === 'vacation' ? limit : 100,
       });
-      const filtered = logs.filter((l) => (l as unknown as { newValues?: { status?: string } }).newValues?.status === status);
+      const filtered = logs.filter((l) => parseAuditLogNewValues(l.newValues).status === status);
       outItems.push(
         ...filtered.map((l) => {
-          const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
+          const nv = parseAuditLogNewValues(l.newValues);
           return {
             id: l.id,
             type: (l.action === 'VACATION_REQUEST' ? 'vacation' : 'tijd-voor-tijd') as 'vacation' | 'tijd-voor-tijd',
             employeeId: l.userId!,
             employeeName: l.user?.name || l.user?.email || 'Onbekend',
             submittedAt: l.createdAt?.toISOString() || new Date().toISOString(),
-            status: (nv.status as string) || 'PENDING',
-            startDate: nv.startDate as string | undefined,
-            endDate: nv.endDate as string | undefined,
-            description: nv.description as string | undefined,
-            totalDays: nv.totalDays as number | undefined,
+            status: nv.status || 'PENDING',
+            startDate: nv.startDate,
+            endDate: nv.endDate,
+            description: nv.description,
+            totalDays: nv.totalDays,
           } satisfies Item;
         })
       );
@@ -143,20 +167,20 @@ export async function GET(request: NextRequest) {
         skip: type === 'sickleave' ? (page - 1) * limit : 0,
         take: type === 'sickleave' ? limit : 100,
       });
-      const filtered = logs.filter((l) => (l as unknown as { newValues?: { status?: string } }).newValues?.status === status);
+      const filtered = logs.filter((l) => parseAuditLogNewValues(l.newValues).status === status);
       outItems.push(
         ...filtered.map((l) => {
-          const nv = (l as unknown as { newValues?: Record<string, unknown> }).newValues || {};
+          const nv = parseAuditLogNewValues(l.newValues);
           return {
             id: l.id,
             type: 'sick-leave' as const,
             employeeId: l.userId!,
             employeeName: l.user?.name || l.user?.email || 'Onbekend',
             submittedAt: l.createdAt?.toISOString() || new Date().toISOString(),
-            status: (nv.status as string) || 'PENDING',
-            startDate: nv.startDate as string | undefined,
-            endDate: nv.endDate as string | undefined,
-            reason: nv.reason as string | undefined,
+            status: nv.status || 'PENDING',
+            startDate: nv.startDate,
+            endDate: nv.endDate,
+            reason: nv.reason,
           } satisfies Item;
         })
       );

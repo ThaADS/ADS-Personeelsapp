@@ -6,6 +6,11 @@ import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import { maskApiResponse, getAllowedFieldsForRole } from "@/lib/security/data-masking";
 import { logSensitiveDataAccess } from "@/lib/security/sensitive-data-audit";
+import {
+  validateUpdateEmployee,
+  createValidationErrorResponse,
+  type UpdateEmployeeInput,
+} from "@/lib/validation/employee-schemas";
 
 /**
  * GET /api/employees/[id]
@@ -230,6 +235,17 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
+    // Valideer input met Zod schema
+    const validationResult = validateUpdateEmployee(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(validationResult.error),
+        { status: 400 }
+      );
+    }
+
+    const validatedData: UpdateEmployeeInput = validationResult.data;
+
     // Haal bestaande TenantUser op
     const tenantUser = await prisma.tenantUser.findFirst({
       where: {
@@ -253,24 +269,24 @@ export async function PUT(
     await prisma.user.update({
       where: { id: tenantUser.userId },
       data: {
-        name: body.name,
-        phone: body.phone,
-        department: body.department,
-        position: body.position,
-        employeeId: body.employeeId,
-        startDate: body.startDate ? new Date(body.startDate) : null,
-        contractType: body.contractType,
-        workHoursPerWeek: body.workHoursPerWeek ? parseFloat(body.workHoursPerWeek) : null,
-        dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
-        gender: body.gender,
-        nationality: body.nationality,
-        maritalStatus: body.maritalStatus,
-        address: body.address,
-        city: body.city,
-        postalCode: body.postalCode,
-        bankAccountNumber: body.bankAccountNumber,
-        bankAccountName: body.bankAccountName,
-        bsnNumber: body.bsnNumber,
+        name: validatedData.name,
+        phone: validatedData.phone,
+        department: validatedData.department,
+        position: validatedData.position,
+        employeeId: validatedData.employeeId,
+        startDate: validatedData.startDate ? new Date(validatedData.startDate) : null,
+        contractType: validatedData.contractType,
+        workHoursPerWeek: validatedData.hoursPerWeek ? Number(validatedData.hoursPerWeek) : null,
+        dateOfBirth: validatedData.dateOfBirth ? new Date(validatedData.dateOfBirth) : null,
+        gender: validatedData.gender,
+        nationality: validatedData.nationality,
+        maritalStatus: validatedData.maritalStatus,
+        address: validatedData.address,
+        city: validatedData.city,
+        postalCode: validatedData.postalCode,
+        bankAccountNumber: validatedData.bankAccountNumber,
+        bankAccountName: validatedData.bankAccountName,
+        bsnNumber: validatedData.bsnNumber,
       },
     });
 
@@ -278,8 +294,8 @@ export async function PUT(
     await prisma.tenantUser.update({
       where: { id },
       data: {
-        role: body.role,
-        isActive: body.isActive,
+        role: validatedData.role,
+        isActive: validatedData.isActive,
       },
     });
 
@@ -289,27 +305,27 @@ export async function PUT(
       await prisma.employees.update({
         where: { id: tenantUser.user.employees.id },
         data: {
-          employee_number: body.employeeId,
-          position: body.position,
-          contract_type: body.contractType as 'FULLTIME' | 'PARTTIME' | 'FLEX' | 'TEMPORARY' | 'INTERN' | null,
-          hours_per_week: body.hoursPerWeek ? body.hoursPerWeek : null,
-          start_date: body.startDate ? new Date(body.startDate) : new Date(),
-          end_date: body.endDate ? new Date(body.endDate) : null,
-          phone_number: body.phone,
-          emergency_contact: body.emergencyContact,
-          emergency_phone: body.emergencyPhone,
-          emergency_relationship: body.emergencyRelationship,
-          hourly_rate: body.hourlyRate ? body.hourlyRate : null,
-          manager_id: body.managerId,
-          cost_center: body.costCenter,
-          skills: body.skills || [],
-          certifications: body.certifications || [],
-          education_level: body.educationLevel,
-          languages: body.languages || [],
-          remote_work_allowed: body.remoteWorkAllowed ?? false,
-          work_location: body.workLocation,
-          notes: body.notes,
-          department_id: body.departmentId,
+          employee_number: validatedData.employeeId,
+          position: validatedData.position,
+          contract_type: validatedData.contractType as 'FULLTIME' | 'PARTTIME' | 'FLEX' | 'TEMPORARY' | 'INTERN' | null,
+          hours_per_week: validatedData.hoursPerWeek ? Number(validatedData.hoursPerWeek) : null,
+          start_date: validatedData.startDate ? new Date(validatedData.startDate) : new Date(),
+          end_date: validatedData.endDate ? new Date(validatedData.endDate) : null,
+          phone_number: validatedData.phone,
+          emergency_contact: validatedData.emergencyContact,
+          emergency_phone: validatedData.emergencyPhone,
+          emergency_relationship: validatedData.emergencyRelationship,
+          hourly_rate: validatedData.hourlyRate ? Number(validatedData.hourlyRate) : null,
+          manager_id: validatedData.managerId,
+          cost_center: validatedData.costCenter,
+          skills: validatedData.skills || [],
+          certifications: validatedData.certifications || [],
+          education_level: validatedData.educationLevel,
+          languages: validatedData.languages || [],
+          remote_work_allowed: validatedData.remoteWorkAllowed ?? false,
+          work_location: validatedData.workLocation,
+          notes: validatedData.notes,
+          department_id: validatedData.departmentId,
         },
       });
     } else {
@@ -318,33 +334,33 @@ export async function PUT(
         data: {
           user_id: tenantUser.userId,
           tenant_id: context.tenantId,
-          employee_number: body.employeeId,
-          position: body.position,
-          contract_type: (body.contractType as 'FULLTIME' | 'PARTTIME' | 'FLEX' | 'TEMPORARY' | 'INTERN') || 'FULLTIME',
-          hours_per_week: body.hoursPerWeek ? body.hoursPerWeek : 40,
-          start_date: body.startDate ? new Date(body.startDate) : new Date(),
-          end_date: body.endDate ? new Date(body.endDate) : null,
-          phone_number: body.phone,
-          emergency_contact: body.emergencyContact,
-          emergency_phone: body.emergencyPhone,
-          emergency_relationship: body.emergencyRelationship,
-          hourly_rate: body.hourlyRate ? body.hourlyRate : null,
-          manager_id: body.managerId,
-          cost_center: body.costCenter,
-          skills: body.skills || [],
-          certifications: body.certifications || [],
-          education_level: body.educationLevel,
-          languages: body.languages || [],
-          remote_work_allowed: body.remoteWorkAllowed ?? false,
-          work_location: body.workLocation,
-          notes: body.notes,
-          department_id: body.departmentId,
+          employee_number: validatedData.employeeId,
+          position: validatedData.position,
+          contract_type: (validatedData.contractType as 'FULLTIME' | 'PARTTIME' | 'FLEX' | 'TEMPORARY' | 'INTERN') || 'FULLTIME',
+          hours_per_week: validatedData.hoursPerWeek ? Number(validatedData.hoursPerWeek) : 40,
+          start_date: validatedData.startDate ? new Date(validatedData.startDate) : new Date(),
+          end_date: validatedData.endDate ? new Date(validatedData.endDate) : null,
+          phone_number: validatedData.phone,
+          emergency_contact: validatedData.emergencyContact,
+          emergency_phone: validatedData.emergencyPhone,
+          emergency_relationship: validatedData.emergencyRelationship,
+          hourly_rate: validatedData.hourlyRate ? Number(validatedData.hourlyRate) : null,
+          manager_id: validatedData.managerId,
+          cost_center: validatedData.costCenter,
+          skills: validatedData.skills || [],
+          certifications: validatedData.certifications || [],
+          education_level: validatedData.educationLevel,
+          languages: validatedData.languages || [],
+          remote_work_allowed: validatedData.remoteWorkAllowed ?? false,
+          work_location: validatedData.workLocation,
+          notes: validatedData.notes,
+          department_id: validatedData.departmentId,
         },
       });
     }
 
     // Update voertuig koppelingen als meegegeven
-    if (body.vehicleIds !== undefined) {
+    if (validatedData.vehicleIds !== undefined) {
       // Haal het employees record opnieuw op
       const employeeRecord = await prisma.employees.findUnique({
         where: { user_id: tenantUser.userId },
@@ -363,11 +379,11 @@ export async function PUT(
         });
 
         // Maak nieuwe koppelingen
-        if (body.vehicleIds && body.vehicleIds.length > 0) {
+        if (validatedData.vehicleIds && validatedData.vehicleIds.length > 0) {
           await prisma.vehicleMapping.updateMany({
             where: {
               tenant_id: context.tenantId,
-              id: { in: body.vehicleIds },
+              id: { in: validatedData.vehicleIds },
             },
             data: {
               employee_id: employeeRecord.id,

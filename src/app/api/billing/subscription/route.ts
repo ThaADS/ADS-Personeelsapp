@@ -6,12 +6,6 @@ import { canManageBilling } from '@/lib/rbac';
 import { z } from 'zod';
 import type Stripe from 'stripe';
 
-// Extended type for Stripe subscription with billing period fields
-interface StripeSubscriptionWithPeriod extends Stripe.Subscription {
-  current_period_start?: number;
-  current_period_end?: number;
-}
-
 const updateSubscriptionSchema = z.object({
   userCount: z.number().min(1).max(100).optional(),
   interval: z.enum(['month', 'year']).optional(),
@@ -103,7 +97,7 @@ export async function GET(_request: NextRequest) {
       } : null,
       stripeSubscription: stripeSubscription ? {
         status: stripeSubscription.status,
-        currentPeriodEnd: (stripeSubscription as StripeSubscriptionWithPeriod).current_period_end || 0,
+        currentPeriodEnd: stripeSubscription.current_period_end || 0,
         cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
       } : null,
       usage: {
@@ -159,7 +153,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Get updated subscription
-    const updatedSubscription = await stripeService.getSubscription(tenant.stripeSubscriptionId) as StripeSubscriptionWithPeriod;
+    const updatedSubscription = await stripeService.getSubscription(tenant.stripeSubscriptionId);
 
     return NextResponse.json({
       message: 'Subscription updated successfully',
@@ -219,7 +213,7 @@ export async function DELETE(request: NextRequest) {
     const canceledSubscription = await stripeService.cancelSubscription(
       tenant.stripeSubscriptionId,
       immediately
-    ) as StripeSubscriptionWithPeriod;
+    );
 
     return NextResponse.json({
       message: immediately ? 'Subscription canceled immediately' : 'Subscription will be canceled at period end',

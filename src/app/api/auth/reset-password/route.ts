@@ -16,6 +16,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { resetPassword } from '@/lib/auth/password-reset';
 import { z } from 'zod';
+import { checkRateLimit, rateLimitedResponse } from '@/lib/security/rate-limiter';
 
 // Validation schema
 const resetPasswordSchema = z.object({
@@ -35,6 +36,12 @@ const resetPasswordSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting check - auth type: 10 req/min
+    const rateLimitResult = await checkRateLimit(request, 'auth');
+    if (!rateLimitResult.success) {
+      return rateLimitedResponse(rateLimitResult);
+    }
+
     const body = await request.json();
 
     // Validate input

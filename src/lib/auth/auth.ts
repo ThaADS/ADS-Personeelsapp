@@ -3,6 +3,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/db/prisma";
 import { compare } from "bcryptjs";
 import { UserRole } from "@/types";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger('Auth');
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -13,10 +16,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        console.log('[Authorize] Starting with email:', credentials?.email);
+        logger.debug('Authorization attempt', { email: credentials?.email });
 
         if (!credentials?.email || !credentials?.password) {
-          console.log('[Authorize] Missing credentials');
+          logger.debug('Missing credentials');
           return null;
         }
 
@@ -51,14 +54,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           if (!user || !user.password) {
-            console.log('[Authorize] User not found or no password');
+            logger.debug('User not found or no password set');
             return null;
           }
 
           // Verify password
           const isValidPassword = await compare(credentials.password as string, user.password);
           if (!isValidPassword) {
-            console.log('[Authorize] Invalid password');
+            logger.debug('Invalid password attempt');
             return null;
           }
 
@@ -78,10 +81,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             tenantName: tenantUser?.tenant?.name || null,
           };
 
-          console.log('[Authorize] Success! Returning user:', { id: authUser.id, email: authUser.email, tenantId: authUser.tenantId });
+          logger.debug('Authorization successful', { userId: authUser.id, tenantId: authUser.tenantId });
           return authUser;
         } catch (error) {
-          console.error("Auth error:", error);
+          logger.error('Authorization error', error);
           return null;
         }
       }
@@ -89,9 +92,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
-      console.log('[JWT Callback] User:', user ? 'Present' : 'Absent');
-      console.log('[JWT Callback] Token before:', { sub: token.sub, role: token.role, tenantId: token.tenantId });
-
       if (user) {
         token.role = user.role;
         token.isSuperuser = user.isSuperuser;
@@ -102,14 +102,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.iat = Math.floor(Date.now() / 1000);
         token.exp = Math.floor(Date.now() / 1000) + (24 * 60 * 60); // 24 hours
 
-        console.log('[JWT Callback] Token after update:', { sub: token.sub, role: token.role, tenantId: token.tenantId });
+        logger.debug('JWT token updated', { userId: token.sub, tenantId: token.tenantId });
       }
       return token;
     },
     async session({ session, token }) {
-      console.log('[Session Callback] Token:', { sub: token.sub, role: token.role, tenantId: token.tenantId });
-      console.log('[Session Callback] Session user before:', session.user);
-
       if (session.user) {
         session.user.id = token.sub as string;
         session.user.role = token.role as UserRole;
@@ -117,8 +114,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.tenantId = token.tenantId as string | null;
         session.user.tenantSlug = token.tenantSlug as string | null;
         session.user.tenantName = token.tenantName as string | null;
-
-        console.log('[Session Callback] Session user after:', session.user);
       }
       return session;
     },
