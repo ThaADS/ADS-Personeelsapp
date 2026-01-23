@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import bcrypt from "bcryptjs";
+import { maskSensitiveData, getAllowedFieldsForRole } from "@/lib/security/data-masking";
 
 /**
  * GET /api/employees
@@ -204,8 +205,14 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    // Pas data masking toe op basis van user role
+    const allowedFields = getAllowedFieldsForRole(context.userRole);
+    const maskedEmployees = formattedEmployees.map(emp =>
+      maskSensitiveData(emp, { allowedFields })
+    );
+
     return NextResponse.json({
-      employees: formattedEmployees,
+      employees: maskedEmployees,
       pagination: {
         total: totalCount,
         page,
@@ -215,6 +222,10 @@ export async function GET(request: NextRequest) {
       filters: {
         departments,
         roles: ['USER', 'MANAGER', 'TENANT_ADMIN'],
+      },
+      _meta: {
+        dataMasked: true,
+        allowedSensitiveFields: allowedFields,
       },
     });
   } catch (error) {

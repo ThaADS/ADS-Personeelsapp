@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
+import { maskApiResponse, getAllowedFieldsForRole } from "@/lib/security/data-masking";
 
 /**
  * GET /api/employees/[id]
@@ -171,7 +172,23 @@ export async function GET(
       vehicleMappings,
     };
 
-    return NextResponse.json({ employee });
+    // Check of unmasked data is aangevraagd via query param
+    const requestUnmasked = request.nextUrl.searchParams.get('unmasked') === 'true';
+
+    // Pas data masking toe op basis van user role
+    const { data: maskedEmployee, masked } = maskApiResponse(
+      employee,
+      context.userRole,
+      { requestUnmasked }
+    );
+
+    return NextResponse.json({
+      employee: maskedEmployee,
+      _meta: {
+        dataMasked: masked,
+        allowedSensitiveFields: getAllowedFieldsForRole(context.userRole),
+      }
+    });
   } catch (error) {
     console.error("Error in employee GET:", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
