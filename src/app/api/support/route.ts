@@ -1,5 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { auth } from '@/lib/auth/auth';
+import { createLogger } from '@/lib/logger';
+import {
+  successResponse,
+  errorResponse,
+  internalErrorResponse,
+  ErrorCodes,
+} from '@/lib/api/response';
+
+const logger = createLogger('Support');
 
 interface ChatMessage {
   type: 'user' | 'bot';
@@ -23,9 +32,9 @@ export async function POST(request: NextRequest) {
     const { question, chatHistory, userEmail, userName } = body;
 
     if (!question || !chatHistory || chatHistory.length === 0) {
-      return NextResponse.json(
-        { error: 'Vraag en chatgeschiedenis zijn verplicht' },
-        { status: 400 }
+      return errorResponse(
+        ErrorCodes.VALIDATION_ERROR,
+        'Vraag en chatgeschiedenis zijn verplicht'
       );
     }
 
@@ -103,41 +112,32 @@ De gebruiker kon geen antwoord vinden op de bovenstaande vraag.
 
       if (!resendResponse.ok) {
         const errorData = await resendResponse.json();
-        console.error('Resend API error:', errorData);
+        logger.error('Resend API error', undefined, { errorData });
         throw new Error('Failed to send email via Resend');
       }
 
-      console.log('Support email sent successfully via Resend');
+      logger.info('Support email sent successfully via Resend');
     } else {
-      // Fallback: Log to console (for development or when no email service is configured)
-      console.log('='.repeat(80));
-      console.log('SUPPORT EMAIL (would be sent to:', supportEmail, ')');
-      console.log('='.repeat(80));
-      console.log('Subject:', emailSubject);
-      console.log('Body:', emailBody);
-      console.log('='.repeat(80));
-
-      // You can also try to use nodemailer or other SMTP service if configured
-      // For now, we'll consider this a success in development
+      // Log email content in development mode (using structured logger)
+      logger.debug('Support email (no Resend API key configured)', {
+        to: supportEmail,
+        subject: emailSubject,
+        questionPreview: question.slice(0, 100),
+      });
     }
 
     // Create audit log entry if needed
     // await createAuditLog('SUPPORT_REQUEST', { question, userId: session?.user?.id });
 
-    return NextResponse.json({
-      success: true,
-      message: 'Uw vraag is verzonden naar onze support afdeling. We nemen zo spoedig mogelijk contact met u op.',
-      emailSent: !!resendApiKey,
-    });
+    return successResponse(
+      { emailSent: !!resendApiKey },
+      { message: 'Uw vraag is verzonden naar onze support afdeling. We nemen zo spoedig mogelijk contact met u op.' }
+    );
 
   } catch (error) {
-    console.error('Error sending support request:', error);
-    return NextResponse.json(
-      {
-        error: 'Er is een fout opgetreden bij het verzenden van uw vraag. Probeer het later opnieuw of neem direct contact op met support@adspersoneelapp.nl',
-        success: false,
-      },
-      { status: 500 }
+    logger.error('Error sending support request', error instanceof Error ? error : undefined);
+    return internalErrorResponse(
+      'Er is een fout opgetreden bij het verzenden van uw vraag. Probeer het later opnieuw of neem direct contact op met support@adspersoneelapp.nl'
     );
   }
 }

@@ -1,4 +1,7 @@
 import Stripe from 'stripe';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Stripe');
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
@@ -66,7 +69,7 @@ export const ensureStripeProducts = async () => {
       prices,
     };
   } catch (error) {
-    console.error('Error ensuring Stripe products:', error);
+    logger.error('Error ensuring Stripe products', error instanceof Error ? error : undefined);
     throw error;
   }
 };
@@ -95,7 +98,7 @@ const ensureStandardPrices = async (productId: string) => {
     try {
       prices.monthly = await stripe.prices.retrieve(STRIPE_CONFIG.prices.standardMonthly);
     } catch {
-      console.log('Monthly price not found, creating...');
+      logger.debug('Monthly price not found, creating...');
     }
   }
 
@@ -122,7 +125,7 @@ const ensureStandardPrices = async (productId: string) => {
     try {
       prices.yearly = await stripe.prices.retrieve(STRIPE_CONFIG.prices.standardYearly);
     } catch {
-      console.log('Yearly price not found, creating...');
+      logger.debug('Yearly price not found, creating...');
     }
   }
 
@@ -150,7 +153,7 @@ const ensureStandardPrices = async (productId: string) => {
     try {
       prices.extraUser = await stripe.prices.retrieve(STRIPE_CONFIG.prices.extraUserMonthly);
     } catch {
-      console.log('Extra user price not found, creating...');
+      logger.debug('Extra user price not found, creating...');
     }
   }
 

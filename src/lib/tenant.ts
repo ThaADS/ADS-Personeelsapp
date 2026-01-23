@@ -1,5 +1,8 @@
 import { prisma } from '@/lib/db/prisma';
 import { headers } from 'next/headers';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Tenant');
 
 export interface TenantContext {
   id: string;
@@ -26,7 +29,7 @@ export async function getTenantFromSlug(slug: string): Promise<TenantContext | n
 
     return tenant;
   } catch (error) {
-    console.error('Error fetching tenant:', error);
+    logger.error('Error fetching tenant', error instanceof Error ? error : undefined);
     return null;
   }
 }
@@ -47,7 +50,7 @@ export async function getTenantFromDomain(domain: string): Promise<TenantContext
 
     return tenant;
   } catch (error) {
-    console.error('Error fetching tenant by domain:', error);
+    logger.error('Error fetching tenant by domain', error instanceof Error ? error : undefined);
     return null;
   }
 }
@@ -100,7 +103,7 @@ export async function getUserTenants(userId: string) {
       userRole: tu.role,
     }));
   } catch (error) {
-    console.error('Error fetching user tenants:', error);
+    logger.error('Error fetching user tenants', error instanceof Error ? error : undefined);
     return [];
   }
 }
@@ -118,7 +121,7 @@ export async function canUserAccessTenant(userId: string, tenantId: string): Pro
 
     return tenantUser?.isActive ?? false;
   } catch (error) {
-    console.error('Error checking tenant access:', error);
+    logger.error('Error checking tenant access', error instanceof Error ? error : undefined);
     return false;
   }
 }
@@ -132,7 +135,7 @@ export async function isSuperuser(userId: string): Promise<boolean> {
 
     return user?.isSuperuser ?? false;
   } catch (error) {
-    console.error('Error checking superuser status:', error);
+    logger.error('Error checking superuser status', error instanceof Error ? error : undefined);
     return false;
   }
 }
@@ -154,7 +157,7 @@ export async function isSlugAvailable(slug: string): Promise<boolean> {
 
     return !existingTenant;
   } catch (error) {
-    console.error('Error checking slug availability:', error);
+    logger.error('Error checking slug availability', error instanceof Error ? error : undefined);
     return false;
   }
 }
