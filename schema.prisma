@@ -692,6 +692,60 @@ model VehicleMapping {
   @@map("vehicle_mappings")
 }
 
+// Payroll Provider Configuration - Generic config for payroll integrations (Nmbrs, AFAS, etc)
+model PayrollProviderConfig {
+  id              String    @id @default(uuid()) @db.Uuid
+  tenant_id       String    @db.Uuid
+  provider_type   String    // nmbrs, afas, loket, exact
+  display_name    String?   // Custom name for this integration
+
+  // Credentials (encrypted)
+  credentials     Json      // { apiToken?, clientId?, clientSecret?, domain?, companyId?, environment? }
+
+  // Sync settings
+  sync_employees  Boolean   @default(true)
+  sync_hours      Boolean   @default(true)
+  sync_leave      Boolean   @default(true)
+  sync_enabled    Boolean   @default(false)
+  sync_interval   Int       @default(1440) // Minutes between syncs (default 24h)
+  last_sync       DateTime? @db.Timestamptz(6)
+  last_sync_error String?
+
+  // Status
+  is_active       Boolean   @default(true)
+  connection_status String  @default("unconfigured") // unconfigured, connected, error
+
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@unique([tenant_id, provider_type])
+  @@index([tenant_id], map: "idx_payroll_provider_config_tenant_id")
+  @@index([provider_type], map: "idx_payroll_provider_config_provider_type")
+  @@index([sync_enabled], map: "idx_payroll_provider_config_sync_enabled")
+  @@map("payroll_provider_configs")
+}
+
+// Payroll Sync Log - Track sync history and errors
+model PayrollSyncLog {
+  id              String    @id @default(uuid()) @db.Uuid
+  tenant_id       String    @db.Uuid
+  provider_type   String
+  sync_type       String    // employees, hours, leave, full
+  status          String    // success, partial, error
+  records_synced  Int       @default(0)
+  records_failed  Int       @default(0)
+  error_message   String?
+  error_details   Json?
+  started_at      DateTime  @db.Timestamptz(6)
+  completed_at    DateTime? @db.Timestamptz(6)
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([tenant_id], map: "idx_payroll_sync_log_tenant_id")
+  @@index([provider_type], map: "idx_payroll_sync_log_provider_type")
+  @@index([created_at], map: "idx_payroll_sync_log_created_at")
+  @@map("payroll_sync_logs")
+}
+
 // Trip Record - Synchronized trips from fleet providers
 model TripRecord {
   id                  String    @id @default(uuid()) @db.Uuid
