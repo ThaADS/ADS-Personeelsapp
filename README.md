@@ -18,15 +18,16 @@
   <img src="https://img.shields.io/badge/PostgreSQL-Supabase-3ECF8E?style=flat-square&logo=supabase" alt="Supabase">
   <img src="https://img.shields.io/badge/Stripe-Payments-635BFF?style=flat-square&logo=stripe" alt="Stripe">
   <img src="https://img.shields.io/badge/Vercel-Deployed-000?style=flat-square&logo=vercel" alt="Vercel">
+  <img src="https://img.shields.io/badge/i18n-NL%20|%20EN%20|%20DE%20|%20PL-4A90D9?style=flat-square" alt="Multi-language">
 </p>
 
 <p align="center">
   <a href="#-kernfuncties">Kernfuncties</a> •
+  <a href="#-declaratiebeheer">Declaraties</a> •
   <a href="#-fleet-tracking-integratie">Fleet Tracking</a> •
-  <a href="#-nederlandse-compliance">Compliance</a> •
-  <a href="#-architectuur">Architectuur</a> •
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-api-referentie">API</a>
+  <a href="#-nmbrs-payroll-integratie">Nmbrs</a> •
+  <a href="#-multi-language-ondersteuning">i18n</a> •
+  <a href="#-architectuur">Architectuur</a>
 </p>
 
 <p align="center">
@@ -45,7 +46,10 @@ ADSPersoneelapp is een volledig uitgerust **enterprise HR management platform** 
 - **Tijdregistratie** met GPS-verificatie en automatische validatie
 - **Verlofbeheer** met wettelijke en bovenwettelijke dagen tracking
 - **Ziekmeldingen** met UWV Poortwachter compliance en 42-dagen monitoring
+- **Declaratiebeheer** met kilometervergoeding en onkosten workflow
 - **Fleet tracking integratie** met automatische rit-koppeling aan urenregistraties
+- **Nmbrs payroll integratie** voor naadloze salarisverwerking
+- **Multi-language ondersteuning** voor NL, EN, DE en PL
 - **Multi-tenant architectuur** met volledige data-isolatie per organisatie
 - **SaaS billing** via Stripe met freemium en betaalde plannen
 
@@ -201,6 +205,93 @@ Dag 0          Dag 42 (6 weken)     Dag 56 (8 weken)
 
 ---
 
+## Declaratiebeheer
+
+ADSPersoneelapp biedt een complete **onkostendeclaratie workflow** met ondersteuning voor kilometervergoeding en diverse onkostentypes.
+
+### Declaratietypes
+
+| Type | Beschrijving | Vergoeding |
+|------|--------------|------------|
+| **Kilometervergoeding** | Zakelijke ritten met auto | €0,23/km (belastingvrij) |
+| **Reiskosten** | OV, taxi, parkeren | Werkelijke kosten |
+| **Maaltijden** | Zakelijke lunch/diner | Max €50/dag |
+| **Verblijf** | Hotel, accommodatie | Max €150/nacht |
+| **Overig** | Overige zakelijke kosten | Op goedkeuring |
+
+### Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  DECLARATIE WORKFLOW                                                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   MEDEWERKER              MANAGER                 SALARISADMIN          │
+│   ──────────              ───────                 ────────────          │
+│        │                     │                         │                │
+│   ┌────┴────┐                │                         │                │
+│   │ Indienen │               │                         │                │
+│   │ + Bon    │               │                         │                │
+│   └────┬────┘                │                         │                │
+│        │                     │                         │                │
+│        ▼                     ▼                         │                │
+│   ┌─────────┐          ┌─────────┐                     │                │
+│   │ PENDING │ ────────▶│ REVIEW  │                     │                │
+│   └─────────┘          └────┬────┘                     │                │
+│                             │                          │                │
+│              ┌──────────────┼──────────────┐           │                │
+│              ▼              │              ▼           │                │
+│        ┌─────────┐          │        ┌─────────┐      │                │
+│        │REJECTED │          │        │APPROVED │──────▶│                │
+│        └─────────┘          │        └─────────┘      │                │
+│                             │                    ┌────┴────┐            │
+│                             │                    │ Export  │            │
+│                             │                    │ → Nmbrs │            │
+│                             │                    └─────────┘            │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Features
+
+| Feature | Beschrijving |
+|---------|--------------|
+| **Bon Upload** | Foto/PDF upload van bonnetjes (max 5MB) |
+| **Automatische Berekening** | Kilometervergoeding automatisch berekend |
+| **GPS Integratie** | Route verificatie via Fleet Tracking |
+| **Approval Workflow** | Manager goedkeuring met opmerkingen |
+| **Export naar Nmbrs** | Directe integratie met salarisverwerking |
+| **Rapportages** | Maandelijkse declaratieoverzichten |
+
+### Data Model
+
+```typescript
+interface Expense {
+  id: string
+  tenant_id: string
+  employee_id: string
+  expense_type: 'MILEAGE' | 'TRAVEL' | 'MEALS' | 'ACCOMMODATION' | 'OTHER'
+  date: DateTime
+  amount: Decimal
+  description?: string
+  receipt_url?: string
+
+  // Mileage specific
+  distance_km?: Decimal
+  start_location?: string
+  end_location?: string
+  rate_per_km?: Decimal
+
+  // Workflow
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  approved_by?: string
+  approved_at?: DateTime
+  rejection_reason?: string
+}
+```
+
+---
+
 ## Fleet Tracking Integratie
 
 ADSPersoneelapp integreert met populaire fleet tracking systemen voor **automatische ritregistratie** die gekoppeld wordt aan urenregistraties.
@@ -273,6 +364,173 @@ interface FleetProviderConfig {
   last_sync_error?: string
 }
 ```
+
+---
+
+## Nmbrs Payroll Integratie
+
+ADSPersoneelapp integreert met **Nmbrs** (Visma), het toonaangevende salarispakket in Nederland, voor naadloze gegevensuitwisseling.
+
+### Integratie Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      NMBRS INTEGRATIE                                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ADSPersoneelapp                         Nmbrs (Visma)                 │
+│   ───────────────                         ─────────────                 │
+│                                                                         │
+│   ┌─────────────────┐                   ┌─────────────────┐            │
+│   │   Timesheets    │ ──── Export ────▶ │   Uren Import   │            │
+│   │   (Approved)    │      (CSV/API)    │                 │            │
+│   └─────────────────┘                   └─────────────────┘            │
+│                                                                         │
+│   ┌─────────────────┐                   ┌─────────────────┐            │
+│   │   Expenses      │ ──── Export ────▶ │   Declaraties   │            │
+│   │   (Approved)    │      (CSV/API)    │                 │            │
+│   └─────────────────┘                   └─────────────────┘            │
+│                                                                         │
+│   ┌─────────────────┐                   ┌─────────────────┐            │
+│   │   Sick Leaves   │ ──── Export ────▶ │   Verzuim       │            │
+│   │                 │      (CSV/API)    │                 │            │
+│   └─────────────────┘                   └─────────────────┘            │
+│                                                                         │
+│   ┌─────────────────┐                   ┌─────────────────┐            │
+│   │   Vacations     │ ──── Export ────▶ │   Verlof        │            │
+│   │                 │      (CSV/API)    │                 │            │
+│   └─────────────────┘                   └─────────────────┘            │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Features
+
+| Feature | Beschrijving |
+|---------|--------------|
+| **Automatische Export** | Maandelijkse export naar Nmbrs formaat |
+| **Employee Sync** | Medewerkergegevens synchronisatie |
+| **Hours Export** | Uren export met projectcodes |
+| **Expense Export** | Declaraties met looncomponenten |
+| **Absence Export** | Verzuim en verlof registratie |
+| **API Integratie** | Optionele directe API koppeling |
+
+### Export Formaten
+
+```typescript
+interface NmbrsExport {
+  // Employee Identification
+  personeelsnummer: string
+  bsn?: string           // Burgerservicenummer (encrypted)
+
+  // Hours Data
+  periode: string        // Format: YYYY-MM
+  uren_regulier: number
+  uren_overwerk: number
+  uren_ziekte: number
+  uren_verlof: number
+
+  // Expenses
+  kilometervergoeding: number
+  reiskosten: number
+  overige_declaraties: number
+
+  // Metadata
+  kostenplaats?: string
+  projectcode?: string
+}
+```
+
+### Configuratie
+
+| Setting | Beschrijving | Standaard |
+|---------|--------------|-----------|
+| **Export Frequentie** | Auto-export schema | Maandelijks |
+| **Export Formaat** | CSV of API | CSV |
+| **Loonperiode Mapping** | Periode configuratie | Kalendermaand |
+| **Kostenplaats** | Standaard kostenplaats | Per tenant |
+
+---
+
+## Multi-Language Ondersteuning
+
+ADSPersoneelapp ondersteunt **meerdere talen** om teams met diverse achtergronden te bedienen.
+
+### Ondersteunde Talen
+
+| Taal | Code | Status | Dekking |
+|------|------|--------|---------|
+| 🇳🇱 **Nederlands** | `nl` | ✅ Primair | 100% |
+| 🇬🇧 **English** | `en` | ✅ Volledig | 100% |
+| 🇩🇪 **Deutsch** | `de` | ✅ Volledig | 100% |
+| 🇵🇱 **Polski** | `pl` | ✅ Volledig | 100% |
+
+### Implementatie
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      i18n ARCHITECTUUR                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐  │
+│   │   User Login    │────▶│  Session Locale │────▶│   UI Rendering  │  │
+│   │   (Preference)  │     │   (JWT Token)   │     │   (next-intl)   │  │
+│   └─────────────────┘     └─────────────────┘     └─────────────────┘  │
+│                                                                         │
+│   ┌─────────────────────────────────────────────────────────────────┐  │
+│   │                     LocaleProvider (Context)                     │  │
+│   │  • Synchronisatie met session                                   │  │
+│   │  • LocalStorage persistence                                     │  │
+│   │  • Real-time taalwissel                                         │  │
+│   └─────────────────────────────────────────────────────────────────┘  │
+│                                                                         │
+│   ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐      │
+│   │  nl.json   │  │  en.json   │  │  de.json   │  │  pl.json   │      │
+│   │  messages  │  │  messages  │  │  messages  │  │  messages  │      │
+│   └────────────┘  └────────────┘  └────────────┘  └────────────┘      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Features
+
+| Feature | Beschrijving |
+|---------|--------------|
+| **Gebruiker Voorkeur** | Taalvoorkeur per medewerker instelbaar |
+| **Manager Instelling** | Managers kunnen taal instellen bij medewerker aanmaken |
+| **Session Sync** | Taal wordt opgeslagen in JWT token en sessie |
+| **Instant Switch** | Real-time taalwissel zonder pagina refresh |
+| **Fallback** | Nederlands als standaard fallback taal |
+
+### Vertaalde Onderdelen
+
+| Sectie | Beschrijving |
+|--------|--------------|
+| **Dashboard** | KPI's, widgets, navigatie |
+| **Tijdregistratie** | Formulieren, validatie, status |
+| **Verlofbeheer** | Aanvragen, saldi, types |
+| **Ziekmeldingen** | UWV alerts, status, workflow |
+| **Declaraties** | Types, bedragen, goedkeuring |
+| **Instellingen** | Profielbeheer, voorkeuren |
+| **Emails** | Notificaties, reminders, alerts |
+| **Errors** | Validatiefouten, systeemfouten |
+
+### Taalvoorkeur Instellen
+
+**Via Medewerker Profiel:**
+```typescript
+// Schema validatie
+const localeSchema = z.enum(['nl', 'en', 'de', 'pl']).default('nl')
+
+// Update via employee form
+const updateEmployee = {
+  // ...other fields
+  locale: 'en'  // Preferred language
+}
+```
+
+**Via Manager bij Aanmaken:**
+Managers kunnen bij het aanmaken van een nieuwe medewerker direct de taalvoorkeur instellen, ideaal voor internationale teams.
 
 ---
 
@@ -489,6 +747,7 @@ src/
 │   │   ├── employees/             # Employee management
 │   │   │   └── [id]/              # Employee detail view
 │   │   ├── approvals/             # Approval workflows
+│   │   ├── expenses/              # Expense management
 │   │   ├── trips/                 # Fleet tracking trips
 │   │   ├── billing/               # Subscription & invoices
 │   │   ├── profile/               # User profile
@@ -508,6 +767,7 @@ src/
 │   │   ├── employees/             # Employee CRUD
 │   │   │   ├── [id]/              # Single employee
 │   │   │   └── vehicles/          # Vehicle mappings
+│   │   ├── expenses/              # Expense CRUD
 │   │   ├── fleet-provider/        # Fleet provider API
 │   │   ├── routevision/           # RouteVision API
 │   │   ├── approvals/             # Batch approvals
@@ -568,7 +828,13 @@ src/
 │   └── validation/                # Input validation
 │
 ├── test/                          # Test setup
-└── types/                         # TypeScript definitions
+├── types/                         # TypeScript definitions
+│
+messages/                           # i18n Translation Files
+├── nl.json                         # Nederlands (primary)
+├── en.json                         # English
+├── de.json                         # Deutsch
+└── pl.json                         # Polski
 ```
 
 ---
@@ -701,6 +967,15 @@ interface Session {
 | POST | `/api/sick-leaves` | Nieuwe ziekmelding |
 | PATCH | `/api/sick-leaves/[id]` | Herstelmelding / UWV status |
 
+#### Expenses
+| Method | Endpoint | Beschrijving |
+|--------|----------|--------------|
+| GET | `/api/expenses` | Lijst declaraties (filtered by tenant) |
+| POST | `/api/expenses` | Nieuwe declaratie indienen |
+| PATCH | `/api/expenses/[id]` | Update declaratie |
+| DELETE | `/api/expenses/[id]` | Verwijder declaratie |
+| GET | `/api/expenses/export` | Export naar Nmbrs formaat |
+
 #### Approvals
 | Method | Endpoint | Beschrijving |
 |--------|----------|--------------|
@@ -798,8 +1073,11 @@ npx prisma studio        # Open Prisma Studio GUI
 | **Tijdregistratie** | ✅ | ✅ |
 | **Verlofbeheer** | ✅ | ✅ |
 | **Ziekmeldingen** | ✅ | ✅ |
+| **Declaratiebeheer** | ✅ Basis | ✅ Volledig |
+| **Multi-Language** | ✅ NL | ✅ NL/EN/DE/PL |
 | **GPS Verificatie** | ❌ | ✅ |
 | **Fleet Tracking** | ❌ | ✅ |
+| **Nmbrs Export** | ❌ | ✅ |
 | **PDF/Excel Export** | ❌ | ✅ |
 | **API Access** | ❌ | ✅ |
 | **Priority Support** | ❌ | ✅ |
@@ -834,9 +1112,11 @@ npx prisma studio        # Open Prisma Studio GUI
   <br>
   <img src="https://img.shields.io/badge/Made%20in-Netherlands-FF6C2D?style=for-the-badge" alt="Made in Netherlands">
   <br><br>
-  <strong>ADSPersoneelapp v3.0</strong>
+  <strong>ADSPersoneelapp v3.1</strong>
   <br>
   <em>Enterprise HR Management voor Nederlandse Organisaties</em>
+  <br>
+  <em>Met declaratiebeheer, Nmbrs integratie & meertalige ondersteuning</em>
   <br><br>
-  December 2025
+  Januari 2026
 </p>
