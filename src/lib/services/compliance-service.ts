@@ -1,7 +1,17 @@
 /**
  * Compliance Service
  * Handles GDPR/AVG and Dutch labor law compliance features
+ *
+ * Features:
+ * - Data retention policies (Nederlandse wetgeving)
+ * - Consent management
+ * - Data access requests (GDPR Article 15-22)
+ * - Data breach reporting
+ * - Working time compliance (Arbeidstijdenwet)
+ * - Automated data retention enforcement
  */
+
+import { prisma } from '@/lib/db/prisma';
 
 // Interface voor data retention policy
 interface DataRetentionPolicy {
@@ -330,13 +340,13 @@ export async function generatePrivacyStatement(employeeId: string): Promise<stri
  */
 export function anonymizePersonalData(data: Record<string, string | number | boolean>): Record<string, string | number | boolean> {
   const result = { ...data };
-  
+
   // Lijst van velden die geanonimiseerd moeten worden
   const fieldsToAnonymize = [
     'name', 'firstName', 'lastName', 'email', 'phone', 'address',
     'postalCode', 'city', 'birthDate', 'bsn', 'iban'
   ];
-  
+
   // Anonimiseer de velden
   for (const field of fieldsToAnonymize) {
     if (field in result) {
@@ -353,6 +363,320 @@ export function anonymizePersonalData(data: Record<string, string | number | boo
       }
     }
   }
-  
+
   return result;
+}
+
+// ============================================================================
+// Server-side Data Retention Enforcement Functions
+// ============================================================================
+
+export interface DataRetentionReport {
+  tenantId: string;
+  reportDate: string;
+  summary: {
+    totalItemsChecked: number;
+    itemsExpired: number;
+    itemsAnonymized: number;
+    itemsDeleted: number;
+    errors: number;
+  };
+  details: DataRetentionItem[];
+}
+
+export interface DataRetentionItem {
+  dataType: string;
+  recordId: string;
+  creationDate: string;
+  expirationDate: string;
+  status: 'expired' | 'pending_deletion' | 'anonymized' | 'deleted';
+  action?: 'anonymize' | 'delete' | 'none';
+  error?: string;
+}
+
+/**
+ * Maps data types to their database tables and date fields
+ */
+const dataTypeMapping: Record<string, { table: string; dateField: string; strategy: 'anonymize' | 'delete' }> = {
+  sollicitatiegegevens: {
+    table: 'invitations',
+    dateField: 'created_at',
+    strategy: 'delete', // Delete unused invitations
+  },
+  verzuimgegevens: {
+    table: 'sick_leaves',
+    dateField: 'created_at',
+    strategy: 'anonymize', // Anonymize after retention period
+  },
+  // Note: personeelsdossier and salarisadministratie require more complex handling
+  // as they span multiple tables and require employee termination date tracking
+};
+
+/**
+ * Finds all data records due for deletion/anonymization for a tenant
+ */
+export async function findExpiredDataForTenant(tenantId: string): Promise<DataRetentionItem[]> {
+  const expiredItems: DataRetentionItem[] = [];
+  const now = new Date();
+
+  for (const policy of dataRetentionPolicies) {
+    const mapping = dataTypeMapping[policy.dataType];
+    if (!mapping) continue;
+
+    const expirationThreshold = new Date(now.getTime() - policy.retentionPeriod * 24 * 60 * 60 * 1000);
+
+    try {
+      // Query based on data type
+      if (policy.dataType === 'sollicitatiegegevens') {
+        const expiredInvitations = await prisma.invitation.findMany({
+          where: {
+            tenantId,
+            createdAt: { lt: expirationThreshold },
+            usedAt: null, // Only unused invitations
+          },
+          select: { id: true, createdAt: true },
+        });
+
+        for (const inv of expiredInvitations) {
+          expiredItems.push({
+            dataType: policy.dataType,
+            recordId: inv.id,
+            creationDate: inv.createdAt?.toISOString() || '',
+            expirationDate: new Date(
+              (inv.createdAt?.getTime() || 0) + policy.retentionPeriod * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            status: 'expired',
+            action: mapping.strategy,
+          });
+        }
+      }
+
+      if (policy.dataType === 'verzuimgegevens') {
+        const expiredSickLeaves = await prisma.sick_leaves.findMany({
+          where: {
+            tenant_id: tenantId,
+            created_at: { lt: expirationThreshold },
+            status: 'RECOVERED', // Only archived sick leaves
+          },
+          select: { id: true, created_at: true },
+        });
+
+        for (const sl of expiredSickLeaves) {
+          expiredItems.push({
+            dataType: policy.dataType,
+            recordId: sl.id,
+            creationDate: sl.created_at?.toISOString() || '',
+            expirationDate: new Date(
+              (sl.created_at?.getTime() || 0) + policy.retentionPeriod * 24 * 60 * 60 * 1000
+            ).toISOString(),
+            status: 'expired',
+            action: mapping.strategy,
+          });
+        }
+      }
+    } catch (error) {
+      console.error(`Error finding expired ${policy.dataType} for tenant ${tenantId}:`, error);
+      expiredItems.push({
+        dataType: policy.dataType,
+        recordId: 'error',
+        creationDate: '',
+        expirationDate: '',
+        status: 'expired',
+        action: 'none',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  return expiredItems;
+}
+
+/**
+ * Processes data retention for a single tenant - anonymizes or deletes expired data
+ */
+export async function processDataRetentionForTenant(
+  tenantId: string,
+  dryRun: boolean = true
+): Promise<DataRetentionReport> {
+  const expiredItems = await findExpiredDataForTenant(tenantId);
+
+  const report: DataRetentionReport = {
+    tenantId,
+    reportDate: new Date().toISOString(),
+    summary: {
+      totalItemsChecked: expiredItems.length,
+      itemsExpired: expiredItems.filter(i => i.status === 'expired').length,
+      itemsAnonymized: 0,
+      itemsDeleted: 0,
+      errors: expiredItems.filter(i => i.error).length,
+    },
+    details: [],
+  };
+
+  for (const item of expiredItems) {
+    if (item.error) {
+      report.details.push(item);
+      continue;
+    }
+
+    if (dryRun) {
+      report.details.push({
+        ...item,
+        status: 'pending_deletion',
+      });
+      continue;
+    }
+
+    try {
+      if (item.action === 'delete') {
+        // Delete the record
+        if (item.dataType === 'sollicitatiegegevens') {
+          await prisma.invitation.delete({
+            where: { id: item.recordId },
+          });
+          report.summary.itemsDeleted++;
+          report.details.push({
+            ...item,
+            status: 'deleted',
+          });
+        }
+      } else if (item.action === 'anonymize') {
+        // Anonymize the record
+        if (item.dataType === 'verzuimgegevens') {
+          await prisma.sick_leaves.update({
+            where: { id: item.recordId },
+            data: {
+              reason: 'Geanonimiseerd',
+              // Keep medical_certificate and other flags for compliance reporting
+            },
+          });
+          report.summary.itemsAnonymized++;
+          report.details.push({
+            ...item,
+            status: 'anonymized',
+          });
+        }
+      }
+    } catch (error) {
+      report.summary.errors++;
+      report.details.push({
+        ...item,
+        status: 'expired',
+        error: error instanceof Error ? error.message : 'Processing failed',
+      });
+    }
+  }
+
+  // Log the retention processing to audit log
+  if (!dryRun && (report.summary.itemsDeleted > 0 || report.summary.itemsAnonymized > 0)) {
+    await prisma.auditLog.create({
+      data: {
+        tenantId,
+        action: 'DATA_RETENTION_PROCESSED',
+        resource: 'Compliance',
+        newValues: {
+          itemsAnonymized: report.summary.itemsAnonymized,
+          itemsDeleted: report.summary.itemsDeleted,
+          processedAt: report.reportDate,
+        },
+      },
+    });
+  }
+
+  return report;
+}
+
+/**
+ * Gets data retention status summary for all tenants (superuser function)
+ */
+export async function getGlobalRetentionStatus(): Promise<{
+  totalTenants: number;
+  tenantsWithExpiredData: number;
+  expiredItemsByType: Record<string, number>;
+  lastProcessedAt?: string;
+}> {
+  const tenants = await prisma.tenant.findMany({
+    where: {
+      isArchived: { not: true },
+    },
+    select: { id: true },
+  });
+
+  const expiredItemsByType: Record<string, number> = {};
+  let tenantsWithExpiredData = 0;
+
+  for (const tenant of tenants) {
+    const items = await findExpiredDataForTenant(tenant.id);
+    if (items.length > 0) {
+      tenantsWithExpiredData++;
+      for (const item of items) {
+        expiredItemsByType[item.dataType] = (expiredItemsByType[item.dataType] || 0) + 1;
+      }
+    }
+  }
+
+  // Find last retention processing from audit logs
+  const lastProcessing = await prisma.auditLog.findFirst({
+    where: { action: 'DATA_RETENTION_PROCESSED' },
+    orderBy: { createdAt: 'desc' },
+    select: { createdAt: true },
+  });
+
+  return {
+    totalTenants: tenants.length,
+    tenantsWithExpiredData,
+    expiredItemsByType,
+    lastProcessedAt: lastProcessing?.createdAt?.toISOString(),
+  };
+}
+
+/**
+ * Find employees with terminated employment due for data deletion
+ * According to Dutch law: 2 years after end of employment
+ */
+export async function findTerminatedEmployeesForDeletion(tenantId: string): Promise<{
+  employeeId: string;
+  userId: string;
+  name: string;
+  terminationDate: string;
+  deletionDueDate: string;
+  daysUntilDeletion: number;
+}[]> {
+  const twoYearsAgo = new Date();
+  twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+
+  const terminatedEmployees = await prisma.employees.findMany({
+    where: {
+      tenant_id: tenantId,
+      end_date: {
+        not: null,
+        lt: twoYearsAgo,
+      },
+    },
+    include: {
+      users: {
+        select: { id: true, name: true },
+      },
+    },
+  });
+
+  return terminatedEmployees.map(emp => {
+    const endDate = emp.end_date!;
+    const deletionDueDate = new Date(endDate);
+    deletionDueDate.setFullYear(deletionDueDate.getFullYear() + 2);
+
+    const now = new Date();
+    const daysUntilDeletion = Math.ceil(
+      (deletionDueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    return {
+      employeeId: emp.id,
+      userId: emp.user_id,
+      name: emp.users.name || 'Unknown',
+      terminationDate: endDate.toISOString(),
+      deletionDueDate: deletionDueDate.toISOString(),
+      daysUntilDeletion,
+    };
+  });
 }
