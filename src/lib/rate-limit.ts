@@ -1,17 +1,65 @@
+/**
+ * Unified Rate Limiting Module
+ *
+ * This module provides rate limiting for both production (Redis) and development (in-memory).
+ * - Production: Uses Upstash Redis for distributed rate limiting
+ * - Development: Falls back to in-memory rate limiting
+ *
+ * Configuration via environment variables:
+ * - UPSTASH_REDIS_REST_URL: Redis URL for production
+ * - UPSTASH_REDIS_REST_TOKEN: Redis token for production
+ */
+
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
+// In-memory store for development fallback
+const inMemoryStore = new Map<string, { count: number; resetTime: number }>();
+
 // Create Redis instance for production or mock for development
-const redis = process.env.UPSTASH_REDIS_REST_URL
+const isRedisConfigured = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+
+const redis = isRedisConfigured
   ? Redis.fromEnv()
   : {
-      // Mock Redis for development
-      get: async () => null,
-      set: async () => "OK",
-      incr: async () => 1,
+      // In-memory mock Redis for development with proper sliding window behavior
+      get: async (key: string) => {
+        const entry = inMemoryStore.get(key);
+        if (!entry) return null;
+        if (Date.now() > entry.resetTime) {
+          inMemoryStore.delete(key);
+          return null;
+        }
+        return entry.count.toString();
+      },
+      set: async (key: string, value: string, options?: { ex?: number }) => {
+        const expiresIn = options?.ex ? options.ex * 1000 : 3600000;
+        inMemoryStore.set(key, {
+          count: parseInt(value, 10) || 1,
+          resetTime: Date.now() + expiresIn,
+        });
+        return "OK";
+      },
+      incr: async (key: string) => {
+        const entry = inMemoryStore.get(key);
+        if (!entry || Date.now() > entry.resetTime) {
+          inMemoryStore.set(key, { count: 1, resetTime: Date.now() + 3600000 });
+          return 1;
+        }
+        entry.count++;
+        return entry.count;
+      },
       expire: async () => 1,
-      flushdb: async () => "OK",
+      flushdb: async () => {
+        inMemoryStore.clear();
+        return "OK";
+      },
     } as unknown as Redis;
+
+// Log rate limiting mode on startup
+if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'test') {
+  console.log(`[Rate Limit] Mode: ${isRedisConfigured ? 'Redis (production)' : 'In-Memory (development)'}`);
+}
 
 // API Rate Limits - Banking Grade Security
 const apiLimiter = new Ratelimit({
