@@ -121,6 +121,7 @@ model TenantUser {
   @@index([role], map: "idx_tenant_users_role")
   @@index([tenantId], map: "idx_tenant_users_tenant_id")
   @@index([userId], map: "idx_tenant_users_user_id")
+  @@index([tenantId, isActive], map: "idx_tenant_users_tenant_active")
   @@map("tenant_users")
 }
 
@@ -247,6 +248,8 @@ model Timesheet {
   @@index([tenantId, date], map: "idx_timesheets_tenant_date")
   @@index([tenantId], map: "idx_timesheets_tenant_id")
   @@index([userId], map: "idx_timesheets_user_id")
+  @@index([tenantId, status], map: "idx_timesheets_tenant_status")
+  @@index([tenantId, userId, date], map: "idx_timesheets_tenant_user_date")
   @@map("timesheets")
 }
 
@@ -314,6 +317,7 @@ model LeaveRequest {
   @@index([userId], map: "idx_leave_requests_user_id")
   @@index([status], map: "idx_leave_requests_status")
   @@index([startDate, endDate], map: "idx_leave_requests_dates")
+  @@index([tenantId, status], map: "idx_leave_requests_tenant_status")
   @@map("leave_requests")
 }
 
@@ -423,6 +427,7 @@ model notifications {
 
   @@index([tenant_id], map: "idx_notifications_tenant_id")
   @@index([user_id], map: "idx_notifications_user_id")
+  @@index([user_id, is_read], map: "idx_notifications_user_unread")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -462,6 +467,7 @@ model sick_leaves {
   @@index([employee_id], map: "idx_sick_leaves_employee_id")
   @@index([status], map: "idx_sick_leaves_status")
   @@index([tenant_id], map: "idx_sick_leaves_tenant_id")
+  @@index([tenant_id, status], map: "idx_sick_leaves_tenant_status")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -488,6 +494,7 @@ model vacations {
   @@index([employee_id], map: "idx_vacations_employee_id")
   @@index([status], map: "idx_vacations_status")
   @@index([tenant_id], map: "idx_vacations_tenant_id")
+  @@index([tenant_id, status], map: "idx_vacations_tenant_status")
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -760,6 +767,8 @@ model Expense {
   @@index([employee_id], map: "idx_expenses_employee_id")
   @@index([status], map: "idx_expenses_status")
   @@index([date], map: "idx_expenses_date")
+  @@index([tenant_id, status], map: "idx_expenses_tenant_status")
+  @@index([tenant_id, employee_id, date], map: "idx_expenses_tenant_employee_date")
   @@map("expenses")
 }
 
