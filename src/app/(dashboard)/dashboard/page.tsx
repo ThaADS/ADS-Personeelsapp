@@ -13,7 +13,7 @@ import {
   HeartIcon,
   DocumentCheckIcon
 } from '@heroicons/react/24/outline';
-import { QuickClockIn, VacationBalance, TripsWidget, FleetTrackingFAQ } from '@/components/dashboard';
+import { QuickClockIn, VacationBalance, TripsWidget, FleetTrackingFAQ, DashboardAnalytics } from '@/components/dashboard';
 import { SkeletonStatsCard } from '@/components/ui/skeleton';
 
 interface DashboardStats {
@@ -346,6 +346,9 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Analytics Charts & Reports */}
+      <DashboardAnalytics />
 
       {/* Quick Actions */}
       <div>
