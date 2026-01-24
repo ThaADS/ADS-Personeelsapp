@@ -84,7 +84,7 @@ export default function DashboardLayout({
                   ADSPersoneelapp
                 </h1>
               </div>
-              <div className="hidden lg:ml-6 lg:flex lg:space-x-4 xl:space-x-6">
+              <div className="hidden lg:ml-6 lg:flex lg:space-x-2 xl:space-x-4">
                 {getNavigationItems().map((item) => (
                   <Link
                     key={item.name}
@@ -93,7 +93,8 @@ export default function DashboardLayout({
                       item.current
                         ? 'border-purple-500 text-purple-700 dark:text-white font-semibold bg-purple-50 dark:bg-white/5'
                         : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-purple-700 dark:hover:text-white hover:border-purple-400/50 hover:bg-purple-50 dark:hover:bg-white/5 font-medium'
-                    } inline-flex items-center px-2 xl:px-3 pt-1 border-b-2 text-sm transition-all duration-200 rounded-t-lg whitespace-nowrap`}
+                    } inline-flex items-center px-2 xl:px-3 pt-1 border-b-2 text-xs lg:text-sm transition-all duration-200 rounded-t-lg whitespace-nowrap max-w-[120px] xl:max-w-none truncate`}
+                    title={item.name}
                   >
                     {item.name}
                   </Link>
@@ -112,7 +113,7 @@ export default function DashboardLayout({
                     <span>Sneltoetsen</span>
                   </button>
                   <ThemeToggle />
-                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium hidden xl:inline">
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium hidden xl:inline max-w-[200px] truncate" title={`${session?.user?.name} (${session?.user?.role})`}>
                     {session?.user?.name} <span className="text-purple-600 dark:text-purple-400">({session?.user?.role})</span>
                   </span>
                   <button
@@ -161,14 +162,14 @@ export default function DashboardLayout({
 
         {/* Mobile/Tablet Menu Dropdown - visible on screens smaller than lg */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-white/20 dark:border-purple-500/20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl">
+          <div className="lg:hidden border-t border-white/20 dark:border-purple-500/20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl max-h-[70vh] overflow-y-auto">
             <div className="px-4 py-3 space-y-1">
               {getNavigationItems().map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                  className={`block px-3 py-2 rounded-lg text-base font-medium transition-colors truncate ${
                     item.current
                       ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-white/10'
@@ -180,11 +181,11 @@ export default function DashboardLayout({
 
               {/* User info and logout */}
               <div className="pt-4 pb-2 border-t border-gray-200 dark:border-white/10 mt-4">
-                <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                  Ingelogd als: <span className="font-medium text-gray-900 dark:text-white">{session?.user?.name}</span>
+                <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 truncate">
+                  Ingelogd als: <span className="font-medium text-gray-900 dark:text-white truncate">{session?.user?.name}</span>
                 </div>
                 <div className="flex items-center justify-between px-3 py-2">
-                  <span className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                  <span className="text-xs text-purple-600 dark:text-purple-400 font-medium truncate max-w-full">
                     {session?.user?.role}
                   </span>
                 </div>
@@ -212,9 +213,9 @@ export default function DashboardLayout({
       </nav>
 
       {/* Mobile bottom bar - only on small screens, hidden on tablets and up */}
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-t border-white/20 dark:border-purple-500/20 px-4 py-2 shadow-glass">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 overflow-x-auto">
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-t border-white/20 dark:border-purple-500/20 px-2 py-2 shadow-glass safe-area-inset-bottom">
+        <div className="flex items-center justify-between gap-1">
+          <div className="flex items-center flex-1 min-w-0 overflow-x-auto scrollbar-hide gap-1">
             {getNavigationItems().slice(0, 4).map((item) => (
               <Link
                 key={item.name}
@@ -223,13 +224,16 @@ export default function DashboardLayout({
                   item.current
                     ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300'
                     : 'text-gray-600 dark:text-gray-400'
-                } px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors`}
+                } px-2 py-2 rounded-lg text-[10px] font-medium whitespace-nowrap transition-colors flex-shrink-0 max-w-[72px] truncate text-center`}
+                title={item.name}
               >
                 {item.name}
               </Link>
             ))}
           </div>
-          <ThemeToggle />
+          <div className="flex-shrink-0">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
 
