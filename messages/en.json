@@ -8,7 +8,30 @@
     "employees": "Employees",
     "approvals": "Approvals",
     "settings": "Settings",
+    "help": "Help",
     "logout": "Logout"
+  },
+  "help": {
+    "title": "Help & Documentation",
+    "subtitle": "Everything you need to know about ADSPersoneelapp",
+    "searchPlaceholder": "Search documentation...",
+    "sections": {
+      "gettingStarted": "Getting Started",
+      "timeRegistration": "Time Registration",
+      "leave": "Leave Management",
+      "sickLeave": "Sick Leave",
+      "expenses": "Expenses",
+      "fleet": "Fleet Tracking",
+      "manager": "For Managers",
+      "reports": "Reports & Export",
+      "settings": "Settings"
+    },
+    "contact": {
+      "title": "More questions?",
+      "chatbot": "Use the FAQ chatbot in the bottom right",
+      "email": "Email: support@adspersoneelapp.nl",
+      "docs": "Full documentation"
+    }
   },
   "auth": {
     "login": "Login",

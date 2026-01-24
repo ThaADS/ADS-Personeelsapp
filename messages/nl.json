@@ -8,7 +8,30 @@
     "employees": "Werknemers",
     "approvals": "Goedkeuringen",
     "settings": "Instellingen",
+    "help": "Hulp",
     "logout": "Uitloggen"
+  },
+  "help": {
+    "title": "Hulp & Documentatie",
+    "subtitle": "Alles wat u moet weten over ADSPersoneelapp",
+    "searchPlaceholder": "Zoek in de documentatie...",
+    "sections": {
+      "gettingStarted": "Aan de slag",
+      "timeRegistration": "Tijdregistratie",
+      "leave": "Verlofbeheer",
+      "sickLeave": "Ziekmeldingen",
+      "expenses": "Declaraties",
+      "fleet": "Fleet Tracking",
+      "manager": "Voor Managers",
+      "reports": "Rapportages & Export",
+      "settings": "Instellingen"
+    },
+    "contact": {
+      "title": "Nog vragen?",
+      "chatbot": "Gebruik de FAQ chatbot rechtsonder",
+      "email": "E-mail: support@adspersoneelapp.nl",
+      "docs": "Volledige documentatie"
+    }
   },
   "auth": {
     "login": "Inloggen",

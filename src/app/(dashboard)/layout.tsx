@@ -43,6 +43,7 @@ export default function DashboardLayout({
       { name: 'Verlof', href: '/vacation', current: pathname === '/vacation' },
       { name: 'Ziekmelding', href: '/sick-leave', current: pathname === '/sick-leave' },
       { name: 'Profiel', href: '/profile', current: pathname === '/profile' },
+      { name: 'Hulp', href: '/help', current: pathname === '/help' },
     ];
 
     // Add manager/admin specific items

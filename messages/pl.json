@@ -8,7 +8,30 @@
     "employees": "Pracownicy",
     "approvals": "Zatwierdzenia",
     "settings": "Ustawienia",
+    "help": "Pomoc",
     "logout": "Wyloguj"
+  },
+  "help": {
+    "title": "Pomoc i dokumentacja",
+    "subtitle": "Wszystko, co musisz wiedzieć o ADSPersoneelapp",
+    "searchPlaceholder": "Szukaj w dokumentacji...",
+    "sections": {
+      "gettingStarted": "Pierwsze kroki",
+      "timeRegistration": "Rejestracja czasu",
+      "leave": "Zarządzanie urlopami",
+      "sickLeave": "Zwolnienia lekarskie",
+      "expenses": "Wydatki",
+      "fleet": "Śledzenie floty",
+      "manager": "Dla kierowników",
+      "reports": "Raporty i eksport",
+      "settings": "Ustawienia"
+    },
+    "contact": {
+      "title": "Więcej pytań?",
+      "chatbot": "Użyj chatbota FAQ w prawym dolnym rogu",
+      "email": "E-mail: support@adspersoneelapp.nl",
+      "docs": "Pełna dokumentacja"
+    }
   },
   "auth": {
     "login": "Zaloguj",
