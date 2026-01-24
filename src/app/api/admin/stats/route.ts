@@ -193,51 +193,60 @@ export async function GET(request: NextRequest) {
       uptime: process.uptime(),
     };
 
-    return NextResponse.json({
-      overview: {
-        totalTenants,
-        activeTenants,
-        trialTenants,
-        freemiumTenants,
-        totalUsers,
-        activeUsers,
-        totalTimesheets,
-        recentTimesheets,
-        paidTenants,
-        mrr: Math.round(mrr * 100) / 100, // Round to 2 decimal places
+    // Return with cache headers for admin dashboard performance
+    return NextResponse.json(
+      {
+        overview: {
+          totalTenants,
+          activeTenants,
+          trialTenants,
+          freemiumTenants,
+          totalUsers,
+          activeUsers,
+          totalTimesheets,
+          recentTimesheets,
+          paidTenants,
+          mrr: Math.round(mrr * 100) / 100, // Round to 2 decimal places
+        },
+        growth: {
+          tenantGrowth: tenantGrowth.map(item => ({
+            date: item.createdAt,
+            count: item._count.id,
+          })),
+          subscriptionDistribution: subscriptionDistribution.map(item => ({
+            status: item.subscriptionStatus,
+            plan: item.currentPlan,
+            count: item._count.id,
+          })),
+        },
+        activity: {
+          recentTenants: recentTenants.map(tenant => ({
+            id: tenant.id,
+            name: tenant.name,
+            slug: tenant.slug,
+            status: tenant.subscriptionStatus,
+            plan: tenant.currentPlan,
+            activeUsers: tenant._count.tenantUsers,
+            createdAt: tenant.createdAt,
+          })),
+          topTenants: topTenants.map(tenant => ({
+            id: tenant.id,
+            name: tenant.name,
+            slug: tenant.slug,
+            status: tenant.subscriptionStatus,
+            activeUsers: tenant._count.tenantUsers,
+            recentActivity: tenant._count.timesheets,
+          })),
+        },
+        systemHealth,
       },
-      growth: {
-        tenantGrowth: tenantGrowth.map(item => ({
-          date: item.createdAt,
-          count: item._count.id,
-        })),
-        subscriptionDistribution: subscriptionDistribution.map(item => ({
-          status: item.subscriptionStatus,
-          plan: item.currentPlan,
-          count: item._count.id,
-        })),
-      },
-      activity: {
-        recentTenants: recentTenants.map(tenant => ({
-          id: tenant.id,
-          name: tenant.name,
-          slug: tenant.slug,
-          status: tenant.subscriptionStatus,
-          plan: tenant.currentPlan,
-          activeUsers: tenant._count.tenantUsers,
-          createdAt: tenant.createdAt,
-        })),
-        topTenants: topTenants.map(tenant => ({
-          id: tenant.id,
-          name: tenant.name,
-          slug: tenant.slug,
-          status: tenant.subscriptionStatus,
-          activeUsers: tenant._count.tenantUsers,
-          recentActivity: tenant._count.timesheets,
-        })),
-      },
-      systemHealth,
-    });
+      {
+        headers: {
+          // Admin stats can be cached for 60 seconds
+          'Cache-Control': 'private, max-age=60, stale-while-revalidate=120',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error fetching platform stats:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -196,10 +196,19 @@ export async function GET(request: NextRequest) {
     outItems.sort((a, b) => (a.submittedAt < b.submittedAt ? 1 : -1));
     const start = (page - 1) * limit;
     const paged = outItems.slice(start, start + limit);
-    return NextResponse.json({
-      items: paged,
-      pagination: { page, limit, total: outItems.length, pages: Math.ceil(outItems.length / limit) || 0 },
-    });
+
+    // Return with short-term cache for better performance
+    return NextResponse.json(
+      {
+        items: paged,
+        pagination: { page, limit, total: outItems.length, pages: Math.ceil(outItems.length / limit) || 0 },
+      },
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=30, stale-while-revalidate=60',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error in approvals GET:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

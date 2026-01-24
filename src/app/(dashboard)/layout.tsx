@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, lazy, Suspense } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import FAQChatbot from "@/components/chat/FAQChatbot";
+
+// Lazy load the chatbot component for better initial page load performance
+const FAQChatbot = lazy(() => import("@/components/chat/FAQChatbot"));
 
 export default function DashboardLayout({
   children,
@@ -221,8 +223,10 @@ export default function DashboardLayout({
         {children}
       </main>
 
-      {/* FAQ Chatbot - Available on all dashboard pages */}
-      <FAQChatbot />
+      {/* FAQ Chatbot - Lazy loaded for better performance */}
+      <Suspense fallback={null}>
+        <FAQChatbot />
+      </Suspense>
     </div>
   );
 }
