@@ -39,13 +39,17 @@ export function middleware(req: NextRequest) {
   response.headers.set('Content-Security-Policy', cspHeader);
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/login', '/register', '/forgot-password', '/reset-password', '/marketing'];
+  const publicRoutes = ['/', '/login', '/register', '/forgot-password', '/reset-password', '/marketing', '/pricing', '/features', '/contact', '/checkout'];
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
   const isApiRoute = pathname.startsWith('/api');
   const isNextRoute = pathname.startsWith('/_next');
 
-  // Allow public routes, API routes, and Next.js internal routes
-  if (isPublicRoute || isApiRoute || isNextRoute) {
+  // Locale routes for SEO pages (nl, en, de, pl, fr)
+  const localeRoutes = ['/nl', '/en', '/de', '/pl', '/fr'];
+  const isLocaleRoute = localeRoutes.some(route => pathname.startsWith(route));
+
+  // Allow public routes, API routes, Next.js internal routes, and locale routes
+  if (isPublicRoute || isApiRoute || isNextRoute || isLocaleRoute) {
     return response;
   }
 
