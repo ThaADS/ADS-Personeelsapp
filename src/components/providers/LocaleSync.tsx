@@ -9,11 +9,11 @@ export default function LocaleSync() {
   const { setLocale } = useLocale();
 
   useEffect(() => {
-    const preferred = (session?.user as unknown as { locale?: string })?.locale;
-    if (preferred && (preferred === 'nl' || preferred === 'pl' || preferred === 'en' || preferred === 'de')) {
+    const preferred = session?.user?.locale;
+    if (preferred) {
       const current = (typeof window !== 'undefined') ? localStorage.getItem('locale') : null;
       if (current !== preferred) {
-        setLocale(preferred as 'nl' | 'pl' | 'en' | 'de');
+        setLocale(preferred);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

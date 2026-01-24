@@ -35,6 +35,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               role: true,
               isSuperuser: true,
               emailVerified: true,
+              locale: true,
               tenantUsers: {
                 where: { isActive: true },
                 select: {
@@ -79,6 +80,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             tenantId: tenantId,
             tenantSlug: tenantUser?.tenant?.slug || null,
             tenantName: tenantUser?.tenant?.name || null,
+            locale: (user.locale as 'nl' | 'en' | 'de' | 'pl') || 'nl',
           };
 
           logger.debug('Authorization successful', { userId: authUser.id, tenantId: authUser.tenantId });
@@ -98,6 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.tenantId = user.tenantId;
         token.tenantName = user.tenantName;
         token.tenantSlug = user.tenantSlug;
+        token.locale = user.locale;
         // Add security: token issued time and expiry tracking
         token.iat = Math.floor(Date.now() / 1000);
         token.exp = Math.floor(Date.now() / 1000) + (24 * 60 * 60); // 24 hours
@@ -114,6 +117,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.tenantId = token.tenantId as string | null;
         session.user.tenantSlug = token.tenantSlug as string | null;
         session.user.tenantName = token.tenantName as string | null;
+        session.user.locale = token.locale as 'nl' | 'en' | 'de' | 'pl' | undefined;
       }
       return session;
     },

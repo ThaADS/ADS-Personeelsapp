@@ -12,6 +12,7 @@ declare module 'next-auth' {
       tenantSlug: string | null;
       tenantName: string | null;
       tenants?: Array<{id: string; name: string; slug: string}>;
+      locale?: 'nl' | 'en' | 'de' | 'pl';
     } & DefaultSession['user'];
   }
 
@@ -22,6 +23,7 @@ declare module 'next-auth' {
     tenantSlug: string | null;
     tenantName: string | null;
     emailVerified?: Date | null;
+    locale?: 'nl' | 'en' | 'de' | 'pl';
   }
 }
 
@@ -33,5 +35,6 @@ declare module 'next-auth/jwt' {
     tenantSlug: string | null;
     tenantName: string | null;
     emailVerified?: Date | null;
+    locale?: 'nl' | 'en' | 'de' | 'pl';
   }
 }
