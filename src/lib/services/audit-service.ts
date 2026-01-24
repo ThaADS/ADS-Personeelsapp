@@ -3,6 +3,10 @@
  * Handles audit logging, reporting, and regulatory integration
  */
 
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("audit-service");
+
 // Interface voor audit log entry
 export interface AuditLogEntry {
   id: string;
@@ -83,7 +87,7 @@ export async function logAuditEvent(
 
     return await response.json();
   } catch (error) {
-    console.error('Error logging audit event:', error);
+    logger.error("Error logging audit event", error, { userId, action, category });
     // Fallback naar lokale logging als de API niet beschikbaar is
     const fallbackEntry = {
       id: `local-${Date.now()}`,
@@ -93,7 +97,7 @@ export async function logAuditEvent(
       category,
       details,
     };
-    console.warn('Fallback audit log:', fallbackEntry);
+    logger.warn("Fallback audit log created", { fallbackEntry });
     return fallbackEntry as AuditLogEntry;
   }
 }
@@ -129,7 +133,7 @@ export async function fetchAuditLogs(options: AuditSearchOptions = {}): Promise<
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching audit logs:', error);
+    logger.error("Error fetching audit logs", error, { options });
     throw error;
   }
 }
@@ -166,7 +170,7 @@ export async function generateAuditReport(
     const data = await response.json();
     return data.reportUrl;
   } catch (error) {
-    console.error('Error generating audit report:', error);
+    logger.error("Error generating audit report", error, { startDate, endDate, format });
     throw error;
   }
 }
@@ -200,7 +204,7 @@ export async function generateUWVReport(
     const data = await response.json();
     return data.reportUrl;
   } catch (error) {
-    console.error('Error generating UWV report:', error);
+    logger.error("Error generating UWV report", error, { year, quarter });
     throw error;
   }
 }
@@ -234,7 +238,7 @@ export async function generateTaxReport(
     const data = await response.json();
     return data.reportUrl;
   } catch (error) {
-    console.error('Error generating tax report:', error);
+    logger.error("Error generating tax report", error, { year, month });
     throw error;
   }
 }
@@ -259,7 +263,7 @@ export async function generateGDPRComplianceReport(): Promise<string> {
     const data = await response.json();
     return data.reportUrl;
   } catch (error) {
-    console.error('Error generating GDPR compliance report:', error);
+    logger.error("Error generating GDPR compliance report", error);
     throw error;
   }
 }
@@ -293,7 +297,7 @@ export async function generateWorkingTimeReport(
     const data = await response.json();
     return data.reportUrl;
   } catch (error) {
-    console.error('Error generating working time report:', error);
+    logger.error("Error generating working time report", error, { startDate, endDate });
     throw error;
   }
 }

@@ -3,6 +3,10 @@
  * Tools for improving application accessibility (WCAG 2.1 AA compliance)
  */
 
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("Accessibility");
+
 // Interface voor accessibility opties
 export interface AccessibilityOptions {
   highContrast: boolean;
@@ -41,7 +45,7 @@ export function getAccessibilityOptions(): AccessibilityOptions {
       return JSON.parse(storedOptions);
     }
   } catch (error) {
-    console.error('Fout bij ophalen accessibility opties:', error);
+    logger.error('Fout bij ophalen accessibility opties', error);
   }
   
   return defaultOptions;
@@ -64,7 +68,7 @@ export function saveAccessibilityOptions(options: Partial<AccessibilityOptions>)
     // Pas de opties direct toe
     applyAccessibilityOptions(updatedOptions);
   } catch (error) {
-    console.error('Fout bij opslaan accessibility opties:', error);
+    logger.error('Fout bij opslaan accessibility opties', error);
   }
 }
 

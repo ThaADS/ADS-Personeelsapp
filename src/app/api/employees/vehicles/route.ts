@@ -4,6 +4,9 @@
 import { NextResponse } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-employees-vehicles");
 
 /**
  * GET /api/employees/vehicles
@@ -53,7 +56,7 @@ export async function GET() {
 
     return NextResponse.json({ vehicles: formattedVehicles });
   } catch (error) {
-    console.error("Error getting vehicles for employees:", error);
+    logger.error("Error getting vehicles for employees", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }

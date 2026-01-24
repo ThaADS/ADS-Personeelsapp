@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext, createAuditLog } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-timesheets-id");
 
 // Validation schema for updating timesheets (clock out)
 const updateTimesheetSchema = z.object({
@@ -70,7 +73,7 @@ export async function GET(
       updatedAt: timesheet.updatedAt?.toISOString() || new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Error fetching timesheet:", error);
+    logger.error("Error fetching timesheet", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -214,7 +217,7 @@ export async function PATCH(
       );
     }
 
-    console.error("Error updating timesheet:", error);
+    logger.error("Error updating timesheet", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -284,7 +287,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, message: "Timesheet verwijderd" });
   } catch (error) {
-    console.error("Error deleting timesheet:", error);
+    logger.error("Error deleting timesheet", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

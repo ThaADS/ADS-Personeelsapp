@@ -7,6 +7,9 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { prisma } from '@/lib/db/prisma';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-expense-categories");
 
 // Default Dutch expense categories
 const DEFAULT_CATEGORIES = [
@@ -68,7 +71,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    console.error('[Expense Categories API] Error:', error);
+    logger.error("Failed to fetch expense categories", error);
     return NextResponse.json({ error: 'Failed to fetch categories' }, { status: 500 });
   }
 }

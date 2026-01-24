@@ -9,6 +9,9 @@ import {
   convertTripToDbFormat,
 } from "@/lib/services/routevision-service";
 import { matchTripsToTimesheets } from "@/lib/services/trip-timesheet-matcher";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-routevision-sync");
 
 /**
  * POST /api/routevision/sync
@@ -133,7 +136,7 @@ export async function POST(request: NextRequest) {
           dateTo,
         });
       } catch (matchError) {
-        console.error("Error auto-matching trips:", matchError);
+        logger.error("Failed to auto-match trips", matchError);
         errors.push(
           `Auto-match fout: ${matchError instanceof Error ? matchError.message : "Unknown"}`
         );
@@ -158,7 +161,7 @@ export async function POST(request: NextRequest) {
         : undefined,
     });
   } catch (error) {
-    console.error("Error syncing RouteVision trips:", error);
+    logger.error("Failed to sync RouteVision trips", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Sync failed" },
       { status: 500 }

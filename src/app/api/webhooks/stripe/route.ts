@@ -3,6 +3,11 @@ import { stripe } from "@/lib/stripe/config";
 import { prisma } from "@/lib/db/prisma";
 import { SubscriptionStatus, PlanType } from "@/types";
 import Stripe from "stripe";
+import { createLogger } from "@/lib/logger";
+import { sendEmail } from "@/lib/services/email-service";
+import { getPaymentFailedEmail, getSubscriptionCanceledEmail } from "@/lib/email/templates";
+
+const logger = createLogger("stripe-webhook");
 
 // Disable body parsing, we need raw body for webhook signature verification
 export const dynamic = "force-dynamic";
@@ -21,7 +26,7 @@ async function handleSubscriptionCreated(subscription: StripeSubscriptionWithPer
   const tenantId = subscription.metadata?.tenantId;
 
   if (!tenantId) {
-    console.error("No tenantId in subscription metadata");
+    logger.warn("No tenantId in subscription metadata", { subscriptionId: subscription.id });
     return;
   }
 
@@ -31,7 +36,7 @@ async function handleSubscriptionCreated(subscription: StripeSubscriptionWithPer
   });
 
   if (!plan) {
-    console.error("Standard plan not found in database");
+    logger.error("Standard plan not found in database");
     return;
   }
 
@@ -91,7 +96,7 @@ async function handleSubscriptionCreated(subscription: StripeSubscriptionWithPer
     },
   });
 
-  console.log(`Subscription created/updated for tenant ${tenantId}: ${status}`);
+  logger.info("Subscription created/updated", { tenantId, status, subscriptionId: subscription.id });
 }
 
 async function handleSubscriptionUpdated(subscription: StripeSubscriptionWithPeriods) {
@@ -160,7 +165,7 @@ async function updateSubscriptionFromStripe(
     },
   });
 
-  console.log(`Subscription updated for tenant ${tenantId}: ${status}`);
+  logger.info("Subscription updated", { tenantId, status, subscriptionId: subscription.id });
 }
 
 async function handleSubscriptionDeleted(subscription: StripeSubscriptionWithPeriods) {
@@ -170,7 +175,7 @@ async function handleSubscriptionDeleted(subscription: StripeSubscriptionWithPer
   });
 
   if (!dbSubscription) {
-    console.log("Subscription not found in database:", subscription.id);
+    logger.warn("Subscription not found in database", { subscriptionId: subscription.id });
     return;
   }
 
@@ -192,9 +197,13 @@ async function handleSubscriptionDeleted(subscription: StripeSubscriptionWithPer
     },
   });
 
-  console.log(
-    `Subscription deleted, tenant ${dbSubscription.tenantId} downgraded to FREEMIUM`
-  );
+  logger.info("Subscription deleted, tenant downgraded to FREEMIUM", {
+    tenantId: dbSubscription.tenantId,
+    subscriptionId: subscription.id
+  });
+
+  // Send subscription canceled notification email
+  await sendSubscriptionCanceledNotification(dbSubscription.tenantId, subscription);
 }
 
 async function handleInvoicePaymentSucceeded(invoice: StripeInvoiceWithSubscription) {
@@ -227,9 +236,10 @@ async function handleInvoicePaymentSucceeded(invoice: StripeInvoiceWithSubscript
       data: { subscriptionStatus: SubscriptionStatus.ACTIVE },
     });
 
-    console.log(
-      `Payment succeeded, subscription ${subscriptionId} now ACTIVE`
-    );
+    logger.info("Payment succeeded, subscription now ACTIVE", {
+      subscriptionId,
+      tenantId: dbSubscription.tenantId
+    });
   }
 }
 
@@ -259,11 +269,13 @@ async function handleInvoicePaymentFailed(invoice: StripeInvoiceWithSubscription
     data: { subscriptionStatus: SubscriptionStatus.PAST_DUE },
   });
 
-  console.log(
-    `Payment failed, subscription ${subscriptionId} now PAST_DUE`
-  );
+  logger.warn("Payment failed, subscription now PAST_DUE", {
+    subscriptionId,
+    tenantId: dbSubscription.tenantId
+  });
 
-  // TODO: Send notification email to tenant admin
+  // Send notification email to tenant admin
+  await sendPaymentFailedNotification(dbSubscription.tenantId, invoice);
 }
 
 async function handleCheckoutSessionCompleted(
@@ -273,7 +285,7 @@ async function handleCheckoutSessionCompleted(
   const subscriptionId = session.subscription;
 
   if (!tenantId || !subscriptionId) {
-    console.log("Missing tenantId or subscriptionId in checkout session");
+    logger.warn("Missing tenantId or subscriptionId in checkout session", { sessionId: session.id });
     return;
   }
 
@@ -286,7 +298,108 @@ async function handleCheckoutSessionCompleted(
   // Handle as subscription created
   await handleSubscriptionCreated(subscription as unknown as StripeSubscriptionWithPeriods);
 
-  console.log(`Checkout completed for tenant ${tenantId}`);
+  logger.info("Checkout completed", { tenantId, subscriptionId: stripeSubscriptionId });
+}
+
+/**
+ * Send payment failed notification email to tenant admin
+ */
+async function sendPaymentFailedNotification(tenantId: string, invoice: StripeInvoiceWithSubscription) {
+  try {
+    // Get tenant with admin user
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: {
+        tenantUsers: {
+          where: { role: "TENANT_ADMIN" },
+          include: { user: true },
+          take: 1,
+        },
+      },
+    });
+
+    if (!tenant || !tenant.tenantUsers[0]?.user) {
+      logger.warn("Could not find tenant admin for payment failed notification", { tenantId });
+      return;
+    }
+
+    const admin = tenant.tenantUsers[0].user;
+    const amount = invoice.amount_due
+      ? new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" }).format(invoice.amount_due / 100)
+      : "Onbekend";
+
+    const billingUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://ads-personeelsapp.nl"}/billing`;
+
+    const emailData = getPaymentFailedEmail({
+      adminName: admin.name || admin.email,
+      tenantName: tenant.name,
+      amount,
+      failureReason: invoice.last_finalization_error?.message,
+      billingUrl,
+    });
+
+    const sent = await sendEmail(admin.email, emailData.subject, emailData.html, emailData.text);
+
+    if (sent) {
+      logger.info("Payment failed notification email sent", { tenantId, adminEmail: admin.email });
+    } else {
+      logger.warn("Failed to send payment failed notification email", { tenantId, adminEmail: admin.email });
+    }
+  } catch (error) {
+    logger.error("Error sending payment failed notification", error, { tenantId });
+  }
+}
+
+/**
+ * Send subscription canceled notification email to tenant admin
+ */
+async function sendSubscriptionCanceledNotification(tenantId: string, subscription: StripeSubscriptionWithPeriods) {
+  try {
+    // Get tenant with admin user
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      include: {
+        tenantUsers: {
+          where: { role: "TENANT_ADMIN" },
+          include: { user: true },
+          take: 1,
+        },
+      },
+    });
+
+    if (!tenant || !tenant.tenantUsers[0]?.user) {
+      logger.warn("Could not find tenant admin for subscription canceled notification", { tenantId });
+      return;
+    }
+
+    const admin = tenant.tenantUsers[0].user;
+    const endDate = subscription.current_period_end
+      ? new Date(subscription.current_period_end * 1000).toLocaleDateString("nl-NL", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "Onbekend";
+
+    const reactivateUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://ads-personeelsapp.nl"}/billing`;
+
+    const emailData = getSubscriptionCanceledEmail({
+      adminName: admin.name || admin.email,
+      tenantName: tenant.name,
+      endDate,
+      reactivateUrl,
+    });
+
+    const sent = await sendEmail(admin.email, emailData.subject, emailData.html, emailData.text);
+
+    if (sent) {
+      logger.info("Subscription canceled notification email sent", { tenantId, adminEmail: admin.email });
+    } else {
+      logger.warn("Failed to send subscription canceled notification email", { tenantId, adminEmail: admin.email });
+    }
+  } catch (error) {
+    logger.error("Error sending subscription canceled notification", error, { tenantId });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -303,7 +416,7 @@ export async function POST(request: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    console.error("STRIPE_WEBHOOK_SECRET not configured");
+    logger.error("STRIPE_WEBHOOK_SECRET not configured");
     return NextResponse.json(
       { error: "Webhook secret not configured" },
       { status: 500 }
@@ -315,14 +428,14 @@ export async function POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error("Webhook signature verification failed:", err);
+    logger.error("Webhook signature verification failed", err);
     return NextResponse.json(
       { error: "Webhook signature verification failed" },
       { status: 400 }
     );
   }
 
-  console.log(`Processing webhook event: ${event.type}`);
+  logger.info("Processing webhook event", { eventType: event.type, eventId: event.id });
 
   try {
     switch (event.type) {
@@ -359,12 +472,12 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.debug("Unhandled event type", { eventType: event.type });
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error(`Error processing webhook ${event.type}:`, error);
+    logger.error("Error processing webhook", error, { eventType: event.type, eventId: event.id });
     return NextResponse.json(
       { error: "Webhook handler failed" },
       { status: 500 }

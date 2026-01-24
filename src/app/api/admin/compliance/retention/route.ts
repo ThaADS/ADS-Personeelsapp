@@ -7,6 +7,9 @@ import {
   findTerminatedEmployeesForDeletion,
   dataRetentionPolicies,
 } from '@/lib/services/compliance-service';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-compliance-retention");
 
 /**
  * GET /api/admin/compliance/retention - Get data retention status
@@ -68,7 +71,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching retention status:', error);
+    logger.error("Error fetching retention status", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -109,7 +112,7 @@ export async function POST(request: NextRequest) {
         : `Processed: ${report.summary.itemsDeleted} deleted, ${report.summary.itemsAnonymized} anonymized`,
     });
   } catch (error) {
-    console.error('Error processing retention:', error);
+    logger.error("Error processing retention", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -3,13 +3,16 @@
  * Handles sick leave, vacation, and tijd-voor-tijd requests
  */
 
-import { 
-  SickLeaveApproval, 
-  VacationApproval, 
+import {
+  SickLeaveApproval,
+  VacationApproval,
   PaginationData,
   ValidationError,
   ValidationWarning
 } from "@/types/approval";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("leave-service");
 
 // Interface voor de response van verlofaanvragen
 interface LeaveResponse<T> {
@@ -66,7 +69,7 @@ export async function fetchSickLeaves(
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching sick leaves:', error);
+    logger.error("Error fetching sick leaves", error, { page, limit, status });
     throw error;
   }
 }
@@ -107,7 +110,7 @@ export async function fetchVacations(
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching vacations:', error);
+    logger.error("Error fetching vacations", error, { page, limit, status, type });
     throw error;
   }
 }
@@ -131,7 +134,7 @@ export async function createSickLeave(data: CreateSickLeaveRequest): Promise<Sic
 
     return await response.json();
   } catch (error) {
-    console.error('Error creating sick leave:', error);
+    logger.error("Error creating sick leave", error, { employeeId: data.employeeId, startDate: data.startDate });
     throw error;
   }
 }
@@ -155,7 +158,7 @@ export async function createVacation(data: CreateVacationRequest): Promise<Vacat
 
     return await response.json();
   } catch (error) {
-    console.error('Error creating vacation:', error);
+    logger.error("Error creating vacation", error, { employeeId: data.employeeId, vacationType: data.vacationType });
     throw error;
   }
 }

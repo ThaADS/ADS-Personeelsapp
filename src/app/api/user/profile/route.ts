@@ -5,6 +5,9 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-user-profile");
 
 const profileUpdateSchema = z.object({
   name: z.string().min(2, "Naam moet minimaal 2 karakters bevatten").optional(),
@@ -116,7 +119,7 @@ export const GET = auth(async function GET(req) {
       updatedAt: user.updatedAt?.toISOString(),
     });
   } catch (error) {
-    console.error("Error in profile GET:", error);
+    logger.error("Error in profile GET", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 });
@@ -230,7 +233,7 @@ export const PUT = auth(async function PUT(req) {
         },
       });
     } catch (auditError) {
-      console.error("Failed to create audit log:", auditError);
+      logger.warn("Failed to create audit log", { error: auditError instanceof Error ? auditError.message : String(auditError) });
     }
 
     return NextResponse.json({
@@ -257,7 +260,7 @@ export const PUT = auth(async function PUT(req) {
       );
     }
 
-    console.error("Error in profile PUT:", error);
+    logger.error("Error in profile PUT", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 });

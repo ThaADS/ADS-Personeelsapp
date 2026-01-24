@@ -13,6 +13,9 @@ import type {
   PayrollLeaveEntry,
   SyncResult,
 } from './types';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('NmbrsAdapter');
 
 interface NmbrsEmployee {
   Id: number;
@@ -211,7 +214,7 @@ export class NmbrsAdapter implements PayrollProviderAdapter {
         bankAccountNumber: emp.BankAccountNumber,
       }));
     } catch (error) {
-      console.error('[Nmbrs] Error fetching employees:', error);
+      logger.error('Error fetching employees', error);
       throw error;
     }
   }
@@ -243,7 +246,7 @@ export class NmbrsAdapter implements PayrollProviderAdapter {
         status: this.mapStatus(entry.Status),
       }));
     } catch (error) {
-      console.error('[Nmbrs] Error fetching hours:', error);
+      logger.error('Error fetching hours', error);
       throw error;
     }
   }
@@ -277,7 +280,7 @@ export class NmbrsAdapter implements PayrollProviderAdapter {
         description: absence.Description,
       }));
     } catch (error) {
-      console.error('[Nmbrs] Error fetching leave:', error);
+      logger.error('Error fetching leave', error);
       throw error;
     }
   }

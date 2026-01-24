@@ -9,6 +9,9 @@ import {
 } from "@/lib/services/routevision-service";
 import { matchTripsToTimesheets } from "@/lib/services/trip-timesheet-matcher";
 import { verifyCronAuth } from "@/lib/security/cron-auth";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("cron-routevision-sync");
 
 /**
  * GET /api/cron/routevision-sync
@@ -190,7 +193,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("RouteVision cron sync error:", error);
+    logger.error("RouteVision cron sync failed", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Cron sync failed" },
       { status: 500 }

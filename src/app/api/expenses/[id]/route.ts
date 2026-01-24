@@ -9,6 +9,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { prisma } from '@/lib/db/prisma';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-expenses-id");
 
 export async function GET(
   request: NextRequest,
@@ -74,7 +77,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('[Expense API] GET error:', error);
+    logger.error("GET error", error);
     return NextResponse.json({ error: 'Failed to fetch expense' }, { status: 500 });
   }
 }
@@ -190,7 +193,7 @@ export async function PUT(
       },
     });
   } catch (error) {
-    console.error('[Expense API] PUT error:', error);
+    logger.error("PUT error", error);
     return NextResponse.json({ error: 'Failed to update expense' }, { status: 500 });
   }
 }
@@ -244,7 +247,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[Expense API] DELETE error:', error);
+    logger.error("DELETE error", error);
     return NextResponse.json({ error: 'Failed to delete expense' }, { status: 500 });
   }
 }

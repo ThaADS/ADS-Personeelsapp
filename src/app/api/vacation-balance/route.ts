@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getTenantContext } from "@/lib/auth/tenant-access";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-vacation-balance");
 
 export async function GET() {
   try {
@@ -126,7 +129,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Error fetching vacation balance:", error);
+    logger.error("Error fetching vacation balance", error);
     return NextResponse.json(
       { error: "Fout bij ophalen verlof saldo" },
       { status: 500 }

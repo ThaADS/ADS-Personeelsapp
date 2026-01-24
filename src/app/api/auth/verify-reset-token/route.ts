@@ -11,6 +11,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyResetToken } from '@/lib/auth/password-reset';
 import { z } from 'zod';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-auth-verify-reset-token");
 
 // Validation schema
 const verifyTokenSchema = z.object({
@@ -44,7 +47,7 @@ export async function POST(request: NextRequest) {
       error: result.error,
     });
   } catch (error) {
-    console.error('Verify reset token error:', error);
+    logger.error("Verify reset token error", error);
 
     return NextResponse.json(
       {

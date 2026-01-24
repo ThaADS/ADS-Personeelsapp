@@ -7,6 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { prisma } from '@/lib/db/prisma';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-expenses-approve");
 
 export async function POST(
   request: NextRequest,
@@ -85,7 +88,7 @@ export async function POST(
       },
     });
   } catch (error) {
-    console.error('[Expense Approve API] Error:', error);
+    logger.error("Error processing approval", error);
     return NextResponse.json({ error: 'Failed to process approval' }, { status: 500 });
   }
 }

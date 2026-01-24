@@ -3,6 +3,10 @@
  * Tools for monitoring and optimizing application performance
  */
 
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("Performance");
+
 // Interface voor performance metrics
 export interface PerformanceMetrics {
   timeToFirstByte: number;
@@ -128,7 +132,7 @@ export function observeWebVitals(
     }).observe({ type: 'layout-shift', buffered: true });
 
   } catch (error) {
-    console.error('PerformanceObserver niet ondersteund:', error);
+    logger.error('PerformanceObserver niet ondersteund', error);
   }
 }
 
@@ -167,7 +171,7 @@ export function lazyImport<T>(modulePath: string): Promise<T> {
   return import(/* webpackChunkName: "[request]" */ `${modulePath}`)
     .then(module => module.default || module)
     .catch(error => {
-      console.error(`Fout bij laden van module ${modulePath}:`, error);
+      logger.error('Fout bij laden van module', error, { modulePath });
       throw error;
     });
 }

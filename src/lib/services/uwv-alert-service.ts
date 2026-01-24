@@ -18,6 +18,9 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("uwv-alert-service");
 import { sendEmail } from '@/lib/services/email-service';
 
 interface AlertResult {
@@ -403,7 +406,7 @@ export async function markAsReportedToUwv(sickLeaveId: string): Promise<boolean>
     });
     return true;
   } catch (error) {
-    console.error('Failed to mark sick leave as reported:', error);
+    logger.error("Failed to mark sick leave as reported", error, { sickLeaveId });
     return false;
   }
 }

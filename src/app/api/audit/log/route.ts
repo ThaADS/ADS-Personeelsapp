@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { v4 as uuidv4 } from "uuid";
 import { AuditLogEntry, AuditCategory } from "@/lib/services/audit-service";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-audit-log");
 
 // In-memory audit log voor demo doeleinden
 // In productie zou dit naar de database gaan
@@ -78,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(auditEntry);
   } catch (error) {
-    console.error("Error in audit log POST:", error);
+    logger.error("Error in audit log POST", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }

@@ -10,6 +10,9 @@ import {
   validationErrorResponse,
   ErrorCodes,
 } from "@/lib/api/response";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-timesheets");
 
 // Validation schema for creating/updating timesheets
 const timesheetSchema = z.object({
@@ -109,7 +112,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching timesheets:", error);
+    logger.error("Error fetching timesheets", error);
     return internalErrorResponse();
   }
 }
@@ -210,7 +213,7 @@ export async function POST(request: NextRequest) {
       return validationErrorResponse(errors);
     }
 
-    console.error("Error creating timesheet:", error);
+    logger.error("Error creating timesheet", error);
     return internalErrorResponse();
   }
 }

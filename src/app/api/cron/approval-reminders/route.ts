@@ -10,28 +10,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processApprovalReminders } from '@/lib/services/approval-reminder-service';
 import { verifyCronAuth } from '@/lib/security/cron-auth';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('cron-approval-reminders');
 
 /**
  * GET handler for Vercel Cron
  * Vercel cron jobs send GET requests
  */
 export async function GET(request: NextRequest) {
-  console.log('[Approval Reminders Cron] Starting execution...');
+  logger.info('Starting execution');
 
   // Verify authorization - CRON_SECRET is required in production
   const auth = verifyCronAuth(request);
   if (!auth.authorized) {
-    console.error('[Approval Reminders Cron] Unauthorized request');
+    logger.error('Unauthorized request');
     return auth.error!;
   }
 
   try {
     const result = await processApprovalReminders();
 
-    console.log('[Approval Reminders Cron] Completed:', {
+    logger.info('Completed', {
       totalManagers: result.totalManagers,
       emailsSent: result.emailsSent,
-      errors: result.errors.length
+      errorCount: result.errors.length
     });
 
     return NextResponse.json({
@@ -43,7 +46,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[Approval Reminders Cron] Error:', error);
+    logger.error('Failed to process approval reminders', error);
 
     return NextResponse.json(
       {

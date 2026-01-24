@@ -3,6 +3,9 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-notifications");
 import { 
   sendApprovalNotification, 
   sendStatusUpdateNotification, 
@@ -55,7 +58,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Fout bij versturen notificatie" }, { status: 500 });
     }
   } catch (error) {
-    console.error("Error in notifications POST:", error);
+    logger.error("Error in notifications POST", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }

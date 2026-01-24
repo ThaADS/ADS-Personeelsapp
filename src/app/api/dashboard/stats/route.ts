@@ -10,6 +10,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/lib/auth/auth';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-dashboard-stats");
 
 interface DashboardStats {
   // Basic stats (existing)
@@ -290,7 +293,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('[Dashboard Stats] Error:', error);
+    logger.error("Failed to fetch dashboard stats", error);
     return NextResponse.json(
       { error: 'Failed to fetch dashboard stats' },
       { status: 500 }

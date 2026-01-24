@@ -23,6 +23,9 @@ import {
   notifyManagersAboutIncompleteTimesheets,
 } from '@/lib/services/timesheet-reminder';
 import { verifyCronAuth } from '@/lib/security/cron-auth';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('cron-timesheet-reminder');
 
 export async function GET(request: NextRequest) {
   // Verify authorization - CRON_SECRET is required in production
@@ -47,17 +50,17 @@ export async function GET(request: NextRequest) {
   try {
     // Friday reminders (or forced)
     if (forceType === 'friday' || (dayOfWeek === 5 && !forceType)) {
-      console.log('Processing Friday reminders...');
+      logger.info('Processing Friday reminders');
       results.friday = await processFridayReminders();
     }
 
     // Monday escalations (or forced)
     if (forceType === 'monday' || forceType === 'all' || (dayOfWeek === 1 && !forceType)) {
-      console.log('Processing Monday escalations...');
+      logger.info('Processing Monday escalations');
       results.monday = await processMondayEscalations();
 
       // Also notify managers on Monday
-      console.log('Notifying managers...');
+      logger.info('Notifying managers');
       results.managers = await notifyManagersAboutIncompleteTimesheets();
     }
 
@@ -98,7 +101,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Cron job error:', error);
+    logger.error('Cron job failed', error);
 
     return NextResponse.json(
       {

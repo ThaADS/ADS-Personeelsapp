@@ -10,6 +10,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { processMonthlyReports, buildAndSendMonthlyReport, ReportConfig } from "@/lib/services/report-builder";
 import { verifyCronAuth } from "@/lib/security/cron-auth";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("cron-monthly-reports");
 
 // GET - Automatic monthly report generation
 export async function GET(request: NextRequest) {
@@ -20,7 +23,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log("Processing monthly reports...");
+    logger.info("Processing monthly reports");
     const result = await processMonthlyReports();
 
     return NextResponse.json({
@@ -31,7 +34,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Monthly reports cron error:", error);
+    logger.error("Monthly reports cron failed", error);
     return NextResponse.json(
       {
         success: false,
@@ -93,7 +96,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Manual report generation error:", error);
+    logger.error("Manual report generation failed", error);
     return NextResponse.json(
       {
         success: false,

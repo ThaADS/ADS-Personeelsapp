@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { getTenantContext } from "@/lib/auth/tenant-access";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-routevision-trips");
 
 /**
  * GET /api/routevision/trips
@@ -122,7 +125,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error getting trips:", error);
+    logger.error("Failed to get trips", error);
     return NextResponse.json(
       { error: "Failed to get trips" },
       { status: 500 }

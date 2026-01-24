@@ -6,6 +6,9 @@ import {
   decryptCredential,
   testConnection,
 } from "@/lib/services/routevision-service";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-routevision-config");
 
 /**
  * GET /api/routevision/config
@@ -45,7 +48,7 @@ export async function GET() {
       last_sync: config.last_sync,
     });
   } catch (error) {
-    console.error("Error getting RouteVision config:", error);
+    logger.error("Failed to get RouteVision config", error);
     return NextResponse.json(
       { error: "Failed to get configuration" },
       { status: 500 }
@@ -113,7 +116,7 @@ export async function POST(request: NextRequest) {
       last_sync: config.last_sync,
     });
   } catch (error) {
-    console.error("Error saving RouteVision config:", error);
+    logger.error("Failed to save RouteVision config", error);
     return NextResponse.json(
       { error: "Failed to save configuration" },
       { status: 500 }
@@ -143,7 +146,7 @@ export async function DELETE() {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting RouteVision config:", error);
+    logger.error("Failed to delete RouteVision config", error);
     return NextResponse.json(
       { error: "Failed to delete configuration" },
       { status: 500 }

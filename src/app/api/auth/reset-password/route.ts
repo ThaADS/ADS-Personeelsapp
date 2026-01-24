@@ -24,6 +24,9 @@ import {
   internalErrorResponse,
   ErrorCodes,
 } from '@/lib/api/response';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-auth-reset-password");
 
 // Validation schema
 const resetPasswordSchema = z.object({
@@ -81,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     return successResponse({ reset: true }, { message: result.message });
   } catch (error) {
-    console.error('Reset password error:', error);
+    logger.error("Reset password error", error);
     return internalErrorResponse('Er is een fout opgetreden. Probeer het opnieuw.');
   }
 }

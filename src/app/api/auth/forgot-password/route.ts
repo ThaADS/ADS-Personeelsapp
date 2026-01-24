@@ -17,6 +17,9 @@ import { requestPasswordReset } from '@/lib/auth/password-reset';
 import { z } from 'zod';
 import { checkRateLimit, rateLimitedResponse } from '@/lib/security/rate-limiter';
 import { successResponse, validationErrorResponse } from '@/lib/api/response';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-auth-forgot-password");
 
 // Validation schema
 const forgotPasswordSchema = z.object({
@@ -53,7 +56,7 @@ export async function POST(request: NextRequest) {
     // Always return 200 to prevent email enumeration
     return successResponse({ sent: result.success }, { message: result.message });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    logger.error("Forgot password error", error);
 
     // Generic success to prevent information leakage
     return successResponse(

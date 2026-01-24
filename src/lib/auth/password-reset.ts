@@ -16,6 +16,9 @@ import { prisma } from '@/lib/db/prisma';
 import { hash } from 'bcryptjs';
 import crypto from 'crypto';
 import { sendPasswordResetEmail, sendPasswordChangedEmail } from '@/lib/services/email-service';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('PasswordReset');
 
 // Constants
 const TOKEN_EXPIRY_HOURS = 1;
@@ -145,7 +148,7 @@ async function createAuditLog(
       }
     });
   } catch (error) {
-    console.error('Failed to create audit log:', error);
+    logger.error('Failed to create audit log', error);
   }
 }
 
@@ -165,7 +168,7 @@ export async function requestPasswordReset(
   const normalizedEmail = email.toLowerCase().trim();
 
   // Clean up expired tokens periodically (async, don't await)
-  cleanupExpiredTokens().catch(err => console.error('Token cleanup error:', err));
+  cleanupExpiredTokens().catch(err => logger.error('Token cleanup error', err));
 
   // Check rate limiting
   const { allowed } = await checkRateLimit(normalizedEmail);
@@ -245,7 +248,7 @@ export async function requestPasswordReset(
     });
 
     if (!emailSent) {
-      console.error('Failed to send password reset email to:', normalizedEmail);
+      logger.error('Failed to send password reset email', undefined, { email: normalizedEmail });
       // Don't reveal email sending failure to prevent enumeration
     }
 
@@ -261,7 +264,7 @@ export async function requestPasswordReset(
     };
 
   } catch (error) {
-    console.error('Password reset request error:', error);
+    logger.error('Password reset request error', error);
 
     await createAuditLog('PASSWORD_RESET_ERROR', null, {
       email: normalizedEmail,
@@ -432,7 +435,7 @@ export async function resetPassword(
     };
 
   } catch (error) {
-    console.error('Password reset error:', error);
+    logger.error('Password reset error', error);
 
     await createAuditLog('PASSWORD_RESET_ERROR', null, {
       email: normalizedEmail,

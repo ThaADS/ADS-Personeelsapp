@@ -3,15 +3,18 @@
  * Handles document uploads, retrieval, and management
  */
 
-import { 
-  Document, 
-  DocumentVersion, 
+import {
+  Document,
+  DocumentVersion,
   DocumentUploadRequest,
   DocumentUpdateRequest,
   DocumentCategory,
   AccessLevel,
   DocumentStatus
 } from "@/types/document";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("document-service");
 
 // Interface voor document zoekopties
 interface DocumentSearchOptions {
@@ -70,7 +73,7 @@ export async function fetchDocuments(options: DocumentSearchOptions = {}): Promi
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching documents:', error);
+    logger.error("Error fetching documents", error, { options });
     throw error;
   }
 }
@@ -93,7 +96,7 @@ export async function fetchDocumentById(id: string): Promise<Document> {
 
     return await response.json();
   } catch (error) {
-    console.error(`Error fetching document with ID ${id}:`, error);
+    logger.error("Error fetching document", error, { documentId: id });
     throw error;
   }
 }
@@ -116,7 +119,7 @@ export async function fetchDocumentVersions(documentId: string): Promise<Documen
 
     return await response.json();
   } catch (error) {
-    console.error(`Error fetching versions for document ${documentId}:`, error);
+    logger.error("Error fetching document versions", error, { documentId });
     throw error;
   }
 }
@@ -145,7 +148,7 @@ export async function uploadDocument(
 
     return await response.json();
   } catch (error) {
-    console.error('Error uploading document:', error);
+    logger.error("Error uploading document", error, { fileName: file.name, fileSize: file.size });
     throw error;
   }
 }
@@ -169,7 +172,7 @@ export async function updateDocument(data: DocumentUpdateRequest): Promise<Docum
 
     return await response.json();
   } catch (error) {
-    console.error(`Error updating document ${data.id}:`, error);
+    logger.error("Error updating document", error, { documentId: data.id });
     throw error;
   }
 }
@@ -202,7 +205,7 @@ export async function uploadDocumentVersion(
 
     return await response.json();
   } catch (error) {
-    console.error(`Error uploading version for document ${documentId}:`, error);
+    logger.error("Error uploading document version", error, { documentId, fileName: file.name });
     throw error;
   }
 }
@@ -225,7 +228,7 @@ export async function deleteDocument(id: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.error(`Error deleting document ${id}:`, error);
+    logger.error("Error deleting document", error, { documentId: id });
     throw error;
   }
 }
@@ -249,7 +252,7 @@ export async function generateDocumentDownloadUrl(id: string): Promise<string> {
     const data = await response.json();
     return data.downloadUrl;
   } catch (error) {
-    console.error(`Error generating download URL for document ${id}:`, error);
+    logger.error("Error generating download URL", error, { documentId: id });
     throw error;
   }
 }

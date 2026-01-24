@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
 import { testConnection } from "@/lib/services/routevision-service";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-routevision-test-connection");
 
 /**
  * POST /api/routevision/test-connection
@@ -44,7 +47,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error("Error testing RouteVision connection:", error);
+    logger.error("Failed to test RouteVision connection", error);
     return NextResponse.json(
       {
         success: false,

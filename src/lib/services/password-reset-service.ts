@@ -8,6 +8,9 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("password-reset-service");
 import { randomBytes, createHash } from 'crypto';
 
 // Token expiration time (1 hour)
@@ -117,11 +120,11 @@ async function cleanupExpiredTokens(): Promise<void> {
  */
 export async function createResetToken(email: string): Promise<string | null> {
   // Clean up expired tokens periodically
-  cleanupExpiredTokens().catch(err => console.error('[PasswordReset] Cleanup error:', err));
+  cleanupExpiredTokens().catch(err => logger.error("Cleanup error", err));
 
   // Check rate limiting
   if (await isRateLimited(email)) {
-    console.log(`[PasswordReset] Rate limited: ${email}`);
+    logger.info("Rate limited", { email });
     return null;
   }
 
@@ -148,7 +151,7 @@ export async function createResetToken(email: string): Promise<string | null> {
     }
   });
 
-  console.log(`[PasswordReset] Token created for: ${email}`);
+  logger.info("Token created", { email });
   return plainToken;
 }
 
@@ -165,17 +168,17 @@ export async function validateResetToken(token: string): Promise<string | null> 
   });
 
   if (!data) {
-    console.log('[PasswordReset] Token not found');
+    logger.debug("Token not found");
     return null;
   }
 
   if (data.usedAt) {
-    console.log('[PasswordReset] Token already used');
+    logger.debug("Token already used");
     return null;
   }
 
   if (data.expiresAt < new Date()) {
-    console.log('[PasswordReset] Token expired');
+    logger.debug("Token expired");
     await prisma.passwordResetToken.delete({
       where: { id: data.id }
     });

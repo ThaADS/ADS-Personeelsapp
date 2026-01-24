@@ -23,6 +23,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processUwvAlerts } from '@/lib/services/uwv-alert-service';
 import { verifyCronAuth } from '@/lib/security/cron-auth';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('cron-uwv-alerts');
 
 export async function GET(request: NextRequest) {
   // Verify authorization - CRON_SECRET is required in production
@@ -32,7 +35,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('Processing UWV deadline alerts...');
+    logger.info('Processing UWV deadline alerts');
     const result = await processUwvAlerts();
 
     return NextResponse.json({
@@ -46,7 +49,7 @@ export async function GET(request: NextRequest) {
       errors: result.errors.length > 0 ? result.errors : undefined,
     });
   } catch (error) {
-    console.error('Cron job error:', error);
+    logger.error('Cron job failed', error);
 
     return NextResponse.json(
       {

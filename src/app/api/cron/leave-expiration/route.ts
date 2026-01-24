@@ -23,6 +23,9 @@ import {
   notifyManagersAboutExpiringLeave,
 } from '@/lib/services/leave-expiration-reminder';
 import { verifyCronAuth } from '@/lib/security/cron-auth';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('cron-leave-expiration');
 
 export async function GET(request: NextRequest) {
   // Verify authorization - CRON_SECRET is required in production
@@ -40,11 +43,11 @@ export async function GET(request: NextRequest) {
   } = {};
 
   try {
-    console.log('Processing leave expiration reminders...');
+    logger.info('Processing leave expiration reminders');
     results.employees = await processLeaveExpirationReminders();
 
     if (includeManagers) {
-      console.log('Notifying managers about expiring leave...');
+      logger.info('Notifying managers about expiring leave');
       results.managers = await notifyManagersAboutExpiringLeave();
     }
 
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Cron job error:', error);
+    logger.error('Cron job failed', error);
 
     return NextResponse.json(
       {

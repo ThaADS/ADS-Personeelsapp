@@ -12,6 +12,9 @@
 
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("RateLimit");
 
 // In-memory store for development fallback
 const inMemoryStore = new Map<string, { count: number; resetTime: number }>();
@@ -58,7 +61,7 @@ const redis = isRedisConfigured
 
 // Log rate limiting mode on startup
 if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'test') {
-  console.log(`[Rate Limit] Mode: ${isRedisConfigured ? 'Redis (production)' : 'In-Memory (development)'}`);
+  logger.info('Rate limiting initialized', { mode: isRedisConfigured ? 'Redis (production)' : 'In-Memory (development)' });
 }
 
 // API Rate Limits - Banking Grade Security

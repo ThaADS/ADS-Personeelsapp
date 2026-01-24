@@ -6,6 +6,9 @@ import {
   getVehicles,
   decryptCredential,
 } from "@/lib/services/routevision-service";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-routevision-vehicles");
 
 /**
  * GET /api/routevision/vehicles
@@ -87,7 +90,7 @@ export async function GET() {
 
     return NextResponse.json({ vehicles });
   } catch (error) {
-    console.error("Error getting vehicles:", error);
+    logger.error("Failed to get vehicles", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to get vehicles" },
       { status: 500 }
@@ -170,7 +173,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error saving vehicle mapping:", error);
+    logger.error("Failed to save vehicle mapping", error);
     return NextResponse.json(
       { error: "Failed to save vehicle mapping" },
       { status: 500 }

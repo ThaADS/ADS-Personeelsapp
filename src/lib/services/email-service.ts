@@ -4,6 +4,9 @@
  */
 
 import nodemailer from 'nodemailer';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("email-service");
 
 // Interface voor email configuratie
 interface EmailConfig {
@@ -78,10 +81,10 @@ export async function sendEmail(
       html,
     });
 
-    console.log('Email verstuurd:', info.messageId);
+    logger.info("Email verstuurd", { messageId: info.messageId, to });
     return true;
   } catch (error) {
-    console.error('Fout bij versturen email:', error);
+    logger.error("Fout bij versturen email", error, { to, subject });
     return false;
   }
 }

@@ -9,6 +9,9 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("tenant-service");
 import { SubscriptionStatus } from '@/types';
 
 export interface SuspendTenantInput {
@@ -116,7 +119,7 @@ export async function suspendTenant(input: SuspendTenantInput): Promise<TenantAc
       },
     };
   } catch (error) {
-    console.error('Error suspending tenant:', error);
+    logger.error("Error suspending tenant", error, { tenantId });
     return {
       success: false,
       message: 'Failed to suspend tenant',
@@ -217,7 +220,7 @@ export async function reactivateTenant(input: ReactivateTenantInput): Promise<Te
       },
     };
   } catch (error) {
-    console.error('Error reactivating tenant:', error);
+    logger.error("Error reactivating tenant", error, { tenantId });
     return {
       success: false,
       message: 'Failed to reactivate tenant',
@@ -320,7 +323,7 @@ export async function archiveTenant(input: ArchiveTenantInput): Promise<TenantAc
       },
     };
   } catch (error) {
-    console.error('Error archiving tenant:', error);
+    logger.error("Error archiving tenant", error, { tenantId });
     return {
       success: false,
       message: 'Failed to archive tenant',
@@ -496,7 +499,7 @@ export async function exportTenantData(tenantId: string): Promise<{
 
     return { success: true, data: exportData };
   } catch (error) {
-    console.error('Error exporting tenant data:', error);
+    logger.error("Error exporting tenant data", error, { tenantId });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Export failed'
@@ -553,7 +556,7 @@ export async function isTenantOperational(tenantId: string): Promise<{
 
     return { operational: true, status: tenant.subscriptionStatus as string };
   } catch (error) {
-    console.error('Error checking tenant status:', error);
+    logger.error("Error checking tenant status", error, { tenantId });
     return { operational: false, reason: 'Error checking tenant status' };
   }
 }

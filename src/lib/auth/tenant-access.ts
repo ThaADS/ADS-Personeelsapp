@@ -259,7 +259,7 @@ export async function createAuditLog(
       },
     });
   } catch (error) {
-    console.error('Failed to create audit log:', error);
+    logger.error('Failed to create audit log', error);
     // Don't throw error for audit logging failures
   }
 }

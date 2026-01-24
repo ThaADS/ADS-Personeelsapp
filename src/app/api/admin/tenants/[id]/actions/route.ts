@@ -8,6 +8,9 @@ import {
   exportTenantData,
 } from '@/lib/services/tenant-service';
 import { SubscriptionStatus } from '@/types';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-admin-tenant-actions");
 
 const actionSchema = z.object({
   action: z.enum(['suspend', 'reactivate', 'archive', 'export']),
@@ -117,7 +120,7 @@ export async function POST(
       );
     }
 
-    console.error('Error performing tenant action:', error);
+    logger.error("Error performing tenant action", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -226,7 +229,7 @@ export async function GET(
       availableActions,
     });
   } catch (error) {
-    console.error('Error getting tenant actions:', error);
+    logger.error("Error getting tenant actions", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

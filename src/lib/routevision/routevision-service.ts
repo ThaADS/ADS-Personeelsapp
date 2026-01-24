@@ -1,10 +1,14 @@
 /**
  * RouteVision Integratie Service
- * 
+ *
  * Deze service simuleert de integratie met RouteVision voor GPS-verificatie van tijdregistraties.
  * Volgens de projectvereisten heeft RouteVision geen publieke API, dus we gebruiken data-export
  * en portal-integratie om de gegevens te verkrijgen.
  */
+
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("RouteVision");
 
 export interface RouteVisionJourney {
   driverId: string;
@@ -339,7 +343,7 @@ export async function verifyTimesheetWithGPS(
         : matchingJourney.endLocation.address,
     };
   } catch (error) {
-    console.error("Error verifying timesheet with GPS:", error);
+    logger.error("Error verifying timesheet with GPS", error);
     return {
       verified: false,
       startLocationVerified: false,

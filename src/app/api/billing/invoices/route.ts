@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { stripe } from "@/lib/stripe/config";
 import { prisma } from "@/lib/db/prisma";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-billing-invoices");
 
 export async function GET() {
   try {
@@ -57,7 +60,7 @@ export async function GET() {
 
     return NextResponse.json({ invoices: allInvoices });
   } catch (error) {
-    console.error("Error fetching invoices:", error);
+    logger.error("Error fetching invoices", error);
     return NextResponse.json(
       { error: "Failed to fetch invoices" },
       { status: 500 }

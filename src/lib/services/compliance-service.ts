@@ -12,6 +12,9 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("compliance-service");
 
 // Interface voor data retention policy
 interface DataRetentionPolicy {
@@ -150,7 +153,7 @@ export async function recordConsent(
 
     return await response.json();
   } catch (error) {
-    console.error('Error recording consent:', error);
+    logger.error("Error recording consent", error, { employeeId, consentType, granted });
     throw error;
   }
 }
@@ -173,7 +176,7 @@ export async function fetchConsents(employeeId: string): Promise<ConsentRecord[]
 
     return await response.json();
   } catch (error) {
-    console.error(`Error fetching consents for employee ${employeeId}:`, error);
+    logger.error("Error fetching consents", error, { employeeId });
     throw error;
   }
 }
@@ -205,7 +208,7 @@ export async function submitDataAccessRequest(
 
     return await response.json();
   } catch (error) {
-    console.error('Error submitting data access request:', error);
+    logger.error("Error submitting data access request", error, { employeeId, requestType });
     throw error;
   }
 }
@@ -240,7 +243,7 @@ export async function reportDataBreach(
 
     return await response.json();
   } catch (error) {
-    console.error('Error reporting data breach:', error);
+    logger.error("Error reporting data breach", error, { severity, affectedDataTypes });
     throw error;
   }
 }
@@ -273,7 +276,7 @@ export async function performLaborLawCheck(
 
     return await response.json();
   } catch (error) {
-    console.error(`Error performing labor law check ${checkType}:`, error);
+    logger.error("Error performing labor law check", error, { checkType, employeeId });
     throw error;
   }
 }
@@ -306,7 +309,7 @@ export async function checkWorkingTimeCompliance(
 
     return await response.json();
   } catch (error) {
-    console.error(`Error checking working time compliance for employee ${employeeId}:`, error);
+    logger.error("Error checking working time compliance", error, { employeeId, startDate, endDate });
     throw error;
   }
 }
@@ -330,7 +333,7 @@ export async function generatePrivacyStatement(employeeId: string): Promise<stri
     const data = await response.json();
     return data.statement;
   } catch (error) {
-    console.error(`Error generating privacy statement for employee ${employeeId}:`, error);
+    logger.error("Error generating privacy statement", error, { employeeId });
     throw error;
   }
 }
@@ -475,7 +478,7 @@ export async function findExpiredDataForTenant(tenantId: string): Promise<DataRe
         }
       }
     } catch (error) {
-      console.error(`Error finding expired ${policy.dataType} for tenant ${tenantId}:`, error);
+      logger.error("Error finding expired data", error, { dataType: policy.dataType, tenantId });
       expiredItems.push({
         dataType: policy.dataType,
         recordId: 'error',

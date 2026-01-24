@@ -12,6 +12,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-reports-settings");
 
 // Validation schema for report settings
 const reportSettingsSchema = z.object({
@@ -135,7 +138,7 @@ export async function GET() {
       tenantName: tenant.name,
     });
   } catch (error) {
-    console.error("Error fetching report settings:", error);
+    logger.error("Error fetching report settings", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -196,7 +199,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.error("Error updating report settings:", error);
+    logger.error("Error updating report settings", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -252,7 +255,7 @@ export async function POST(request: NextRequest) {
       error: result.error,
     });
   } catch (error) {
-    console.error("Error generating manual report:", error);
+    logger.error("Error generating manual report", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

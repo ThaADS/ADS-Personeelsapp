@@ -3,6 +3,9 @@ import { auth } from '@/lib/auth/auth';
 import { StripeSubscriptionService } from '@/lib/stripe/subscription-service';
 import { prisma } from '@/lib/db/prisma';
 import { canManageBilling } from '@/lib/rbac';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-billing-portal");
 
 // POST /api/billing/portal - Create Stripe customer portal session
 export async function POST(request: NextRequest) {
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
       url: portalSession.url,
     });
   } catch (error) {
-    console.error('Error creating portal session:', error);
+    logger.error("Error creating portal session", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -7,6 +7,9 @@ import { prisma } from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
 import { headers } from 'next/headers';
 import { SENSITIVE_FIELDS } from './data-masking';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('SensitiveDataAudit');
 
 // Types for sensitive data access logging
 export interface SensitiveDataAccessLog {
@@ -162,7 +165,7 @@ export async function logSensitiveDataAccess(params: {
     });
   } catch (error) {
     // Log error maar gooi niet - audit logging mag niet de request blokkeren
-    console.error('Failed to log sensitive data access:', error);
+    logger.error('Failed to log sensitive data access', error);
   }
 }
 
@@ -215,7 +218,7 @@ export async function logUnmaskedDataRequest(params: {
       },
     });
   } catch (error) {
-    console.error('Failed to log unmasked data request:', error);
+    logger.error('Failed to log unmasked data request', error);
   }
 }
 
@@ -266,7 +269,7 @@ export async function logSensitiveDataExport(params: {
       },
     });
   } catch (error) {
-    console.error('Failed to log sensitive data export:', error);
+    logger.error('Failed to log sensitive data export', error);
   }
 }
 

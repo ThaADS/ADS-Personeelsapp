@@ -6,6 +6,9 @@
  */
 
 import crypto from 'crypto';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('Encryption');
 
 // Algorithm configuration
 const ALGORITHM = 'aes-256-gcm';
@@ -114,7 +117,7 @@ export function decrypt(encryptedData: string): string {
     return decrypted.toString('utf8');
   } catch (error) {
     // Log for debugging but don't expose details
-    console.error('Decryption failed:', error instanceof Error ? error.message : 'Unknown error');
+    logger.error('Decryption failed', error);
     throw new Error('Failed to decrypt data. The data may be corrupted or the encryption key may have changed.');
   }
 }
@@ -173,7 +176,7 @@ export function migrateFromXor(oldEncrypted: string, oldKey: string): string {
     return encrypt(decrypted);
   } catch {
     // Migration failed, return original
-    console.error('XOR to AES migration failed for credential');
+    logger.error('XOR to AES migration failed for credential');
     return oldEncrypted;
   }
 }

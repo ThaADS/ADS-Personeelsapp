@@ -3,6 +3,9 @@ import { auth } from '@/lib/auth/auth';
 import { prisma } from '@/lib/db/prisma';
 import { SubscriptionStatus } from '@/types';
 import { z } from 'zod';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-admin-tenants-id");
 
 const updateTenantSchema = z.object({
   name: z.string().min(1).optional(),
@@ -114,7 +117,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error fetching tenant:', error);
+    logger.error("Error fetching tenant", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -189,8 +192,8 @@ export async function PUT(
         { status: 400 }
       );
     }
-    
-    console.error('Error updating tenant:', error);
+
+    logger.error("Error updating tenant", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -267,7 +270,7 @@ export async function DELETE(
       },
     });
   } catch (error) {
-    console.error('Error deleting tenant:', error);
+    logger.error("Error deleting tenant", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

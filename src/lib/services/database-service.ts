@@ -4,6 +4,9 @@
  */
 
 import { sql } from '@vercel/postgres';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("database-service");
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -42,7 +45,7 @@ export async function executeQuery<T>(
     const result = await sql.query(query, params);
     return result.rows as T[];
   } catch (error) {
-    console.error('Database query error:', error);
+    logger.error("Database query error", error, { query: query.substring(0, 100) });
     throw error;
   }
 }
@@ -72,7 +75,7 @@ export async function executeTransaction<T>(
     if (client) {
       await client.query('ROLLBACK');
     }
-    console.error('Transaction error:', error);
+    logger.error("Transaction error", error, { queryCount: queries.length });
     throw error;
   } finally {
     if (client) {
@@ -90,7 +93,7 @@ export async function checkDatabaseConnection(): Promise<boolean> {
     await sql.query('SELECT NOW()');
     return true;
   } catch (error) {
-    console.error('Database connection error:', error);
+    logger.error("Database connection error", error);
     return false;
   }
 }
@@ -131,7 +134,7 @@ export async function getDatabaseStats(): Promise<Record<string, string | number
       lastChecked: new Date().toISOString(),
     };
   } catch (error) {
-    console.error('Error getting database stats:', error);
+    logger.error("Error getting database stats", error);
     throw error;
   }
 }
@@ -155,7 +158,7 @@ export async function createDatabaseBackup(): Promise<{
     const timestamp = new Date().toISOString();
     
     // Log de backup actie
-    console.log(`Database backup created: ${backupId} at ${timestamp}`);
+    logger.info("Database backup created", { backupId, timestamp });
     
     // In een echte implementatie zouden we de backup metadata opslaan in de database
     await sql.query(`
@@ -170,7 +173,7 @@ export async function createDatabaseBackup(): Promise<{
       status: 'completed',
     };
   } catch (error) {
-    console.error('Backup creation error:', error);
+    logger.error("Backup creation error", error);
     throw error;
   }
 }
@@ -191,7 +194,7 @@ export async function getBackupHistory(limit: number = 10): Promise<{ id: string
     
     return result.rows;
   } catch (error) {
-    console.error('Error getting backup history:', error);
+    logger.error("Error getting backup history", error, { limit });
     throw error;
   }
 }
@@ -208,12 +211,12 @@ export async function configureAutomaticBackups(config: Partial<BackupConfig>): 
     
     // In een echte implementatie zouden we de configuratie opslaan in de database
     // en een backup scheduler instellen
-    
-    console.log('Automatic backup configuration updated:', backupConfig);
-    
+
+    logger.info("Automatic backup configuration updated", { config: backupConfig });
+
     return true;
   } catch (error) {
-    console.error('Error configuring automatic backups:', error);
+    logger.error("Error configuring automatic backups", error, { config });
     return false;
   }
 }
@@ -232,11 +235,11 @@ export async function restoreBackup(backupId: string): Promise<boolean> {
     const timestamp = new Date().toISOString();
     
     // Log de restore actie
-    console.log(`Database restored from backup ${backupId} at ${timestamp}`);
-    
+    logger.info("Database restored from backup", { backupId, timestamp });
+
     return true;
   } catch (error) {
-    console.error(`Error restoring backup ${backupId}:`, error);
+    logger.error("Error restoring backup", error, { backupId });
     return false;
   }
 }

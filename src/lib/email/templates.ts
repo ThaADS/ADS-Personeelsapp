@@ -705,8 +705,173 @@ ${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
 }
 
 /**
- * Manager Escalation Email (when employee doesn't submit timesheet)
+ * Payment Failed Email Template
  */
+export function getPaymentFailedEmail(data: {
+  adminName: string;
+  tenantName: string;
+  amount: string;
+  failureReason?: string;
+  nextRetryDate?: string;
+  billingUrl: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `Betaling mislukt - Actie vereist voor ${data.tenantName}`;
+
+  const content = `
+    <h1>⚠️ Betaling mislukt</h1>
+    <p>Hallo ${data.adminName},</p>
+    <p>
+      De automatische betaling voor je <strong>${data.tenantName}</strong> abonnement kon niet worden verwerkt.
+    </p>
+
+    <div class="warning-box">
+      <p>
+        <strong>Actie vereist:</strong> Werk je betaalmethode bij om onderbrekingen in je service te voorkomen.
+      </p>
+    </div>
+
+    <div class="info-box">
+      <div class="info-box-header">Betalingsdetails</div>
+      <div class="info-row">
+        <span class="info-label">Bedrag</span>
+        <span class="info-value">${data.amount}</span>
+      </div>
+      ${data.failureReason ? `
+      <div class="info-row">
+        <span class="info-label">Reden</span>
+        <span class="info-value">${data.failureReason}</span>
+      </div>
+      ` : ''}
+      ${data.nextRetryDate ? `
+      <div class="info-row">
+        <span class="info-label">Volgende poging</span>
+        <span class="info-value">${data.nextRetryDate}</span>
+      </div>
+      ` : ''}
+    </div>
+
+    <div class="button-container">
+      <a href="${data.billingUrl}" class="button">Betaalmethode bijwerken</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 14px; color: #94a3b8;">
+      Je abonnement blijft actief totdat de betalingsperiode afloopt. We proberen de betaling
+      automatisch opnieuw. Om onderbrekingen te voorkomen, raden we aan je betaalmethode te controleren.
+    </p>
+
+    <p style="font-size: 14px; color: #94a3b8;">
+      Vragen? Neem contact op via
+      <a href="mailto:support@ads-personeelsapp.nl" style="color: #a5b4fc;">support@ads-personeelsapp.nl</a>
+    </p>
+  `;
+
+  const text = `
+Betaling mislukt - ADSPersoneelapp
+
+Hallo ${data.adminName},
+
+De automatische betaling voor je ${data.tenantName} abonnement kon niet worden verwerkt.
+
+Betalingsdetails:
+- Bedrag: ${data.amount}
+${data.failureReason ? `- Reden: ${data.failureReason}` : ''}
+${data.nextRetryDate ? `- Volgende poging: ${data.nextRetryDate}` : ''}
+
+Werk je betaalmethode bij via: ${data.billingUrl}
+
+Je abonnement blijft actief totdat de betalingsperiode afloopt.
+
+Vragen? Mail naar support@ads-personeelsapp.nl
+
+---
+ADSPersoneelapp
+${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
+`;
+
+  return {
+    subject,
+    html: getEmailWrapper(content, 'Je betaling kon niet worden verwerkt. Werk je betaalmethode bij.'),
+    text,
+  };
+}
+
+/**
+ * Subscription Canceled Email Template
+ */
+export function getSubscriptionCanceledEmail(data: {
+  adminName: string;
+  tenantName: string;
+  endDate: string;
+  reactivateUrl: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `Abonnement opgezegd - ${data.tenantName}`;
+
+  const content = `
+    <h1>Abonnement opgezegd</h1>
+    <p>Hallo ${data.adminName},</p>
+    <p>
+      Je ADSPersoneelapp abonnement voor <strong>${data.tenantName}</strong> is opgezegd.
+    </p>
+
+    <div class="info-box">
+      <div class="info-box-header">Wat betekent dit?</div>
+      <div class="info-row">
+        <span class="info-label">Toegang tot</span>
+        <span class="info-value">${data.endDate}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Na deze datum</span>
+        <span class="info-value">Freemium (max 3 gebruikers)</span>
+      </div>
+    </div>
+
+    <p>
+      Je kunt de applicatie blijven gebruiken tot ${data.endDate}. Daarna wordt je account
+      automatisch omgezet naar het gratis Freemium plan met beperkte functionaliteit.
+    </p>
+
+    <div class="button-container">
+      <a href="${data.reactivateUrl}" class="button">Abonnement heractiveren</a>
+    </div>
+
+    <div class="divider"></div>
+
+    <p style="font-size: 14px; color: #94a3b8;">
+      We vinden het jammer je te zien gaan. Als je feedback hebt over hoe we onze dienst
+      kunnen verbeteren, horen we dat graag via
+      <a href="mailto:support@ads-personeelsapp.nl" style="color: #a5b4fc;">support@ads-personeelsapp.nl</a>
+    </p>
+  `;
+
+  const text = `
+Abonnement opgezegd - ADSPersoneelapp
+
+Hallo ${data.adminName},
+
+Je ADSPersoneelapp abonnement voor ${data.tenantName} is opgezegd.
+
+Wat betekent dit?
+- Toegang tot: ${data.endDate}
+- Na deze datum: Freemium (max 3 gebruikers)
+
+Je kunt de applicatie blijven gebruiken tot ${data.endDate}.
+
+Abonnement heractiveren: ${data.reactivateUrl}
+
+---
+ADSPersoneelapp
+${process.env.NEXT_PUBLIC_APP_URL || 'https://ads-personeelsapp.nl'}
+`;
+
+  return {
+    subject,
+    html: getEmailWrapper(content, `Je abonnement loopt af op ${data.endDate}`),
+    text,
+  };
+}
+
 export function getManagerEscalationEmail(data: {
   managerName: string;
   employees: Array<{ name: string; email: string; pendingDays: number }>;

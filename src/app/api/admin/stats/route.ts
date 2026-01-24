@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { prisma } from '@/lib/db/prisma';
 import { SubscriptionStatus } from '@/types';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-admin-stats");
 
 // GET /api/admin/stats - Get platform statistics (superuser only)
 export async function GET(request: NextRequest) {
@@ -248,7 +251,7 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Error fetching platform stats:', error);
+    logger.error("Error fetching platform stats", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -8,6 +8,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/auth';
 import { prisma } from '@/lib/db/prisma';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-expenses");
 
 // Dutch expense categories (seeded on first request if not exist)
 const DEFAULT_CATEGORIES = [
@@ -146,7 +149,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[Expenses API] GET error:', error);
+    logger.error("GET error", error);
     return NextResponse.json({ error: 'Failed to fetch expenses' }, { status: 500 });
   }
 }
@@ -262,7 +265,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[Expenses API] POST error:', error);
+    logger.error("POST error", error);
     return NextResponse.json({ error: 'Failed to create expense' }, { status: 500 });
   }
 }

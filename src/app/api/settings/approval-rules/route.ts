@@ -10,6 +10,9 @@ import {
 } from '@/lib/services/approval-rules-service';
 import { z } from 'zod';
 import { UserRole } from '@/types';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-approval-rules");
 
 const updateRulesSchema = z.object({
   timesheet: z.object({
@@ -75,7 +78,7 @@ export async function GET() {
       canEdit: context.userRole === 'TENANT_ADMIN',
     });
   } catch (error) {
-    console.error('Error fetching approval rules:', error);
+    logger.error("Error fetching approval rules", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -122,7 +125,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.error('Error updating approval rules:', error);
+    logger.error("Error updating approval rules", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -155,7 +158,7 @@ export async function DELETE() {
       rules,
     });
   } catch (error) {
-    console.error('Error resetting approval rules:', error);
+    logger.error("Error resetting approval rules", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

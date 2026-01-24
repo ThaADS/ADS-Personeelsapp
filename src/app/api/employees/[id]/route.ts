@@ -20,6 +20,9 @@ import {
   notFoundResponse,
   ErrorCodes,
 } from "@/lib/api/response";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-employees-id");
 
 /**
  * GET /api/employees/[id]
@@ -218,7 +221,7 @@ export async function GET(
       }
     });
   } catch (error) {
-    console.error("Error in employee GET:", error);
+    logger.error("Error in employee GET", error);
     return internalErrorResponse();
   }
 }
@@ -406,7 +409,7 @@ export async function PUT(
 
     return successResponse({ updated: true }, { message: "Werknemer succesvol bijgewerkt" });
   } catch (error) {
-    console.error("Error in employee PUT:", error);
+    logger.error("Error in employee PUT", error);
     return internalErrorResponse();
   }
 }

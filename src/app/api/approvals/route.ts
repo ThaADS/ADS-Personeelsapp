@@ -3,6 +3,9 @@ import { withPermission, createAuditLog, requirePermission } from "@/lib/auth/te
 import { tenantDb } from "@/lib/db/tenant-db";
 import { z } from "zod";
 import { timesheet_status } from "@prisma/client";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-approvals");
 
 // Type-safe helper for parsing audit log JSON values
 interface AuditLogNewValues {
@@ -210,7 +213,7 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Error in approvals GET:', error);
+    logger.error("Error in approvals GET", error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
@@ -240,7 +243,7 @@ export async function POST(request: NextRequest) {
           });
 
           if (!timesheet) {
-            console.warn(`Timesheet ${id} not found`);
+            logger.warn("Timesheet not found", { id });
             continue;
           }
 
@@ -261,7 +264,7 @@ export async function POST(request: NextRequest) {
 
           processedIds.push(id);
         } catch (error) {
-          console.error(`Error processing timesheet ${id}:`, error);
+          logger.error("Error processing timesheet", error, { id });
         }
       }
 
@@ -279,7 +282,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Error in approvals POST:', error);
+    logger.error("Error in approvals POST", error);
     if (error instanceof Error && error.message.includes('Permission denied')) {
       return NextResponse.json({ error: "Onvoldoende rechten" }, { status: 403 });
     }

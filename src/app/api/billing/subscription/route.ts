@@ -4,6 +4,9 @@ import { StripeSubscriptionService } from '@/lib/stripe/subscription-service';
 import { prisma } from '@/lib/db/prisma';
 import { canManageBilling } from '@/lib/rbac';
 import { z } from 'zod';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-billing-subscription");
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type StripeSubscription = any;
@@ -51,7 +54,7 @@ export async function GET(_request: NextRequest) {
         const stripeService = new StripeSubscriptionService();
         stripeSubscription = await stripeService.getSubscription(tenant.stripeSubscriptionId);
       } catch (error) {
-        console.error('Failed to fetch Stripe subscription:', error);
+        logger.error("Failed to fetch Stripe subscription", error);
       }
     }
 
@@ -111,7 +114,7 @@ export async function GET(_request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching subscription:', error);
+    logger.error("Error fetching subscription", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -178,7 +181,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    console.error('Error updating subscription:', error);
+    logger.error("Error updating subscription", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -229,7 +232,7 @@ export async function DELETE(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error canceling subscription:', error);
+    logger.error("Error canceling subscription", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

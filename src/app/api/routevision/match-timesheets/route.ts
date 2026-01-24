@@ -5,6 +5,9 @@ import {
   getMatchingStats,
   clearTimesheetMatches,
 } from "@/lib/services/trip-timesheet-matcher";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-routevision-match-timesheets");
 
 /**
  * GET /api/routevision/match-timesheets
@@ -36,7 +39,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error("Error getting matching stats:", error);
+    logger.error("Failed to get matching stats", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to get stats" },
       { status: 500 }
@@ -96,7 +99,7 @@ export async function POST(request: NextRequest) {
       details: result.results.slice(0, 20), // Limit detailed results
     });
   } catch (error) {
-    console.error("Error matching trips to timesheets:", error);
+    logger.error("Failed to match trips to timesheets", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Matching failed" },
       { status: 500 }
@@ -142,7 +145,7 @@ export async function DELETE(request: NextRequest) {
       cleared: clearedCount,
     });
   } catch (error) {
-    console.error("Error clearing timesheet matches:", error);
+    logger.error("Failed to clear timesheet matches", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Clear failed" },
       { status: 500 }

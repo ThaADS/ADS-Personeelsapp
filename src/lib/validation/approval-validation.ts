@@ -8,6 +8,9 @@
 import { VacationRequest, SickLeave } from "@/types";
 import { Timesheet } from "@prisma/client";
 import { differenceInMinutes, differenceInDays, isWeekend } from "date-fns";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("ApprovalValidation");
 
 // Interface voor validatieresultaten
 export interface ValidationResult {
@@ -148,7 +151,7 @@ export function validateTimesheet(timesheet: Timesheet): ValidationResult {
       errors,
     };
   } catch (error) {
-    console.error("Error validating timesheet:", error);
+    logger.error("Error validating timesheet", error);
     return {
       isValid: false,
       warnings,
@@ -233,7 +236,7 @@ export function validateVacationRequest(
       errors,
     };
   } catch (error) {
-    console.error("Error validating vacation request:", error);
+    logger.error("Error validating vacation request", error);
     return {
       isValid: false,
       warnings,
@@ -302,7 +305,7 @@ export function validateSickLeave(sickLeave: SickLeave): ValidationResult {
       errors,
     };
   } catch (error) {
-    console.error("Error validating sick leave:", error);
+    logger.error("Error validating sick leave", error);
     return {
       isValid: false,
       warnings,

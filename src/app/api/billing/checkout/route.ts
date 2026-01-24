@@ -3,6 +3,9 @@ import { auth } from '@/lib/auth/auth';
 import { StripeSubscriptionService } from '@/lib/stripe/subscription-service';
 import { z } from 'zod';
 import { canManageBilling } from '@/lib/rbac';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-billing-checkout");
 
 const checkoutSchema = z.object({
   userCount: z.number().min(1).max(100),
@@ -61,7 +64,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Checkout error:', error);
+    logger.error("Checkout error", error);
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

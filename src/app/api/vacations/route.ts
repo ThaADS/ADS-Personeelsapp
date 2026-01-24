@@ -5,6 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getTenantContext, createAuditLog, addTenantFilter } from "@/lib/auth/tenant-access";
 import { prisma } from "@/lib/db/prisma";
 import { z } from "zod";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-vacations");
 
 const vacationSchema = z.object({
   startDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
@@ -110,7 +113,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error in vacations GET:", error);
+    logger.error("Error in vacations GET", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }
@@ -208,7 +211,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Error in vacations POST:", error);
+    logger.error("Error in vacations POST", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }

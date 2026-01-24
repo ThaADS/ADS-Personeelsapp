@@ -12,6 +12,9 @@
  */
 
 import PDFDocument from "pdfkit";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("report-builder");
 import { prisma } from "@/lib/db/prisma";
 import { sendEmail } from "./email-service";
 
@@ -514,7 +517,7 @@ export async function buildAndSendMonthlyReport(config: ReportConfig): Promise<{
 
     return { success: true, emailsSent };
   } catch (error) {
-    console.error("Error building monthly report:", error);
+    logger.error("Error building monthly report", error, { tenantId: config.tenantId, reportType: config.reportType });
     return { success: false, emailsSent: 0, error: String(error) };
   }
 }
@@ -602,7 +605,7 @@ export async function processMonthlyReports(): Promise<{
       errors,
     };
   } catch (error) {
-    console.error("Error processing monthly reports:", error);
+    logger.error("Error processing monthly reports", error, { reportsGenerated, totalEmailsSent });
     return {
       success: false,
       reportsGenerated,

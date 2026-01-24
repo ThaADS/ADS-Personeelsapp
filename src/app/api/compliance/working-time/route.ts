@@ -4,6 +4,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/auth";
 import { LaborLawCheck } from "@/lib/services/compliance-service";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-compliance-working-time");
 
 // Arbeidstijdenwet regels
 const WORKING_TIME_RULES = {
@@ -48,7 +51,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(complianceChecks);
   } catch (error) {
-    console.error("Error in working-time GET:", error);
+    logger.error("Error in working-time GET", error);
     return NextResponse.json({ error: "Interne serverfout" }, { status: 500 });
   }
 }

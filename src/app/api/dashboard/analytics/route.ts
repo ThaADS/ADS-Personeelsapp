@@ -11,6 +11,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/lib/auth/auth';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-dashboard-analytics");
 
 interface WeeklyData {
   week: string;
@@ -377,7 +380,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('[Dashboard Analytics] Error:', error);
+    logger.error("Failed to fetch analytics", error);
     return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
   }
 }

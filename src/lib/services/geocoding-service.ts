@@ -9,6 +9,9 @@
  */
 
 import crypto from 'crypto';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("geocoding-service");
 
 // Types
 export interface GeoLocation {
@@ -262,7 +265,7 @@ async function queryPDOK(query: string): Promise<GeoLocation | null> {
     });
 
     if (!response.ok) {
-      console.warn('PDOK API error:', response.status);
+      logger.warn("PDOK API error", { status: response.status, query });
       return null;
     }
 
@@ -285,7 +288,7 @@ async function queryPDOK(query: string): Promise<GeoLocation | null> {
 
     return null;
   } catch (error) {
-    console.warn('PDOK geocoding failed:', error instanceof Error ? error.message : 'Unknown error');
+    logger.warn("PDOK geocoding failed", { query, error: error instanceof Error ? error.message : 'Unknown error' });
     return null;
   }
 }
@@ -318,7 +321,7 @@ async function queryNominatim(query: string): Promise<GeoLocation | null> {
     });
 
     if (!response.ok) {
-      console.warn('Nominatim API error:', response.status);
+      logger.warn("Nominatim API error", { status: response.status, query });
       return null;
     }
 
@@ -347,7 +350,7 @@ async function queryNominatim(query: string): Promise<GeoLocation | null> {
 
     return null;
   } catch (error) {
-    console.warn('Nominatim geocoding failed:', error instanceof Error ? error.message : 'Unknown error');
+    logger.warn("Nominatim geocoding failed", { query, error: error instanceof Error ? error.message : 'Unknown error' });
     return null;
   }
 }

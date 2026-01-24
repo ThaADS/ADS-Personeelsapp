@@ -3,6 +3,9 @@
  */
 
 import { ApprovalItem, ApprovalResponse, ApprovalActionPayload } from "@/types/approval";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("approval-service");
 import { validateApproval } from "@/lib/validation/approval-validation";
 
 /**
@@ -54,7 +57,7 @@ export async function fetchApprovals(
       pagination: data.pagination,
     };
   } catch (error) {
-    console.error("Error fetching approvals:", error);
+    logger.error("Error fetching approvals", error, { type, status, page, limit });
     throw error;
   }
 }
@@ -88,7 +91,7 @@ export async function processApprovals(
       }`,
     };
   } catch (error) {
-    console.error("Error processing approvals:", error);
+    logger.error("Error processing approvals", error, { action: payload.action, ids: payload.ids });
     throw error;
   }
 }

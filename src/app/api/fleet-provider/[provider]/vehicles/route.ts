@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { getTenantContext } from '@/lib/auth/tenant-access';
 import { FleetProviderType, FLEET_PROVIDERS } from '@/lib/services/fleet-providers/types';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('api-fleet-provider-vehicles');
 
 /**
  * GET /api/fleet-provider/[provider]/vehicles
@@ -57,7 +60,7 @@ export async function GET(
       }))
     );
   } catch (error) {
-    console.error('Fleet provider vehicles error:', error);
+    logger.error('Failed to get fleet provider vehicles', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to get vehicles' },
       { status: 500 }

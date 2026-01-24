@@ -5,6 +5,9 @@ import { UserRole, SubscriptionStatus } from '@/types';
 import { createTenantSlug, isSlugAvailable } from '@/lib/tenant';
 import { z } from 'zod';
 import { hash } from 'bcryptjs';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-admin-tenants");
 
 const createTenantSchema = z.object({
   name: z.string().min(1, 'Company name is required'),
@@ -123,7 +126,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching tenants:', error);
+    logger.error("Error fetching tenants", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -231,8 +234,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
-    console.error('Error creating tenant:', error);
+
+    logger.error("Error creating tenant", error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

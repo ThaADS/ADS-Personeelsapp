@@ -6,6 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createLogger } from '@/lib/logger';
+
+const logger = createLogger('CronAuth');
 
 export interface CronAuthResult {
   authorized: boolean;
@@ -31,11 +34,11 @@ export function verifyCronAuth(request: NextRequest): CronAuthResult {
   // CRON_SECRET is required in production
   if (!cronSecret) {
     if (isDevelopment) {
-      console.warn('[Cron Auth] CRON_SECRET not set - allowing in development mode');
+      logger.warn('CRON_SECRET not set - allowing in development mode');
       return { authorized: true };
     }
 
-    console.error('[Cron Auth] CRON_SECRET environment variable is not configured');
+    logger.error('CRON_SECRET environment variable is not configured');
     return {
       authorized: false,
       error: NextResponse.json(
@@ -61,7 +64,7 @@ export function verifyCronAuth(request: NextRequest): CronAuthResult {
   }
 
   // Unauthorized access attempt
-  console.warn('[Cron Auth] Unauthorized access attempt', {
+  logger.warn('Unauthorized access attempt', {
     ip: request.headers.get('x-forwarded-for') || 'unknown',
     userAgent: request.headers.get('user-agent'),
     path: url.pathname,

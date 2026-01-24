@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("api-stripe-checkout");
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-08-27.basil',
@@ -133,7 +136,7 @@ export async function POST(request: NextRequest) {
       url: session.url,
     });
   } catch (error) {
-    console.error('Stripe checkout error:', error);
+    logger.error("Stripe checkout error", error);
 
     if (error instanceof Stripe.errors.StripeError) {
       return NextResponse.json(
