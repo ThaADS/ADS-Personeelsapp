@@ -100,6 +100,53 @@
     "dark": "Dunkel",
     "system": "System"
   },
+  "expenses": {
+    "title": "Spesen",
+    "addExpense": "Spesen hinzufügen",
+    "category": "Kategorie",
+    "amount": "Betrag",
+    "date": "Datum",
+    "description": "Beschreibung",
+    "receipt": "Beleg",
+    "uploadReceipt": "Beleg hochladen",
+    "mileage": "Kilometerabrechnung",
+    "distance": "Entfernung",
+    "startLocation": "Startort",
+    "endLocation": "Zielort",
+    "roundTrip": "Hin- und Rückfahrt",
+    "status": "Status",
+    "pending": "Ausstehend",
+    "approved": "Genehmigt",
+    "rejected": "Abgelehnt",
+    "paid": "Bezahlt",
+    "categories": {
+      "travel": "Reisekosten",
+      "mileage": "Kilometerabrechnung",
+      "meals": "Mahlzeiten",
+      "office": "Bürobedarf",
+      "phone": "Telefon & Internet",
+      "training": "Schulung & Weiterbildung",
+      "representation": "Repräsentation",
+      "other": "Sonstiges"
+    }
+  },
+  "integrations": {
+    "title": "Integrationen",
+    "connected": "Verbunden",
+    "notConnected": "Nicht verbunden",
+    "connect": "Verbinden",
+    "disconnect": "Trennen",
+    "syncNow": "Jetzt synchronisieren",
+    "lastSync": "Letzte Synchronisierung",
+    "nmbrs": {
+      "title": "Nmbrs",
+      "description": "Synchronisieren Sie Ihre Mitarbeiterdaten mit dem Nmbrs Lohnabrechnungssystem"
+    },
+    "calendar": {
+      "title": "Kalender",
+      "description": "Verbinden Sie Ihren Google- oder Microsoft-Kalender"
+    }
+  },
   "common": {
     "save": "Speichern",
     "cancel": "Abbrechen",

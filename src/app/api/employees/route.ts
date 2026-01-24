@@ -340,6 +340,7 @@ export async function POST(request: NextRequest) {
         bankAccountName: validatedData.bankAccountName || null,
         bsnNumber: validatedData.bsnNumber || null,
         role: validatedData.role || "USER",
+        locale: validatedData.locale || "nl",
       },
     });
 

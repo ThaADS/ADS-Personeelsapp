@@ -100,6 +100,53 @@
     "dark": "Ciemny",
     "system": "Systemowy"
   },
+  "expenses": {
+    "title": "Wydatki",
+    "addExpense": "Dodaj wydatek",
+    "category": "Kategoria",
+    "amount": "Kwota",
+    "date": "Data",
+    "description": "Opis",
+    "receipt": "Paragon",
+    "uploadReceipt": "Prześlij paragon",
+    "mileage": "Zwrot kosztów podróży",
+    "distance": "Odległość",
+    "startLocation": "Miejsce rozpoczęcia",
+    "endLocation": "Miejsce docelowe",
+    "roundTrip": "Podróż w obie strony",
+    "status": "Status",
+    "pending": "Oczekujące",
+    "approved": "Zatwierdzone",
+    "rejected": "Odrzucone",
+    "paid": "Wypłacone",
+    "categories": {
+      "travel": "Koszty podróży",
+      "mileage": "Zwrot kosztów przebiegu",
+      "meals": "Posiłki",
+      "office": "Artykuły biurowe",
+      "phone": "Telefon i Internet",
+      "training": "Szkolenia i edukacja",
+      "representation": "Reprezentacja",
+      "other": "Inne"
+    }
+  },
+  "integrations": {
+    "title": "Integracje",
+    "connected": "Połączono",
+    "notConnected": "Nie połączono",
+    "connect": "Połącz",
+    "disconnect": "Rozłącz",
+    "syncNow": "Synchronizuj teraz",
+    "lastSync": "Ostatnia synchronizacja",
+    "nmbrs": {
+      "title": "Nmbrs",
+      "description": "Synchronizuj dane pracowników z systemem płac Nmbrs"
+    },
+    "calendar": {
+      "title": "Kalendarz",
+      "description": "Połącz swój kalendarz Google lub Microsoft"
+    }
+  },
   "common": {
     "save": "Zapisz",
     "cancel": "Anuluj",

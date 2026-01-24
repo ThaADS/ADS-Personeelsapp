@@ -100,6 +100,53 @@
     "dark": "Dark",
     "system": "System"
   },
+  "expenses": {
+    "title": "Expenses",
+    "addExpense": "Add expense",
+    "category": "Category",
+    "amount": "Amount",
+    "date": "Date",
+    "description": "Description",
+    "receipt": "Receipt",
+    "uploadReceipt": "Upload receipt",
+    "mileage": "Mileage reimbursement",
+    "distance": "Distance",
+    "startLocation": "Start location",
+    "endLocation": "End location",
+    "roundTrip": "Round trip",
+    "status": "Status",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "paid": "Paid",
+    "categories": {
+      "travel": "Travel expenses",
+      "mileage": "Mileage reimbursement",
+      "meals": "Meals",
+      "office": "Office supplies",
+      "phone": "Phone & Internet",
+      "training": "Training & Education",
+      "representation": "Representation",
+      "other": "Other"
+    }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "connected": "Connected",
+    "notConnected": "Not connected",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "syncNow": "Sync now",
+    "lastSync": "Last sync",
+    "nmbrs": {
+      "title": "Nmbrs",
+      "description": "Sync your employee data with Nmbrs payroll system"
+    },
+    "calendar": {
+      "title": "Calendar",
+      "description": "Connect your Google or Microsoft calendar"
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

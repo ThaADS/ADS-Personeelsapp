@@ -100,6 +100,53 @@
     "dark": "Donker",
     "system": "Systeem"
   },
+  "expenses": {
+    "title": "Declaraties",
+    "addExpense": "Declaratie toevoegen",
+    "category": "Categorie",
+    "amount": "Bedrag",
+    "date": "Datum",
+    "description": "Beschrijving",
+    "receipt": "Bon",
+    "uploadReceipt": "Bon uploaden",
+    "mileage": "Kilometervergoeding",
+    "distance": "Afstand",
+    "startLocation": "Startlocatie",
+    "endLocation": "Eindlocatie",
+    "roundTrip": "Retour",
+    "status": "Status",
+    "pending": "In behandeling",
+    "approved": "Goedgekeurd",
+    "rejected": "Afgewezen",
+    "paid": "Uitbetaald",
+    "categories": {
+      "travel": "Reiskosten",
+      "mileage": "Kilometervergoeding",
+      "meals": "Maaltijden",
+      "office": "Kantoorbenodigdheden",
+      "phone": "Telefoon & Internet",
+      "training": "Opleiding & Training",
+      "representation": "Representatie",
+      "other": "Overig"
+    }
+  },
+  "integrations": {
+    "title": "Integraties",
+    "connected": "Verbonden",
+    "notConnected": "Niet verbonden",
+    "connect": "Verbinden",
+    "disconnect": "Loskoppelen",
+    "syncNow": "Nu synchroniseren",
+    "lastSync": "Laatste synchronisatie",
+    "nmbrs": {
+      "title": "Nmbrs",
+      "description": "Synchroniseer uw personeelsgegevens met Nmbrs salarisadministratie"
+    },
+    "calendar": {
+      "title": "Agenda",
+      "description": "Koppel uw Google of Microsoft agenda"
+    }
+  },
   "common": {
     "save": "Opslaan",
     "cancel": "Annuleren",

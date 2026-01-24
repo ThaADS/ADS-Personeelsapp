@@ -96,6 +96,14 @@ const userRoleSchema = z.enum([
   'TENANT_ADMIN',
 ]).default('USER');
 
+// Locale/language preference
+const localeSchema = z.enum([
+  'nl',
+  'en',
+  'de',
+  'pl',
+]).default('nl');
+
 // Gender
 const genderSchema = z.enum([
   'MALE',
@@ -128,6 +136,9 @@ export const createEmployeeSchema = z.object({
 
   // Role and status
   role: userRoleSchema,
+
+  // Language preference
+  locale: localeSchema,
 
   // Contact info
   phone: phoneSchema,
@@ -204,6 +215,9 @@ export const updateEmployeeSchema = z.object({
   // Role and status
   role: userRoleSchema.optional(),
   isActive: z.boolean().optional(),
+
+  // Language preference
+  locale: localeSchema.optional(),
 
   // Employment details
   department: z.string().max(100).optional().nullable(),
