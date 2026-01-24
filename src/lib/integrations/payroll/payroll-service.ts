@@ -5,6 +5,7 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
+import { Prisma } from '@prisma/client';
 import { NmbrsAdapter } from './nmbrs-adapter';
 import type {
   PayrollProviderType,
@@ -115,7 +116,7 @@ export class PayrollService {
         },
       },
       update: {
-        credentials: encryptedCredentials as unknown as Record<string, unknown>,
+        credentials: encryptedCredentials as unknown as Prisma.InputJsonValue,
         display_name: options.displayName,
         sync_employees: options.syncEmployees,
         sync_hours: options.syncHours,
@@ -127,7 +128,7 @@ export class PayrollService {
       create: {
         tenant_id: this.tenantId,
         provider_type: providerType,
-        credentials: encryptedCredentials as unknown as Record<string, unknown>,
+        credentials: encryptedCredentials as unknown as Prisma.InputJsonValue,
         display_name: options.displayName || providerType.toUpperCase(),
         sync_employees: options.syncEmployees ?? true,
         sync_hours: options.syncHours ?? true,
@@ -375,7 +376,7 @@ export class PayrollService {
         records_synced: result.recordsSynced,
         records_failed: result.recordsFailed,
         error_message: result.errors?.[0]?.message,
-        error_details: result.errors as unknown as Record<string, unknown>,
+        error_details: result.errors as unknown as Prisma.InputJsonValue,
         completed_at: new Date(),
       },
     });

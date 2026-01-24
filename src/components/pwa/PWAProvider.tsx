@@ -11,14 +11,7 @@ interface PWAProviderProps {
 export function PWAProvider({ children }: PWAProviderProps) {
   const { updateAvailable, update } = useServiceWorker();
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
-
-  // Use toast for notifications (wrapped in try-catch for SSR safety)
-  let toast: ReturnType<typeof useToast> | null = null;
-  try {
-    toast = useToast();
-  } catch {
-    // Toast context not available during SSR
-  }
+  const toast = useToast();
 
   // Show update notification when available
   useEffect(() => {
@@ -26,7 +19,8 @@ export function PWAProvider({ children }: PWAProviderProps) {
       setShowUpdateBanner(true);
       toast?.info('Update beschikbaar', 'Er is een nieuwe versie van de app beschikbaar.');
     }
-  }, [updateAvailable, toast]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateAvailable]);
 
   return (
     <>

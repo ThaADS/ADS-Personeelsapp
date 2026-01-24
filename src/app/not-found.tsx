@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * Global 404 Not Found Page
  */
@@ -30,18 +32,17 @@ export default function NotFound() {
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild variant="default">
-            <Link href="/dashboard">
-              <Home className="w-4 h-4 mr-2" />
-              Naar dashboard
-            </Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="javascript:history.back()">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Ga terug
-            </Link>
-          </Button>
+          <Link href="/dashboard" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-purple-600 text-white hover:bg-purple-700 h-10 px-4 py-2">
+            <Home className="w-4 h-4 mr-2" />
+            Naar dashboard
+          </Link>
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 bg-transparent hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 h-10 px-4 py-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Ga terug
+          </button>
         </div>
 
         {/* Help Text */}

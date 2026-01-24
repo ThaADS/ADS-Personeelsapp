@@ -132,10 +132,10 @@ export class NmbrsAdapter implements PayrollProviderAdapter {
   private parseSoapResponse<T>(xml: string, method: string): T {
     // Simple XML parsing - in production, use a proper XML parser
     // This extracts the response body from the SOAP envelope
-    const responseMatch = xml.match(new RegExp(`<${method}Result>(.*?)</${method}Result>`, 's'));
+    const responseMatch = xml.match(new RegExp(`<${method}Result>([\\s\\S]*?)</${method}Result>`));
     if (!responseMatch) {
       // Check for fault
-      const faultMatch = xml.match(/<faultstring>(.*?)<\/faultstring>/s);
+      const faultMatch = xml.match(/<faultstring>([\s\S]*?)<\/faultstring>/);
       if (faultMatch) {
         throw new Error(`Nmbrs SOAP Fault: ${faultMatch[1]}`);
       }

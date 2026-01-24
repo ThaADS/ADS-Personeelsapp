@@ -63,9 +63,9 @@ export async function GET(request: NextRequest) {
           ? new Date(ts.endTime).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' })
           : '-';
         const totalHours = Number(ts.total_hours) || 0;
-        const breakMinutes = ts.break_duration || 0;
+        const breakMinutes = ts.break_minutes || 0;
         const status = ts.status;
-        const notes = (ts.notes || '').replace(/"/g, '""'); // Escape quotes
+        const notes = (ts.description || '').replace(/"/g, '""'); // Escape quotes
 
         csvContent += `"${date}","${startTime}","${endTime}",${totalHours.toFixed(2)},${breakMinutes},"${status}","${notes}"\n`;
       });
@@ -118,11 +118,11 @@ export async function GET(request: NextRequest) {
       csvContent += 'Type,Totaal,Opgenomen,Resterend\n';
       if (leaveBalance) {
         const statutoryTotal = Number(leaveBalance.statutory_days) || 0;
-        const statutoryUsed = Number(leaveBalance.used_statutory) || 0;
+        const statutoryUsed = Number(leaveBalance.statutory_used) || 0;
         csvContent += `"Wettelijk",${statutoryTotal.toFixed(1)},${statutoryUsed.toFixed(1)},${(statutoryTotal - statutoryUsed).toFixed(1)}\n`;
 
         const extraTotal = Number(leaveBalance.extra_days) || 0;
-        const extraUsed = Number(leaveBalance.used_extra) || 0;
+        const extraUsed = Number(leaveBalance.extra_used) || 0;
         csvContent += `"Bovenwettelijk",${extraTotal.toFixed(1)},${extraUsed.toFixed(1)},${(extraTotal - extraUsed).toFixed(1)}\n`;
 
         const compHours = Number(leaveBalance.compensation_hours) || 0;
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
         const days = Math.ceil(
           (new Date(v.end_date).getTime() - new Date(v.start_date).getTime()) / (1000 * 60 * 60 * 24)
         );
-        const reason = (v.reason || '').replace(/"/g, '""');
+        const reason = (v.description || '').replace(/"/g, '""');
         csvContent += `"${v.type}","${start}","${end}",${days},"${v.status}","${reason}"\n`;
       });
 
@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
         const endDateObj = s.end_date ? new Date(s.end_date) : new Date();
         const days = Math.ceil((endDateObj.getTime() - new Date(s.start_date).getTime()) / (1000 * 60 * 60 * 24));
         const uwvReported = s.uwv_reported ? 'Ja' : 'Nee';
-        const notes = (s.notes || '').replace(/"/g, '""');
+        const notes = (s.reason || '').replace(/"/g, '""');
         csvContent += `"${start}","${end}",${days},"${uwvReported}","${notes}"\n`;
       });
 
@@ -167,11 +167,14 @@ export async function GET(request: NextRequest) {
         },
         select: {
           id: true,
-          first_name: true,
-          last_name: true,
-          email: true,
           user_id: true,
-          department: true,
+          users: {
+            select: {
+              name: true,
+              email: true,
+              department: true,
+            },
+          },
         },
       });
 
@@ -217,9 +220,9 @@ export async function GET(request: NextRequest) {
           }),
         ]);
 
-        const name = `${member.first_name} ${member.last_name}`.trim() || 'Onbekend';
-        const email = member.email || '-';
-        const dept = (member.department || '-').replace(/"/g, '""');
+        const name = member.users?.name || 'Onbekend';
+        const email = member.users?.email || '-';
+        const dept = (member.users?.department || '-').replace(/"/g, '""');
         const hours = Number(totalHours._sum.total_hours) || 0;
 
         csvContent += `"${name}","${email}","${dept}",${hours.toFixed(2)},${pending},${approved},${rejected}\n`;

@@ -1,14 +1,11 @@
+'use client';
+
 /**
  * Offline Page
  * Shown when the user is offline and the requested page isn't cached
  */
 
 import { WifiIcon } from '@heroicons/react/24/outline';
-
-export const metadata = {
-  title: 'Offline - ADSPersoneelapp',
-  description: 'U bent momenteel offline',
-};
 
 export default function OfflinePage() {
   return (

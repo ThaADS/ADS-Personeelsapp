@@ -153,8 +153,8 @@ export async function GET() {
               statutory_days: true,
               extra_days: true,
               compensation_hours: true,
-              used_statutory: true,
-              used_extra: true,
+              statutory_used: true,
+              extra_used: true,
             },
           })
         : Promise.resolve(null),
@@ -259,8 +259,8 @@ export async function GET() {
     // Leave breakdown for pie chart
     const leaveBreakdown: LeaveBreakdown[] = [];
     if (leaveBalance) {
-      const remainingStatutory = (Number(leaveBalance.statutory_days) || 0) - (Number(leaveBalance.used_statutory) || 0);
-      const remainingExtra = (Number(leaveBalance.extra_days) || 0) - (Number(leaveBalance.used_extra) || 0);
+      const remainingStatutory = (Number(leaveBalance.statutory_days) || 0) - (Number(leaveBalance.statutory_used) || 0);
+      const remainingExtra = (Number(leaveBalance.extra_days) || 0) - (Number(leaveBalance.extra_used) || 0);
       const compensationHours = Number(leaveBalance.compensation_hours) || 0;
 
       if (remainingStatutory > 0) {
@@ -285,7 +285,7 @@ export async function GET() {
         });
       }
       // Add used days
-      const usedTotal = (Number(leaveBalance.used_statutory) || 0) + (Number(leaveBalance.used_extra) || 0);
+      const usedTotal = (Number(leaveBalance.statutory_used) || 0) + (Number(leaveBalance.extra_used) || 0);
       if (usedTotal > 0) {
         leaveBreakdown.push({
           type: 'Opgenomen',
@@ -316,9 +316,12 @@ export async function GET() {
         },
         select: {
           id: true,
-          first_name: true,
-          last_name: true,
           user_id: true,
+          users: {
+            select: {
+              name: true,
+            },
+          },
         },
         take: 10, // Limit to top 10
       });
@@ -356,7 +359,7 @@ export async function GET() {
         const approvalRate = totalCount > 0 ? Math.round((approvedCount / totalCount) * 100) : 100;
 
         return {
-          name: `${member.first_name} ${member.last_name}`.trim() || 'Onbekend',
+          name: member.users?.name || 'Onbekend',
           hours: Math.round((Number(monthTimesheets._sum.total_hours) || 0) * 10) / 10,
           approvalRate,
         };

@@ -4,7 +4,9 @@ import { StripeSubscriptionService } from '@/lib/stripe/subscription-service';
 import { prisma } from '@/lib/db/prisma';
 import { canManageBilling } from '@/lib/rbac';
 import { z } from 'zod';
-import type Stripe from 'stripe';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type StripeSubscription = any;
 
 const updateSubscriptionSchema = z.object({
   userCount: z.number().min(1).max(100).optional(),
@@ -41,7 +43,7 @@ export async function GET(_request: NextRequest) {
     }
 
     const currentSubscription = tenant.subscriptions[0];
-    let stripeSubscription: Stripe.Subscription | null = null;
+    let stripeSubscription: StripeSubscription | null = null;
 
     // Get Stripe subscription details if available
     if (tenant.stripeSubscriptionId) {
@@ -98,7 +100,7 @@ export async function GET(_request: NextRequest) {
       stripeSubscription: stripeSubscription ? {
         status: stripeSubscription.status,
         currentPeriodEnd: stripeSubscription.current_period_end || 0,
-        cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+        cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end ?? false,
       } : null,
       usage: {
         activeUsers: activeUserCount,
@@ -153,7 +155,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Get updated subscription
-    const updatedSubscription = await stripeService.getSubscription(tenant.stripeSubscriptionId);
+    const updatedSubscription: StripeSubscription = await stripeService.getSubscription(tenant.stripeSubscriptionId);
 
     return NextResponse.json({
       message: 'Subscription updated successfully',
@@ -210,7 +212,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const stripeService = new StripeSubscriptionService();
-    const canceledSubscription = await stripeService.cancelSubscription(
+    const canceledSubscription: StripeSubscription = await stripeService.cancelSubscription(
       tenant.stripeSubscriptionId,
       immediately
     );

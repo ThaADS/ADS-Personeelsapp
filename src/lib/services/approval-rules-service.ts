@@ -10,6 +10,7 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
+import { Prisma } from '@prisma/client';
 import { UserRole } from '@/types';
 
 // ============================================================================
@@ -212,7 +213,7 @@ export async function updateTenantApprovalRules(
       settings: {
         ...currentSettings,
         approvalRules: updatedRules,
-      },
+      } as unknown as Prisma.InputJsonValue,
     },
   });
 
@@ -224,7 +225,7 @@ export async function updateTenantApprovalRules(
       action: 'APPROVAL_RULES_UPDATED',
       resource: 'TenantSettings',
       resourceId: tenantId,
-      newValues: updatedRules as object,
+      newValues: updatedRules as unknown as Prisma.InputJsonValue,
     },
   });
 
@@ -249,7 +250,7 @@ export async function resetTenantApprovalRules(
   await prisma.tenant.update({
     where: { id: tenantId },
     data: {
-      settings: currentSettings,
+      settings: currentSettings as unknown as Prisma.InputJsonValue,
     },
   });
 
@@ -261,6 +262,7 @@ export async function resetTenantApprovalRules(
       action: 'APPROVAL_RULES_RESET',
       resource: 'TenantSettings',
       resourceId: tenantId,
+      oldValues: Prisma.JsonNull,
     },
   });
 

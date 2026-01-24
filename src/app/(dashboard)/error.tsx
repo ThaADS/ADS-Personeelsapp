@@ -57,12 +57,10 @@ export default function DashboardError({ error, reset }: ErrorProps) {
               <RefreshCw className="w-4 h-4 mr-2" />
               Probeer opnieuw
             </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Terug naar overzicht
-              </Link>
-            </Button>
+            <Link href="/dashboard" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 bg-transparent hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 h-10 px-4 py-2 w-full">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Terug naar overzicht
+            </Link>
           </div>
 
           {/* Help Text */}

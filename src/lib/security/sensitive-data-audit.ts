@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/db/prisma';
+import { Prisma } from '@prisma/client';
 import { headers } from 'next/headers';
 import { SENSITIVE_FIELDS } from './data-masking';
 
@@ -147,7 +148,7 @@ export async function logSensitiveDataAccess(params: {
         action: `SENSITIVE_DATA_${action}`,
         resource: resourceType,
         resourceId,
-        oldValues: null,
+        oldValues: Prisma.JsonNull,
         newValues: JSON.stringify({
           sensitiveFieldsAccessed: fieldsAccessed,
           unmaskedFields,
@@ -200,7 +201,7 @@ export async function logUnmaskedDataRequest(params: {
         action: 'SENSITIVE_DATA_UNMASK_REQUEST',
         resource: resourceType,
         resourceId,
-        oldValues: null,
+        oldValues: Prisma.JsonNull,
         newValues: JSON.stringify({
           requestedFields,
           grantedFields,
@@ -251,7 +252,7 @@ export async function logSensitiveDataExport(params: {
         action: 'SENSITIVE_DATA_EXPORT',
         resource: 'BulkExport',
         resourceId: `export_${Date.now()}`,
-        oldValues: null,
+        oldValues: Prisma.JsonNull,
         newValues: JSON.stringify({
           exportType,
           recordCount,

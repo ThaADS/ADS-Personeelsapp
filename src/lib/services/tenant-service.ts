@@ -390,7 +390,7 @@ export async function exportTenantData(tenantId: string): Promise<{
             phone_number: true,
             emergency_contact: true,
             emergency_phone: true,
-            createdAt: true,
+            created_at: true,
           },
         },
         leaveRequests: {
