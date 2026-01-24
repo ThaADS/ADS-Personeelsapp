@@ -6,13 +6,6 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig: NextConfig = {
   typescript: {
     tsconfigPath: './tsconfig.json',
-    // Ignore TypeScript errors during Vercel builds for now
-    ignoreBuildErrors: true,
-  },
-
-  // Ignore ESLint errors during Vercel builds for now
-  eslint: {
-    ignoreDuringBuilds: true,
   },
 
   // Performance optimizations
