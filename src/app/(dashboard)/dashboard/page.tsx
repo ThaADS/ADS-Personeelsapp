@@ -54,7 +54,9 @@ export default function DashboardPage() {
       try {
         const response = await fetch('/api/dashboard/stats');
         if (response.ok) {
-          const data = await response.json();
+          const result = await response.json();
+          // Handle both wrapped (success/data) and direct response formats
+          const data = result.data || result;
           setStats(data);
         }
       } catch (error) {

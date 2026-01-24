@@ -61,7 +61,9 @@ export default function VacationPage() {
         const errorData = await response.json();
         throw new Error(errorData.error || "Fout bij ophalen aanvragen");
       }
-      const data = await response.json();
+      const result = await response.json();
+      // Handle both wrapped (success/data) and direct response formats
+      const data = result.data || result;
       setRequests(data.items || []);
       setPagination(data.pagination || null);
     } catch (err) {

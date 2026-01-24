@@ -101,10 +101,12 @@ export default function EmployeesPage() {
         throw new Error('Fout bij ophalen werknemers');
       }
 
-      const data: EmployeesResponse = await response.json();
-      setEmployees(data.employees);
-      setDepartments(data.filters.departments);
-      setPagination(data.pagination);
+      const result = await response.json();
+      // Handle both wrapped (success/data) and direct response formats
+      const data: EmployeesResponse = result.data || result;
+      setEmployees(data.employees || []);
+      setDepartments(data.filters?.departments || []);
+      setPagination(data.pagination || { total: 0, page: 1, limit: 50, totalPages: 1 });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Onbekende fout');
     } finally {

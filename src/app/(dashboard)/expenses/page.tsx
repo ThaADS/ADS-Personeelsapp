@@ -298,12 +298,16 @@ export default function ExpensesPage() {
       ]);
 
       if (expensesRes.ok) {
-        const data = await expensesRes.json();
-        setExpenses(data.expenses);
+        const result = await expensesRes.json();
+        // Handle both wrapped (success/data) and direct response formats
+        const data = result.data || result;
+        setExpenses(data.expenses || []);
       }
       if (categoriesRes.ok) {
-        const data = await categoriesRes.json();
-        setCategories(data.categories);
+        const result = await categoriesRes.json();
+        // Handle both wrapped (success/data) and direct response formats
+        const data = result.data || result;
+        setCategories(data.categories || []);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
