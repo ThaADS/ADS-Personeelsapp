@@ -19,14 +19,116 @@ export interface GeoLocation {
   address?: string;
 }
 
-interface CacheEntry {
+interface LRUCacheEntry {
   location: GeoLocation;
   expiresAt: number;
 }
 
-// In-memory cache for geocoding results
-const geocodeCache = new Map<string, CacheEntry>();
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+/**
+ * LRU Cache implementation for geocoding results
+ * - Maximum size limit to prevent unbounded memory growth
+ * - TTL-based expiration for stale entries
+ * - Hit/miss tracking for monitoring
+ */
+class LRUCache {
+  private cache: Map<string, LRUCacheEntry>;
+  private readonly maxSize: number;
+  private readonly ttl: number;
+  private hits: number = 0;
+  private misses: number = 0;
+
+  constructor(maxSize: number = 1000, ttlMs: number = 24 * 60 * 60 * 1000) {
+    this.cache = new Map();
+    this.maxSize = maxSize;
+    this.ttl = ttlMs;
+  }
+
+  get(key: string): GeoLocation | null {
+    const entry = this.cache.get(key);
+
+    if (!entry) {
+      this.misses++;
+      return null;
+    }
+
+    // Check TTL expiration
+    if (entry.expiresAt <= Date.now()) {
+      this.cache.delete(key);
+      this.misses++;
+      return null;
+    }
+
+    // Move to end (most recently used) - Map iteration order is insertion order
+    this.cache.delete(key);
+    this.cache.set(key, entry);
+
+    this.hits++;
+    return { ...entry.location, source: 'cache' };
+  }
+
+  set(key: string, location: GeoLocation): void {
+    // If key exists, delete first to update position
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
+
+    // Evict oldest entries if at capacity
+    while (this.cache.size >= this.maxSize) {
+      // Map.keys().next() gets the first (oldest) key
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey) {
+        this.cache.delete(oldestKey);
+      }
+    }
+
+    this.cache.set(key, {
+      location,
+      expiresAt: Date.now() + this.ttl,
+    });
+  }
+
+  clear(): void {
+    this.cache.clear();
+    this.hits = 0;
+    this.misses = 0;
+  }
+
+  getStats(): { size: number; maxSize: number; hitRate: number; hits: number; misses: number } {
+    const total = this.hits + this.misses;
+    return {
+      size: this.cache.size,
+      maxSize: this.maxSize,
+      hitRate: total > 0 ? this.hits / total : 0,
+      hits: this.hits,
+      misses: this.misses,
+    };
+  }
+
+  // Periodic cleanup of expired entries
+  cleanup(): number {
+    const now = Date.now();
+    let cleaned = 0;
+
+    for (const [key, entry] of this.cache) {
+      if (entry.expiresAt <= now) {
+        this.cache.delete(key);
+        cleaned++;
+      }
+    }
+
+    return cleaned;
+  }
+}
+
+// LRU cache for geocoding results (max 1000 entries, 24h TTL)
+const geocodeCache = new LRUCache(1000, 24 * 60 * 60 * 1000);
+
+// Periodic cleanup every hour
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    geocodeCache.cleanup();
+  }, 60 * 60 * 1000);
+}
 
 // Rate limiting for external APIs
 let lastNominatimCall = 0;
@@ -100,28 +202,6 @@ const DUTCH_POSTAL_REGIONS: Record<string, [number, number]> = {
  */
 function getCacheKey(input: string): string {
   return crypto.createHash('md5').update(input.toLowerCase().trim()).digest('hex');
-}
-
-/**
- * Get from cache
- */
-function getFromCache(key: string): GeoLocation | null {
-  const entry = geocodeCache.get(key);
-  if (entry && entry.expiresAt > Date.now()) {
-    return { ...entry.location, source: 'cache' };
-  }
-  geocodeCache.delete(key);
-  return null;
-}
-
-/**
- * Save to cache
- */
-function saveToCache(key: string, location: GeoLocation): void {
-  geocodeCache.set(key, {
-    location,
-    expiresAt: Date.now() + CACHE_TTL,
-  });
 }
 
 /**
@@ -280,21 +360,21 @@ export async function geocodePostalCode(postalCode: string): Promise<GeoLocation
 
   const cacheKey = getCacheKey(`postal:${postalCode}`);
 
-  // Check cache
-  const cached = getFromCache(cacheKey);
+  // Check LRU cache
+  const cached = geocodeCache.get(cacheKey);
   if (cached) return cached;
 
   // Try PDOK first (Dutch-specific, faster for postal codes)
   const pdokResult = await queryPDOK(postalCode);
   if (pdokResult) {
-    saveToCache(cacheKey, pdokResult);
+    geocodeCache.set(cacheKey, pdokResult);
     return pdokResult;
   }
 
   // Fallback to lookup table for quick approximation
   const lookupResult = getFromLookupTable(postalCode);
   if (lookupResult) {
-    saveToCache(cacheKey, lookupResult);
+    geocodeCache.set(cacheKey, lookupResult);
     return lookupResult;
   }
 
@@ -309,21 +389,21 @@ export async function geocodeAddress(address: string): Promise<GeoLocation | nul
 
   const cacheKey = getCacheKey(`address:${address}`);
 
-  // Check cache
-  const cached = getFromCache(cacheKey);
+  // Check LRU cache
+  const cached = geocodeCache.get(cacheKey);
   if (cached) return cached;
 
   // Try PDOK first
   const pdokResult = await queryPDOK(address);
   if (pdokResult) {
-    saveToCache(cacheKey, pdokResult);
+    geocodeCache.set(cacheKey, pdokResult);
     return pdokResult;
   }
 
   // Fallback to Nominatim
   const nominatimResult = await queryNominatim(address);
   if (nominatimResult) {
-    saveToCache(cacheKey, nominatimResult);
+    geocodeCache.set(cacheKey, nominatimResult);
     return nominatimResult;
   }
 
@@ -390,9 +470,19 @@ export function clearGeocodingCache(): void {
 /**
  * Get cache statistics
  */
-export function getGeocachingStats(): { size: number; hitRate: number } {
-  return {
-    size: geocodeCache.size,
-    hitRate: 0, // Would need to track hits/misses for this
-  };
+export function getGeocachingStats(): {
+  size: number;
+  maxSize: number;
+  hitRate: number;
+  hits: number;
+  misses: number;
+} {
+  return geocodeCache.getStats();
+}
+
+/**
+ * Force cleanup of expired cache entries
+ */
+export function cleanupGeocodingCache(): number {
+  return geocodeCache.cleanup();
 }
