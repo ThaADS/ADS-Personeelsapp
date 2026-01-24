@@ -692,6 +692,86 @@ model VehicleMapping {
   @@map("vehicle_mappings")
 }
 
+// Expense Categories - Predefined categories for expense claims
+model ExpenseCategory {
+  id          String    @id @default(uuid()) @db.Uuid
+  tenant_id   String?   @db.Uuid // null = system default
+  name        String    // e.g., "Reiskosten", "Maaltijden", "Kantoorbenodigdheden"
+  code        String?   // Optional code for accounting integration
+  max_amount  Decimal?  @db.Decimal(10, 2) // Optional max per claim
+  requires_receipt Boolean @default(true)
+  is_mileage  Boolean   @default(false) // Special handling for km claims
+  is_active   Boolean   @default(true)
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  expenses    Expense[]
+
+  @@unique([tenant_id, name])
+  @@index([tenant_id], map: "idx_expense_category_tenant_id")
+  @@map("expense_categories")
+}
+
+// Expense Claims - Individual expense submissions
+model Expense {
+  id              String         @id @default(uuid()) @db.Uuid
+  tenant_id       String         @db.Uuid
+  employee_id     String         @db.Uuid
+  category_id     String         @db.Uuid
+
+  // Expense details
+  date            DateTime       @db.Date
+  amount          Decimal        @db.Decimal(10, 2)
+  currency        String         @default("EUR") @db.VarChar(3)
+  description     String
+  merchant        String?        // Store/vendor name
+
+  // Mileage-specific fields
+  is_mileage      Boolean        @default(false)
+  distance_km     Decimal?       @db.Decimal(10, 2)
+  rate_per_km     Decimal?       @db.Decimal(4, 2) // e.g., 0.23 EUR/km
+  from_location   String?
+  to_location     String?
+
+  // Receipt
+  receipt_url     String?
+  receipt_filename String?
+
+  // Project/Cost center allocation
+  project_code    String?        @db.VarChar(50)
+  cost_center     String?        @db.VarChar(50)
+
+  // Approval workflow
+  status          expense_status @default(DRAFT)
+  submitted_at    DateTime?      @db.Timestamptz(6)
+  reviewed_by     String?        @db.Uuid
+  reviewed_at     DateTime?      @db.Timestamptz(6)
+  rejection_reason String?
+
+  // Payment tracking
+  paid_at         DateTime?      @db.Timestamptz(6)
+  payment_reference String?
+
+  created_at      DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+
+  category        ExpenseCategory @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenant_id], map: "idx_expenses_tenant_id")
+  @@index([employee_id], map: "idx_expenses_employee_id")
+  @@index([status], map: "idx_expenses_status")
+  @@index([date], map: "idx_expenses_date")
+  @@map("expenses")
+}
+
+enum expense_status {
+  DRAFT      // Not yet submitted
+  SUBMITTED  // Awaiting approval
+  APPROVED   // Approved, awaiting payment
+  REJECTED   // Rejected by manager
+  PAID       // Reimbursed
+  CANCELLED  // Cancelled by employee
+}
+
 // Payroll Provider Configuration - Generic config for payroll integrations (Nmbrs, AFAS, etc)
 model PayrollProviderConfig {
   id              String    @id @default(uuid()) @db.Uuid
