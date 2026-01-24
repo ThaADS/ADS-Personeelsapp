@@ -5,6 +5,11 @@ import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import {
+  useKeyboardShortcuts,
+  KeyboardShortcutsDialog,
+  KeySequenceIndicator,
+} from "@/components/ui/keyboard-shortcuts";
 
 // Lazy load the chatbot component for better initial page load performance
 const FAQChatbot = lazy(() => import("@/components/chat/FAQChatbot"));
@@ -18,6 +23,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { showDialog, setShowDialog, currentSequence } = useKeyboardShortcuts();
 
   const handleLogout = useCallback(async () => {
     setIsLoggingOut(true);
@@ -96,6 +102,14 @@ export default function DashboardLayout({
             <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <div className="ml-3 relative">
                 <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setShowDialog(true)}
+                    className="hidden xl:flex items-center gap-1 px-2 py-1 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 bg-gray-100 dark:bg-white/10 rounded-md border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 transition-all"
+                    title="Sneltoetsen (druk op ?)"
+                  >
+                    <kbd className="font-mono">?</kbd>
+                    <span>Sneltoetsen</span>
+                  </button>
                   <ThemeToggle />
                   <span className="text-sm text-gray-700 dark:text-gray-300 font-medium hidden xl:inline">
                     {session?.user?.name} <span className="text-purple-600 dark:text-purple-400">({session?.user?.role})</span>
@@ -227,6 +241,10 @@ export default function DashboardLayout({
       <Suspense fallback={null}>
         <FAQChatbot />
       </Suspense>
+
+      {/* Keyboard Shortcuts */}
+      <KeyboardShortcutsDialog isOpen={showDialog} onClose={() => setShowDialog(false)} />
+      <KeySequenceIndicator sequence={currentSequence} />
     </div>
   );
 }

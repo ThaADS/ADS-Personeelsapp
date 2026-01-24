@@ -14,6 +14,7 @@ import {
   DocumentCheckIcon
 } from '@heroicons/react/24/outline';
 import { QuickClockIn, VacationBalance, TripsWidget, FleetTrackingFAQ } from '@/components/dashboard';
+import { SkeletonStatsCard } from '@/components/ui/skeleton';
 
 interface DashboardStats {
   // Basic stats
@@ -239,29 +240,36 @@ export default function DashboardPage() {
       <div>
         <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4">Mijn statistieken</h2>
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-          {statCards.map((stat, index) => (
-            <div
-              key={index}
-              className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border border-white/20 dark:border-purple-500/20 p-4 md:p-6 hover:shadow-xl hover:border-purple-500/30 dark:hover:border-purple-500/40 transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="flex items-center justify-between mb-3 md:mb-4">
-                <div className={`p-2 md:p-3 rounded-xl ${stat.color}`}>
-                  <stat.icon className="w-5 h-5 md:w-6 md:h-6" />
+          {isLoading ? (
+            // Skeleton loading state
+            Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonStatsCard key={i} className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 border-white/20 dark:border-purple-500/20" />
+            ))
+          ) : (
+            statCards.map((stat, index) => (
+              <div
+                key={index}
+                className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border border-white/20 dark:border-purple-500/20 p-4 md:p-6 hover:shadow-xl hover:border-purple-500/30 dark:hover:border-purple-500/40 transition-all duration-300 hover:-translate-y-1 animate-fade-in"
+              >
+                <div className="flex items-center justify-between mb-3 md:mb-4">
+                  <div className={`p-2 md:p-3 rounded-xl ${stat.color}`}>
+                    <stat.icon className="w-5 h-5 md:w-6 md:h-6" />
+                  </div>
+                  {stat.trend && (
+                    <span className="text-xs md:text-sm font-medium text-green-600 dark:text-green-400 flex items-center">
+                      <ArrowTrendingUpIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+                      {stat.trend}
+                    </span>
+                  )}
                 </div>
-                {stat.trend && (
-                  <span className="text-xs md:text-sm font-medium text-green-600 dark:text-green-400 flex items-center">
-                    <ArrowTrendingUpIcon className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-                    {stat.trend}
-                  </span>
-                )}
+                <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                  {stat.value}
+                  {stat.suffix}
+                </div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">{stat.name}</div>
               </div>
-              <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                {isLoading ? '...' : stat.value}
-                {stat.suffix}
-              </div>
-              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">{stat.name}</div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -269,32 +277,38 @@ export default function DashboardPage() {
       <div>
         <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4">Verlof & gezondheid</h2>
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-          {extendedStatCards.map((stat, index) => (
-            <div
-              key={index}
-              className={`backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border p-4 md:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
-                stat.highlight
-                  ? 'border-amber-400/50 dark:border-amber-500/50 ring-2 ring-amber-400/20 dark:ring-amber-500/20'
-                  : 'border-white/20 dark:border-purple-500/20 hover:border-purple-500/30 dark:hover:border-purple-500/40'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3 md:mb-4">
-                <div className={`p-2 md:p-3 rounded-xl ${stat.color}`}>
-                  <stat.icon className="w-5 h-5 md:w-6 md:h-6" />
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <SkeletonStatsCard key={i} className="backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 border-white/20 dark:border-purple-500/20" />
+            ))
+          ) : (
+            extendedStatCards.map((stat, index) => (
+              <div
+                key={index}
+                className={`backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border p-4 md:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in ${
+                  stat.highlight
+                    ? 'border-amber-400/50 dark:border-amber-500/50 ring-2 ring-amber-400/20 dark:ring-amber-500/20'
+                    : 'border-white/20 dark:border-purple-500/20 hover:border-purple-500/30 dark:hover:border-purple-500/40'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3 md:mb-4">
+                  <div className={`p-2 md:p-3 rounded-xl ${stat.color}`}>
+                    <stat.icon className="w-5 h-5 md:w-6 md:h-6" />
+                  </div>
+                  {stat.highlight && (
+                    <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-full">
+                      Let op
+                    </span>
+                  )}
                 </div>
-                {stat.highlight && (
-                  <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-full">
-                    Let op
-                  </span>
-                )}
+                <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                  {stat.value}
+                  {stat.suffix}
+                </div>
+                <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">{stat.name}</div>
               </div>
-              <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                {isLoading ? '...' : stat.value}
-                {stat.suffix}
-              </div>
-              <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">{stat.name}</div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -306,7 +320,7 @@ export default function DashboardPage() {
             {managerStatCards.map((stat, index) => (
               <div
                 key={index}
-                className={`backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border p-4 md:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${
+                className={`backdrop-blur-xl bg-white/80 dark:bg-slate-800/50 rounded-2xl shadow-lg border p-4 md:p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in ${
                   stat.highlight
                     ? 'border-red-400/50 dark:border-red-500/50 ring-2 ring-red-400/20 dark:ring-red-500/20'
                     : 'border-white/20 dark:border-purple-500/20 hover:border-purple-500/30 dark:hover:border-purple-500/40'
@@ -323,7 +337,7 @@ export default function DashboardPage() {
                   )}
                 </div>
                 <div className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                  {isLoading ? '...' : stat.value}
+                  {stat.value}
                   {stat.suffix}
                 </div>
                 <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400">{stat.name}</div>

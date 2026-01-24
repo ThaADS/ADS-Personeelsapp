@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import AuthSessionProvider from "@/components/providers/SessionProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { LocaleProvider } from "@/components/providers/LocaleProvider";
+import { ToastProvider } from "@/components/ui/toast";
 import LocaleSync from "@/components/providers/LocaleSync";
 import "./globals.css";
 
@@ -104,10 +105,12 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <LocaleProvider>
-            <AuthSessionProvider>
-              <LocaleSync />
-              {children}
-            </AuthSessionProvider>
+            <ToastProvider>
+              <AuthSessionProvider>
+                <LocaleSync />
+                {children}
+              </AuthSessionProvider>
+            </ToastProvider>
           </LocaleProvider>
         </ThemeProvider>
       </body>
