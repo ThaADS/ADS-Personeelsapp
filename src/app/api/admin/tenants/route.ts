@@ -33,20 +33,38 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(url.searchParams.get('limit') || '10');
     const search = url.searchParams.get('search') || '';
     const status = url.searchParams.get('status') || '';
+    const includeArchived = url.searchParams.get('includeArchived') === 'true';
 
     const skip = (page - 1) * limit;
 
     // Build where clause
     const where: Record<string, unknown> = {};
-    
-    if (search) {
+
+    // By default, exclude archived tenants unless explicitly requested
+    if (!includeArchived) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { contactEmail: { contains: search, mode: 'insensitive' } },
-        { contactName: { contains: search, mode: 'insensitive' } },
+        { isArchived: false },
+        { isArchived: null },
       ];
     }
-    
+
+    if (search) {
+      // Combine search with archived filter
+      const searchCondition = {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { contactEmail: { contains: search, mode: 'insensitive' } },
+          { contactName: { contains: search, mode: 'insensitive' } },
+        ],
+      };
+      if (where.OR) {
+        where.AND = [{ OR: where.OR }, searchCondition];
+        delete where.OR;
+      } else {
+        where.OR = searchCondition.OR;
+      }
+    }
+
     if (status) {
       where.subscriptionStatus = status;
     }
@@ -88,6 +106,10 @@ export async function GET(request: NextRequest) {
         subscriptionStatus: tenant.subscriptionStatus,
         currentPlan: tenant.currentPlan,
         trialEndsAt: tenant.trialEndsAt,
+        // Suspension and archive status
+        suspendedAt: (tenant as Record<string, unknown>).suspendedAt,
+        isArchived: (tenant as Record<string, unknown>).isArchived,
+        archivedAt: (tenant as Record<string, unknown>).archivedAt,
         activeUsers: tenant._count.tenantUsers,
         totalTimesheets: tenant._count.timesheets,
         subscription: tenant.subscriptions[0] || null,

@@ -24,6 +24,13 @@ model Tenant {
   stripeCustomerId     String?              @unique @map("stripe_customer_id")
   stripeSubscriptionId String?              @unique @map("stripe_subscription_id")
   trialEndsAt          DateTime?            @map("trial_ends_at") @db.Timestamptz(6)
+  // Suspension and archival tracking
+  suspendedAt          DateTime?            @map("suspended_at") @db.Timestamptz(6)
+  suspendedBy          String?              @map("suspended_by") @db.Uuid
+  suspensionReason     String?              @map("suspension_reason")
+  isArchived           Boolean?             @default(false) @map("is_archived")
+  archivedAt           DateTime?            @map("archived_at") @db.Timestamptz(6)
+  archivedBy           String?              @map("archived_by") @db.Uuid
   createdAt            DateTime?            @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt            DateTime?            @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   auditLogs            AuditLog[]
@@ -554,6 +561,7 @@ enum subscription_status {
   CANCELED
   PAST_DUE
   UNPAID
+  SUSPENDED
 }
 
 enum timesheet_status {

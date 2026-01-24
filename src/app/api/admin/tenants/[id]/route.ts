@@ -11,7 +11,7 @@ const updateTenantSchema = z.object({
   address: z.string().optional(),
   phone: z.string().optional(),
   domain: z.string().optional(),
-  subscriptionStatus: z.enum(['TRIAL', 'ACTIVE', 'FREEMIUM', 'CANCELED', 'PAST_DUE', 'UNPAID']).optional(),
+  subscriptionStatus: z.enum(['TRIAL', 'ACTIVE', 'FREEMIUM', 'CANCELED', 'PAST_DUE', 'UNPAID', 'SUSPENDED']).optional(),
   settings: z.object({}).optional(),
 });
 
@@ -88,6 +88,11 @@ export async function GET(
         subscriptionStatus: tenant.subscriptionStatus,
         currentPlan: tenant.currentPlan,
         trialEndsAt: tenant.trialEndsAt,
+        // Suspension and archive status
+        suspendedAt: (tenant as Record<string, unknown>).suspendedAt,
+        suspensionReason: (tenant as Record<string, unknown>).suspensionReason,
+        isArchived: (tenant as Record<string, unknown>).isArchived,
+        archivedAt: (tenant as Record<string, unknown>).archivedAt,
         settings: tenant.settings,
         createdAt: tenant.createdAt,
         updatedAt: tenant.updatedAt,

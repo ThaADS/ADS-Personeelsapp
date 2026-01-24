@@ -17,7 +17,8 @@ export enum SubscriptionStatus {
   FREEMIUM = 'FREEMIUM',
   CANCELED = 'CANCELED',
   PAST_DUE = 'PAST_DUE',
-  UNPAID = 'UNPAID'
+  UNPAID = 'UNPAID',
+  SUSPENDED = 'SUSPENDED'
 }
 
 export type VacationRequest = {
